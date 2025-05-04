@@ -1,0 +1,43 @@
+# Node modules (cả backend và client)
+client/node_modules/
+backend/node_modules/
+
+# Build output
+build/
+dist/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env
+.env.* 
+client/.env
+client/.env.*
+backend/.env
+backend/.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Mac specific
+.AppleDouble
+.LSOverride
+
+# React build
+client/build/
