@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 // Sử dụng router cho auth
-app.use('/api/auth', authRoutes);
+app.use('/api', authRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is running!');

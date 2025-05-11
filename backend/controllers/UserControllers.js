@@ -84,3 +84,70 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
     }
 };
+// Xóa người dùng
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params; // Lấy ID người dùng từ URL
+        const user = await User.findByIdAndDelete(id);
+
+        if (!user) {
+            return res.status(404).json({ message: "Không tìm thấy người dùng." });
+        }
+
+        res.status(200).json({ message: "Xóa người dùng thành công.", user });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi máy chủ.", error: error.message });
+    }
+};
+
+// Sửa thông tin người dùng
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params; // Lấy ID người dùng từ URL
+        const { hoTen, soDienThoai, trangThai, role } = req.body; // Lấy thông tin cần cập nhật từ body
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { hoTen, soDienThoai, trangThai, role },
+            { new: true, runValidators: true } // Trả về document sau khi cập nhật và kiểm tra validation
+        ).select("-matKhau");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Không tìm thấy người dùng." });
+        }
+
+        res.status(200).json({ message: "Cập nhật thông tin người dùng thành công.", updatedUser });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi máy chủ.", error: error.message });
+    }
+};
+// exports.getUsers = async (req, res) => {
+//     try {
+//         const users = await User.find().select("-matKhau"); // Lấy tất cả người dùng, loại bỏ trường mật khẩu
+//         res.status(200).json({ message: "Lấy danh sách người dùng thành công.", users });
+//     } catch (error) {
+//         res.status(500).json({ message: "Lỗi máy chủ.", error: error.message });
+//     }
+// };
+
+exports.getUsers = async (req, res) => {
+    try {
+        const { role, id } = req.user; // Lấy role và id từ middleware xác thực
+
+        let users;
+        if (role === "admin") {
+            // Nếu là admin, lấy tất cả người dùng
+            users = await User.find().select("-matKhau"); // Loại bỏ trường mật khẩu
+        } else {
+            // Nếu không phải admin, chỉ lấy thông tin của chính họ
+            users = await User.findById(id).select("-matKhau");
+            if (!users) {
+                return res.status(404).json({ message: "Không tìm thấy người dùng." });
+            }
+        }
+
+        res.status(200).json({ message: "Lấy danh sách người dùng thành công.", users });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi máy chủ.", error: error.message });
+    }
+};
