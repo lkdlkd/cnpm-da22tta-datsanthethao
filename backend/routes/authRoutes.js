@@ -12,6 +12,7 @@ router.post('/auth/register', register);
 router.post('/auth/login', login);
 // Endpoint San Bóng
 router.get('/danhsachsan',authenticate, sanBongController.layDanhSachSan);
+router.get('/sanbong/:id', authenticate, sanBongController.laySanTheoId);
 // Endpoint đặt sân
 router.post('/datsan', authenticate, datSanController.datSan);
 router.get('/danhsachdadat', authenticate, datSanController.getDatSanByUserId);
