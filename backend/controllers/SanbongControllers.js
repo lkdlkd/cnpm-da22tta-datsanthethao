@@ -42,3 +42,17 @@ exports.layDanhSachSan = async (req, res) => {
         res.status(500).json({ message: 'Lỗi máy chủ.', error });
     }
 };
+
+// Lấy thông tin sân theo id
+exports.laySanTheoId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const san = await SanBong.findById(id);
+        if (!san) {
+            return res.status(404).json({ message: 'Không tìm thấy sân bóng.' });
+        }
+        res.status(200).json(san);
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi máy chủ.', error });
+    }
+};

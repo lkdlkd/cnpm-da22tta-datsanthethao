@@ -4,7 +4,8 @@ const AutoIncrement = require('mongoose-sequence')(mongoose); // Import mongoose
 const SanBongSchema = new mongoose.Schema({
     _id: { type: Number }, // Đặt _id là kiểu Number để sử dụng AutoIncrement
     tenSan: { type: String, required: true },
-    loaiSan: { type: String, enum: ['5 người', '7 người', '11 người'], required: true },
+    Danhmuc: { type: String, required: true },
+    loaiSan: { type: String, enum: ['2 người','5 người', '7 người', '11 người'], required: true },
     diaChi: { type: String, required: true },
     hinhAnh: { type: String }, // Link ảnh sân
     giaTheoKhungGio: [{
