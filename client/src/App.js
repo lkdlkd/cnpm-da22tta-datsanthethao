@@ -1,38 +1,44 @@
-import React from "react";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./components/AuthContext";
 import { Login } from "./page/Login";
 import { Register } from "./page/Register";
+import LayoutUser from "./components/LayoutUser";
 import Home from "./page/Home";
-import Layout from "./components/Layout";
+import DatSan from "./page/User/DatSan";
+import Danhsachsan from "./page/User/Danhsachsan";
+import Danhsachsandadat from "./page/User/Danhsachsandadat";
+import Lienhe from "./page/User/Lienhe";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Routes khong co Layout */}
+          {/* Routes không có Layout */}
           <Route path="/dang-nhap" element={<Login />} />
           <Route path="/dang-ky" element={<Register />} />
 
-          {/* Routes có Layout */}
+          {/* Routes cho User Layout */}
           <Route
             path="/"
             element={
               <AuthContext.Consumer>
                 {({ auth }) =>
-                  auth.token ? <Layout /> : <Navigate to="/dang-nhap" />
+                  auth.token ? <LayoutUser /> : <Navigate to="/dang-nhap" />
                 }
               </AuthContext.Consumer>
             }
           >
-            <Route path="/" element={<Home />} />
-            <Route index element={<Navigate to="/" replace />} />
-            <Route path="#" element={<Home />} />
-
-            {/* tiếp*/}
-
+            <Route path="/home" element={<Home />} />
+            <Route index element={<Navigate to="/home" replace />} />
+            <Route path="/dat-san/:id" element={<DatSan />} />
+            <Route path="/danh-sach-san-da-dat" element={<Danhsachsandadat />} />
+            <Route path="/danh-sach-san" element={<Danhsachsan />} />
+            <Route path="/lien-he" element={<Lienhe />} />
           </Route>
+
+          
+
           {/* 404 Not Found */}
           <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
         </Routes>
@@ -40,5 +46,4 @@ function App() {
     </AuthProvider>
   );
 }
-
 export default App;

@@ -39,7 +39,7 @@ export const Login = () => {
       setTimeout(() => {
         setLoading(false);
         if (role === "admin") {
-          navigate("/dashboard");
+          navigate("/admin");
         } else {
           navigate("/");
         }
