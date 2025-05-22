@@ -1,15 +1,8 @@
-import React, { useRef } from "react";
+import React from "react";
 import ListSan from "../components/ListSan";
 import Tintuc from "./User/Tintuc";
 import Banner from "../components/user/Banner";
 const Home = () => {
-    const videoRef = useRef(null);
-
-    const handlePlay = () => {
-        if (videoRef.current) {
-            videoRef.current.play();
-        }
-    };
 
     return (
         <div>
