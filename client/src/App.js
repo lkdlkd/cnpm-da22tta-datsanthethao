@@ -1,14 +1,18 @@
+import React from "react";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./components/AuthContext";
 import { Login } from "./page/Login";
 import { Register } from "./page/Register";
-import LayoutUser from "./components/LayoutUser";
 import Home from "./page/Home";
+import Quanlykhachhang from "./page/Admin/Quanlykhachhang";
+import LayoutUser from "./components/LayoutUser";
+import LayoutAdmin from "./components/AdminLayout ";
+import Quanlysan from "./page/Admin/Quanlysan";
+import Quanlydatsan from "./page/Admin/Quanlydatsan";
 import DatSan from "./page/User/DatSan";
 import Danhsachsan from "./page/User/Danhsachsan";
 import Danhsachsandadat from "./page/User/Danhsachsandadat";
 import Lienhe from "./page/User/Lienhe";
-
 function App() {
   return (
     <AuthProvider>
@@ -37,7 +41,26 @@ function App() {
             <Route path="/lien-he" element={<Lienhe />} />
           </Route>
 
-          
+          {/* Routes cho Admin Layout */}
+          <Route
+            path="/admin"
+            element={
+              <AuthContext.Consumer>
+                {({ auth }) =>
+                  auth.token && auth.role === "admin" ? (
+                    <LayoutAdmin />
+                  ) : (
+                    <Navigate to="/dang-nhap" />
+                  )
+                }
+              </AuthContext.Consumer>
+            }
+          >
+            <Route path="/admin/quan-ly-khach-hang" element={<Quanlykhachhang />} />
+            <Route index element={<Navigate to="/admin/quan-ly-khach-hang" replace />} />
+            <Route path="/admin/quan-ly-san" element={<Quanlysan />} />
+            <Route path="/admin/quan-ly-dat-san" element={<Quanlydatsan />} />
+          </Route>
 
           {/* 404 Not Found */}
           <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
@@ -46,4 +69,5 @@ function App() {
     </AuthProvider>
   );
 }
+
 export default App;
