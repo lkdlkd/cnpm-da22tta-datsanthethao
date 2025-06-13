@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getDanhSachSan } from "../services/api"; // import hàm getDanhSachSan
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+const url = "http://localhost:5000"; // URL gốc của backend
 
 const ListSan = () => {
   const [fields, setFields] = useState([]);
@@ -51,8 +52,11 @@ const ListSan = () => {
                 <Card className="h-100 shadow-sm">
                   <Card.Img
                     variant="top"
-                    src={field.hinhAnh || "img/san1.jpg"}
-                    alt={field.tenSan || `Sân ${idx + 1}`}
+                    src={
+                      field.hinhAnh
+                        ? `${url}${field.hinhAnh}`
+                        : "https://via.placeholder.com/300x200.png?text=Hình+ảnh+chưa+có"
+                    } alt={field.tenSan || `Sân ${idx + 1}`}
                     style={{ objectFit: "cover", height: "200px" }}
                   />
                   <Card.Body>
