@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login,deleteUser,updateUser,getUsers } = require('../controllers/UserControllers');
+const { doiMatKhau,register, login,deleteUser,updateUser,getUsers ,capNhatThongTinCaNhan} = require('../controllers/UserControllers');
 const sanBongController = require('../controllers/SanbongControllers');
 const datSanController = require('../controllers/DatSanControllers');
 const { authenticate, authorizeAdmin} = require('../middlewares/authMiddleware');
@@ -29,5 +29,7 @@ router.delete("/xoauser/:id",authenticate,authorizeAdmin, deleteUser);
 // Route sửa thông tin người dùng
 router.put("/updateuser/:id", authenticate,authorizeAdmin, updateUser);
 router.get('/user', authenticate ,getUsers);
+router.put('/cap-nhat-thong-tin', authenticate, capNhatThongTinCaNhan);
+router.put("/doi-mat-khau", authenticate, doiMatKhau);
 
 module.exports = router;

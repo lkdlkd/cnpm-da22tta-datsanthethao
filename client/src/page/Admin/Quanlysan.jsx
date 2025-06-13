@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { getDanhSachSan, themSan, suaSan, xoaSan } from "../../services/api";
-import "../../App.css";
+import { getDanhSachSan, themSan, suaSan, xoaSan, uploadImage } from "../../services/api";
 import Swal from "sweetalert2";
+import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
 
+const url = "http://localhost:5000"; // URL gốc của backend
 const defaultForm = {
   tenSan: "",
   loaiSan: "5 người",
@@ -10,7 +13,7 @@ const defaultForm = {
   hinhAnh: "",
   giaTheoKhungGio: [],
   tinhTrang: "Đang hoạt động",
-  Danhmuc: "", // Đúng tên trường backend
+  Danhmuc: "",
 };
 
 const Quanlysan = () => {
@@ -20,6 +23,8 @@ const Quanlysan = () => {
   const [editField, setEditField] = useState(null);
   const [editForm, setEditForm] = useState(defaultForm);
   const [currentPage, setCurrentPage] = useState(1);
+  const [imageUrl, setImageUrl] = useState(""); // Lưu URL ảnh đã upload
+
   const pageSize = 10;
 
   // Lấy danh sách sân bóng
@@ -65,7 +70,7 @@ const Quanlysan = () => {
     setShowModal(true);
   };
 
-  // Xử lý thêm/sửa sân bóng với Swal
+  // Xử lý thêm/sửa sân bóng
   const handleUpdate = async (e) => {
     e.preventDefault();
     const isEdit = editField && editField._id;
@@ -83,7 +88,7 @@ const Quanlysan = () => {
         if (isEdit) {
           await suaSan(editField._id, editForm);
         } else {
-          await themSan(editForm); // Thêm dòng này để gọi API thêm sân
+          await themSan(editForm);
         }
         setShowModal(false);
         fetchFields();
@@ -95,6 +100,21 @@ const Quanlysan = () => {
       } catch (err) {
         Swal.fire("Lỗi!", "Lưu thất bại!", "error");
       }
+    }
+  };
+
+  // Tải ảnh lên
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const data = await uploadImage(file);
+      setEditForm({ ...editForm, hinhAnh: data.url });
+      setImageUrl(`${url}${data.url}`);
+      Swal.fire("Thành công!", "Ảnh đã được tải lên.", "success");
+    } catch (err) {
+      Swal.fire("Lỗi!", err.message || "Không thể tải ảnh lên.", "error");
     }
   };
 
@@ -119,151 +139,139 @@ const Quanlysan = () => {
 
   return (
     <main className="container py-4">
-      <h2 className="mb-4" style={{ fontSize: "2rem", fontWeight: 700 }}>
-        QUẢN LÍ SÂN BÓNG
+      <h2 className="mb-4 text-primary">
+        <i className="bi bi-house-door-fill me-2"></i>Quản lý sân bóng
       </h2>
-      <div className="mb-4 d-flex align-items-center">
-        <input
-          type="text"
-          className="form-control form-control-lg"
-          placeholder="Tìm kiếm sân bóng"
-          style={{ maxWidth: 400, fontSize: "1.1rem" }}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          className="btn btn-primary btn-lg ms-3"
-          style={{ fontSize: "1.1rem" }}
-          onClick={() => handleShowUpdate(null)}
-        >
-          Thêm sân
-        </button>
-      </div>
-      <div className="table-responsive">
-        <table
-          className="table table-bordered mb-0"
-          style={{ borderColor: "#999", fontSize: "1.15rem", minWidth: 1100 }}
-        >
-          <thead>
-            <tr style={{ fontSize: "1.1rem" }}>
-              <th>STT</th>
-              <th>ID Sân</th>
-              <th>Tên sân</th>
-              <th>Loại sân</th>
-              <th>Danh mục</th> {/* Thêm dòng này */}
-              <th>Địa chỉ</th>
-              <th>Hình ảnh</th>
-              <th>Khung giờ & Giá</th>
-              <th>Tình trạng</th>
-              <th>Chức năng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedFields.length === 0 ? (
+      <Card className="mb-4 shadow-sm">
+        <Card.Body>
+          <div className="d-flex justify-content-between align-items-center">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Tìm kiếm sân bóng"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ maxWidth: "400px" }}
+            />
+            <Button variant="primary" onClick={() => handleShowUpdate(null)}>
+              Thêm sân
+            </Button>
+          </div>
+        </Card.Body>
+      </Card>
+      <Card className="shadow-sm">
+        <Card.Body>
+          <Table striped bordered hover responsive>
+            <thead>
               <tr>
-                <td colSpan={10} className="text-center py-4" style={{ fontSize: "1.1rem" }}>
-                  Không có dữ liệu
-                </td>
+                <th>STT</th>
+                <th>ID Sân</th>
+                <th>Tên sân</th>
+                <th>Loại sân</th>
+                <th>Danh mục</th>
+                <th>Địa chỉ</th>
+                <th>Hình ảnh</th>
+                <th>Tình trạng</th>
+                <th>Chức năng</th>
               </tr>
-            ) : (
-              paginatedFields.map((field, idx) => (
-                <tr key={field._id || idx}>
-                  <td>{(currentPage - 1) * pageSize + idx + 1}</td>
-                  <td>{field._id}</td>
-                  <td className="fw-semibold">{field.tenSan}</td>
-                  <td>
-                    <span className="badge bg-info text-dark">{field.loaiSan}</span>
-                  </td>
-                  <td>{field.Danhmuc || ""}</td> {/* Hiển thị danh mục */}
-                  <td>{field.diaChi}</td>
-                  <td>
-                    {field.hinhAnh && (
-                      <img
-                        src={field.hinhAnh}
-                        alt={field.tenSan}
-                        className="rounded border"
-                        style={{ width: 90, height: 60, objectFit: "cover" }}
-                      />
-                    )}
-                  </td>
-                  <td>
-                    <ul className="mb-0 ps-3" style={{ fontSize: "1rem" }}>
-                      {field.giaTheoKhungGio?.map((g, i) => (
-                        <li key={i}>
-                          <span className="fw-semibold">{g.khungGio}</span> -{" "}
-                          {g.gia?.toLocaleString()}đ -{" "}
-                          <span
-                            className={
-                              "badge " +
-                              (g.Trangthai === "Còn sân"
-                                ? "bg-success"
-                                : "bg-danger")
-                            }
-                          >
-                            {g.Trangthai}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td>
-                    <span
-                      className={
-                        "badge px-2 py-1 " +
-                        (field.tinhTrang === "Đang hoạt động"
-                          ? "bg-success"
-                          : "bg-warning")
-                      }
-                    >
-                      {field.tinhTrang}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-warning me-2"
-                      onClick={() => handleShowUpdate(field)}
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDelete(field._id)}
-                    >
-                      Xóa
-                    </button>
+            </thead>
+            <tbody>
+              {paginatedFields.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center text-muted">
+                    Không có dữ liệu
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Phân trang */}
+              ) : (
+                paginatedFields.map((field, idx) => (
+                  <tr key={field._id || idx}>
+                    <td>{(currentPage - 1) * pageSize + idx + 1}</td>
+                    <td>{field._id}</td>
+                    <td>{field.tenSan}</td>
+                    <td>{field.loaiSan}</td>
+                    <td>{field.Danhmuc}</td>
+                    <td>{field.diaChi}</td>
+                    <td>
+                      {field.hinhAnh && (
+                        <img
+                          src={`${url}${field.hinhAnh}`}
+                          alt={field.tenSan}
+                          className="rounded"
+                          style={{ width: 80, height: 50, objectFit: "cover" }}
+                        />
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`badge ${field.tinhTrang === "Đang hoạt động"
+                            ? "bg-success"
+                            : "bg-warning"
+                          }`}
+                      >
+                        {field.tinhTrang}
+                      </span>
+                    </td>
+                    <td>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        onClick={() => handleShowUpdate(field)}
+                      >
+                        Sửa
+                      </Button>{" "}
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDelete(field._id)}
+                      >
+                        Xóa
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
       {totalPages > 1 && (
         <nav className="mt-3">
           <ul className="pagination justify-content-center">
             <li className={`page-item${currentPage === 1 ? " disabled" : ""}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
+              <Button
+                variant="link"
+                className="page-link"
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
                 &laquo;
-              </button>
+              </Button>
             </li>
             {Array.from({ length: totalPages }, (_, i) => (
               <li
                 key={i}
-                className={`page-item${currentPage === i + 1 ? " active" : ""}`}
+                className={`page-item${currentPage === i + 1 ? " active" : ""
+                  }`}
               >
-                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>
+                <Button
+                  variant="link"
+                  className="page-link"
+                  onClick={() => setCurrentPage(i + 1)}
+                >
                   {i + 1}
-                </button>
+                </Button>
               </li>
             ))}
-            <li className={`page-item${currentPage === totalPages ? " disabled" : ""}`}>
-              <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
+            <li
+              className={`page-item${currentPage === totalPages ? " disabled" : ""
+                }`}
+            >
+              <Button
+                variant="link"
+                className="page-link"
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
                 &raquo;
-              </button>
+              </Button>
             </li>
           </ul>
         </nav>
@@ -328,15 +336,23 @@ const Quanlysan = () => {
                   />
                 </div>
                 <div className="mb-2">
-                  <label className="form-label">Hình ảnh (URL)</label>
+                  <label className="form-label">Hình ảnh</label>
                   <input
-                    type="text"
+                    type="file"
                     className="form-control"
-                    value={editForm.hinhAnh}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, hinhAnh: e.target.value })
-                    }
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e)}
                   />
+                  {editForm.hinhAnh && (
+                    <img
+                      //src={`${url}${san?.hinhAnh}`}
+
+                      src={`${url}${editForm.hinhAnh}`} // Sử dụng editForm.hinhAnh thay vì san?.hinhAnh
+                      alt="Preview"
+                      className="mt-2 rounded border"
+                      style={{ width: 90, height: 60, objectFit: "cover" }}
+                    />
+                  )}
                 </div>
                 <div className="mb-2">
                   <label className="form-label">Tình trạng</label>

@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db'); // Import connectDB
 const authRoutes = require('./routes/authRoutes'); // Import authRoutes
+const path = require("path");
+const uploadRouter = require("./upload"); // Import router từ upload.js
 
 const app = express();
 
@@ -13,8 +15,12 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+// Middleware để phục vụ file tĩnh (nếu cần)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Sử dụng router cho auth
 app.use('/api', authRoutes);
+app.use("/api", uploadRouter);
 
 app.get('/', (req, res) => {
     res.send('Server is running!');

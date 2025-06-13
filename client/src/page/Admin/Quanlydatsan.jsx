@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getDanhSachDaDat, adminXacNhanDatSan } from "../../services/api";
 import Swal from "sweetalert2";
-import "../../App.css";
+import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
 
 const Quanlydatsan = () => {
   const [datSans, setDatSans] = useState([]);
@@ -120,171 +122,174 @@ const Quanlydatsan = () => {
 
   return (
     <main className="container py-4">
-      <h2 className="mb-4" style={{ fontSize: "2.2rem", fontWeight: 700 }}>
-        <i className="bi bi-calendar-check me-2"></i>QUẢN LÝ ĐẶT SÂN
+      <h2 className="mb-4 text-primary">
+        <i className="bi bi-calendar-check me-2"></i>Quản lý đặt sân
       </h2>
-      <div className="mb-3 row g-2 align-items-center">
-        <div className="col-auto">
-          <input
-            type="text"
-            className="form-control form-control-lg"
-            placeholder="Tìm kiếm theo tên sân, khách, SĐT"
-            style={{ minWidth: 340, fontSize: "1.2rem" }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-      <div className="table-responsive rounded shadow-sm">
-        <table
-          className="table table-hover align-middle mb-0"
-          style={{ fontSize: "1.25rem", minWidth: 1200 }}
-        >
-          <thead className="table-light">
-            <tr style={{ fontSize: "1.15rem" }}>
-              <th>STT</th>
-              <th>Tên sân</th>
-              <th>Loại sân</th>
-              <th>Mã khách</th>
-              <th>Địa chỉ sân</th>
-              <th>Khung giờ</th>
-              <th>Ngày đặt</th>
-              <th>Ghi chú</th>
-              <th>Trạng thái</th>
-              <th>thanh toán</th>
-              <th>Chức năng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="text-center text-muted py-4"
-                  style={{ fontSize: "1.15rem" }}
-                >
-                  Không có dữ liệu
-                </td>
+      <Card className="mb-4 shadow-sm">
+        <Card.Body>
+          <div className="d-flex justify-content-between align-items-center">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Tìm kiếm theo tên sân, khách, SĐT"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ maxWidth: "400px" }}
+            />
+          </div>
+        </Card.Body>
+      </Card>
+      <Card className="shadow-sm">
+        <Card.Body>
+          <Table striped bordered hover responsive>
+            <thead className="table-light">
+              <tr style={{ fontSize: "1.15rem" }}>
+                <th>STT</th>
+                <th>Tên sân</th>
+                <th>Loại sân</th>
+                <th>Mã khách</th>
+                <th>Địa chỉ sân</th>
+                <th>Khung giờ</th>
+                <th>Ngày đặt</th>
+                <th>Ghi chú</th>
+                <th>Trạng thái</th>
+                <th>thanh toán</th>
+                <th>Chức năng</th>
               </tr>
-            ) : (
-              paginated.map((item, idx) => (
-                <tr key={item._id || idx}>
-                  <td>{(currentPage - 1) * pageSize + idx + 1}</td>
-                  <td className="fw-semibold">{item.sanBong?.tenSan}</td>
-                  <td>
-                    <span className="badge bg-info text-dark">
-                      {item.sanBong?.loaiSan}
-                    </span>
-                  </td>
-                  <td>
-                    {item.nguoiDat?.hoTen}
-                    <br />
-                    <span className="text-muted small">
-                      {item.nguoiDat?.email}
-                    </span>
-                    <br />
-                    <span className="text-muted small">
-                      {item.nguoiDat?.soDienThoai}
-                    </span>
-                  </td>
-                  <td>{item.sanBong?.diaChi}</td>
-                  <td>
-                    <span className="badge bg-secondary">{item.khungGio}</span>
-                  </td>
-                  <td>
-                    {item.ngayDat
-                      ? new Date(item.ngayDat).toLocaleDateString("vi-VN")
-                      : ""}
-                  </td>
-                  <td>
-                    {item.ghiChu || "Không có ghi chú"}
-                    <br />
-                    {item.trangThai === "Đã hủy" && (
-                      <span className="text-danger">
-                        Đặt sân đã bị hủy
-                      </span>
-                    )}
-                  </td>
-                  <td>
-                    <span
-                      className={
-                        "badge px-2 py-1 " +
-                        (item.trangThai === "Đã xác nhận" || item.daXacNhan
-                          ? "bg-success"
-                          : item.trangThai === "Đã hủy"
-                          ? "bg-danger"
-                          : "bg-warning text-dark")
-                      }
-                    >
-                      {item.trangThai === "Đã xác nhận" || item.daXacNhan
-                        ? "Đã xác nhận"
-                        : item.trangThai === "Đã hủy"
-                        ? "Đã hủy"
-                        : "Chờ xác nhận"}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={
-                        "badge px-2 py-1 me-2 " +
-                        (item.trangThaiThanhToan === "Đã thanh toán"
-                          ? "bg-success"
-                          : item.trangThaiThanhToan === "Chưa thanh toán"
-                          ? "bg-danger"
-                          : "bg-warning text-dark")
-                      }
-                      style={{ cursor: "pointer" }}
-                      title="Bấm để cập nhật trạng thái thanh toán"
-                      onClick={() =>
-                        handleUpdateThanhToan(
-                          item,
-                          item.trangThaiThanhToan === "Đã thanh toán"
-                            ? "Chưa thanh toán"
-                            : "Đã thanh toán"
-                        )
-                      }
-                    >
-                      {item.trangThaiThanhToan || "Chưa thanh toán"}
-                    </span>
-                    {item.trangThaiThanhToan !== "Đã thanh toán" && (
-                      <button
-                        type="button"
-                        className="btn btn-success btn-sm"
-                        style={{ fontSize: "1.1rem" }}
-                        onClick={() => handleUpdateThanhToan(item, "Đã thanh toán")}
-                      >
-                        Đã thanh toán
-                      </button>
-                    )}
-                  </td>
-                  <td>
-                    {!item.daXacNhan && item.trangThai !== "Đã hủy" && (
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-primary"
-                        style={{ fontSize: "1.1rem" }}
-                        onClick={() => handleAction(item._id, item, "xacnhan")}
-                      >
-                        Xác nhận
-                      </button>
-                    )}
-                    {item.daXacNhan && item.trangThai !== "Đã hủy" && (
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-danger"
-                        style={{ fontSize: "1.1rem" }}
-                        onClick={() => handleAction(item._id, item, "huy")}
-                      >
-                        Hủy xác nhận
-                      </button>
-                    )}
+            </thead>
+            <tbody>
+              {paginated.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="text-center text-muted py-4"
+                    style={{ fontSize: "1.15rem" }}
+                  >
+                    Không có dữ liệu
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                paginated.map((item, idx) => (
+                  <tr key={item._id || idx}>
+                    <td>{(currentPage - 1) * pageSize + idx + 1}</td>
+                    <td className="fw-semibold">{item.sanBong?.tenSan}</td>
+                    <td>
+                      <span className="badge bg-info text-dark">
+                        {item.sanBong?.loaiSan}
+                      </span>
+                    </td>
+                    <td>
+                      {item.nguoiDat?.hoTen}
+                      <br />
+                      <span className="text-muted small">
+                        {item.nguoiDat?.email}
+                      </span>
+                      <br />
+                      <span className="text-muted small">
+                        {item.nguoiDat?.soDienThoai}
+                      </span>
+                    </td>
+                    <td>{item.sanBong?.diaChi}</td>
+                    <td>
+                      <span className="badge bg-secondary">{item.khungGio}</span>
+                    </td>
+                    <td>
+                      {item.ngayDat
+                        ? new Date(item.ngayDat).toLocaleDateString("vi-VN")
+                        : ""}
+                    </td>
+                    <td>
+                      {item.ghiChu || "Không có ghi chú"}
+                      <br />
+                      {item.trangThai === "Đã hủy" && (
+                        <span className="text-danger">
+                          Đặt sân đã bị hủy
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={
+                          "badge " +
+                          (item.trangThai === "Đã xác nhận" || item.daXacNhan
+                            ? "bg-success"
+                            : item.trangThai === "Đã hủy"
+                              ? "bg-danger"
+                              : "bg-warning text-dark")
+                        }
+                      >
+                        {item.trangThai === "Đã xác nhận" || item.daXacNhan
+                          ? "Đã xác nhận"
+                          : item.trangThai === "Đã hủy"
+                            ? "Đã hủy"
+                            : "Chờ xác nhận"}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={
+                          "badge " +
+                          (item.trangThaiThanhToan === "Đã thanh toán"
+                            ? "bg-success"
+                            : item.trangThaiThanhToan === "Chưa thanh toán"
+                              ? "bg-danger"
+                              : "bg-warning text-dark")
+                        }
+                        style={{ cursor: "pointer" }}
+                        title="Bấm để cập nhật trạng thái thanh toán"
+                        onClick={() =>
+                          handleUpdateThanhToan(
+                            item,
+                            item.trangThaiThanhToan === "Đã thanh toán"
+                              ? "Chưa thanh toán"
+                              : "Đã thanh toán"
+                          )
+                        }
+                      >
+                        {item.trangThaiThanhToan || "Chưa thanh toán"}
+                      </span>
+                      {/* {item.trangThaiThanhToan !== "Đã thanh toán" && (
+                        <Button
+                          className="mt-1"
+                          variant={
+                            item.trangThaiThanhToan === "Đã thanh toán"
+                              ? "success"
+                              : "danger"
+                          }
+                          size="sm"
+                          onClick={() => handleUpdateThanhToan(item, "Đã thanh toán")}
+                        >
+                          Đã thanh toán
+                        </Button>
+                      )} */}
+                    </td>
+                    <td>
+                      {!item.daXacNhan && item.trangThai !== "Đã hủy" && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleAction(item._id, item, "xacnhan")}
+                        >
+                          Xác nhận
+                        </Button>
+                      )}
+                      {item.daXacNhan && item.trangThai !== "Đã hủy" && (
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleAction(item._id, item, "huy")}
+                        >
+                          Hủy xác nhận
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
       {/* Phân trang */}
       {totalPages > 1 && (
         <nav className="mt-3">
@@ -300,9 +305,8 @@ const Quanlydatsan = () => {
             {Array.from({ length: totalPages }, (_, i) => (
               <li
                 key={i}
-                className={`page-item${
-                  currentPage === i + 1 ? " active" : ""
-                }`}
+                className={`page-item${currentPage === i + 1 ? " active" : ""
+                  }`}
               >
                 <button
                   className="page-link"
@@ -313,9 +317,8 @@ const Quanlydatsan = () => {
               </li>
             ))}
             <li
-              className={`page-item${
-                currentPage === totalPages ? " disabled" : ""
-              }`}
+              className={`page-item${currentPage === totalPages ? " disabled" : ""
+                }`}
             >
               <button
                 className="page-link"

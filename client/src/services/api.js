@@ -137,3 +137,38 @@ export const getUsers = async () => {
         throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
     }
 };
+
+export const uploadImage = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await API.post('/upload', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        return response.data; // Trả về URL của ảnh đã upload
+    } catch (error) {
+        throw error.response ? error.response.data : { message: 'Lỗi khi tải ảnh lên' };
+    }
+};
+
+export const capNhatThongTinCaNhan = async (data) => {
+    try {
+        const response = await API.put('/cap-nhat-thong-tin', data);
+        return response.data; // Trả về thông tin đã cập nhật
+    } catch (error) {
+        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
+    }
+};
+
+export const doiMatKhau = async (data) => {
+    try {
+        const response = await API.put('/doi-mat-khau', data); // Gửi yêu cầu đổi mật khẩu
+        return response.data; // Trả về kết quả đổi mật khẩu
+    } catch (error) {
+        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
+    }
+};
