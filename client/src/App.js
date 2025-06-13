@@ -13,6 +13,7 @@ import DatSan from "./page/User/DatSan";
 import Danhsachsan from "./page/User/Danhsachsan";
 import Danhsachsandadat from "./page/User/Danhsachsandadat";
 import Lienhe from "./page/User/Lienhe";
+import Thongtincanhan from "./page/User/Thongtincanhan";
 function App() {
   return (
     <AuthProvider>
@@ -39,6 +40,7 @@ function App() {
             <Route path="/danh-sach-san-da-dat" element={<Danhsachsandadat />} />
             <Route path="/danh-sach-san" element={<Danhsachsan />} />
             <Route path="/lien-he" element={<Lienhe />} />
+            <Route path="/thong-tin-ca-nhan" element={<Thongtincanhan />} />
           </Route>
 
           {/* Routes cho Admin Layout */}

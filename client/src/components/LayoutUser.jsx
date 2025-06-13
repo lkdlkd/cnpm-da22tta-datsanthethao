@@ -19,8 +19,8 @@ const Layout = () => {
     return (
         <>
            <Header users={users} />
-            <div className="pc-container">
-                <div className="pc-content">
+            <div className="containner">
+                <div className="">
                     {/* Truyền users vào các router con nếu cần */}
                     <Outlet context={{ users }} />
                 </div>

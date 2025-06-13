@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getSanTheoId, datSan } from "../../services/api"; // import hàm datSan
+import { getSanTheoId, datSan } from "../../services/api";
 import Swal from "sweetalert2";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+
+const url = "http://localhost:5000"; // URL gốc của backend
 
 const DatSan = () => {
   const { id } = useParams();
@@ -22,6 +26,7 @@ const DatSan = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -31,10 +36,9 @@ const DatSan = () => {
         ghiChu: form.ghiChu,
       });
 
-      // Lấy giá tiền theo khung giờ đã chọn
       let amount = 0;
       if (san?.giaTheoKhungGio && form.khungGio) {
-        const khung = san.giaTheoKhungGio.find(g => g.khungGio === form.khungGio);
+        const khung = san.giaTheoKhungGio.find((g) => g.khungGio === form.khungGio);
         amount = khung?.gia || 0;
       }
 
@@ -42,16 +46,27 @@ const DatSan = () => {
         icon: "success",
         title: "Đặt sân thành công!",
         html: `
-        <div>
-          <p>Vui lòng quét mã QR để thanh toán:</p>
-          <img
-            src="https://img.vietqr.io/image/ACB-7997211-qronly2.jpg?accountName=${encodeURIComponent('LE KHANH DANG')}&accountNumber=${encodeURIComponent('7997211')}&amount=${encodeURIComponent(amount)}&addInfo=${encodeURIComponent('Đặt sân bóng')}&bankCode=${encodeURIComponent('ACB')}&orderId=${encodeURIComponent('123456789')}"
-            alt="QR CODE"
-            width="250"
-            style="margin: 0 auto; display: block;"
-          />
-        </div>
-      `,
+          <div>
+            <p>Vui lòng quét mã QR để thanh toán:</p>
+            <img
+              src="https://img.vietqr.io/image/ACB-7997211-qronly2.jpg?accountName=${encodeURIComponent(
+                "LE KHANH DANG"
+              )}&accountNumber=${encodeURIComponent(
+                "7997211"
+              )}&amount=${encodeURIComponent(
+                amount
+              )}&addInfo=${encodeURIComponent(
+                "Đặt sân bóng - " + (san?.tenSan || "Sân bóng")
+              )}&bankCode=${encodeURIComponent(
+                "ACB"
+              )}&orderId=${encodeURIComponent("123456789")}"
+
+              alt="QR CODE"
+              width="250"
+              style="margin: 0 auto; display: block;"
+            />
+          </div>
+        `,
         showConfirmButton: true,
         confirmButtonText: "Đã thanh toán",
       });
@@ -69,17 +84,17 @@ const DatSan = () => {
       <div className="row gx-5 gy-4 align-items-stretch">
         {/* Cột 1: Ảnh và thông tin sân */}
         <div className="col-md-6 mb-4 mb-md-0">
-          <div className="card shadow border-0 h-100">
-            <img
-              src={san?.hinhAnh || "img/san1.jpg"}
-              className="img-fluid rounded-top"
+          <Card className="shadow border-0 h-100">
+            <Card.Img
+              variant="top"
+              src={`${url}${san?.hinhAnh}`}
               alt={san?.tenSan || "Sân bóng"}
               style={{ objectFit: "cover", height: 320, width: "100%" }}
             />
-            <div className="card-body">
-              <h4 className="card-title text-primary fw-bold mb-2">
+            <Card.Body>
+              <Card.Title className="text-primary fw-bold mb-2">
                 {san?.tenSan || "Sân bóng đá"}
-              </h4>
+              </Card.Title>
               <ul className="list-unstyled text-muted small mb-2">
                 <li>
                   <i className="bi bi-geo-alt-fill text-danger"></i>{" "}
@@ -96,8 +111,7 @@ const DatSan = () => {
                       san.giaTheoKhungGio.map((g, i) => (
                         <li key={i}>
                           <span className="fw-bold text-dark">{g.khungGio}</span>:{" "}
-                          <span className="fw-bold text-primary">{g.gia?.toLocaleString()}đ</span>
-                          {" "}
+                          <span className="fw-bold text-primary">{g.gia?.toLocaleString()}đ</span>{" "}
                           <span className="text-muted small">({g.Trangthai})</span>
                         </li>
                       ))
@@ -114,14 +128,15 @@ const DatSan = () => {
                 <span className="badge bg-info bg-opacity-10 text-info fw-normal">🚲 Bãi đỗ xe</span>
                 <span className="badge bg-secondary bg-opacity-10 text-secondary fw-normal">🚗 Bãi đỗ xe oto</span>
               </div>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
         </div>
+
         {/* Cột 2: Form */}
         <div className="col-md-6 d-flex flex-column">
-          <div className="card shadow border-0 h-100">
-            <div className="card-body">
-              <h4 className="fw-bold mb-3 text-primary">Gửi yêu cầu đặt sân</h4>
+          <Card className="shadow border-0 h-100">
+            <Card.Body>
+              <Card.Title className="fw-bold mb-3 text-primary">Gửi yêu cầu đặt sân</Card.Title>
               <form
                 id="bookingForm"
                 className="d-flex flex-column gap-3"
@@ -143,10 +158,10 @@ const DatSan = () => {
                     ))
                   ) : (
                     <>
-                      <option>6h - 8h</option>
-                      <option>8h - 10h</option>
+                      <option>Không có giờ</option>
+                      {/* <option>8h - 10h</option>
                       <option>16h - 18h</option>
-                      <option>20h - 22h</option>
+                      <option>20h - 22h</option> */}
                     </>
                   )}
                 </select>
@@ -158,15 +173,16 @@ const DatSan = () => {
                   value={form.ghiChu}
                   onChange={handleChange}
                 ></textarea>
-                <button
+                <Button
                   type="submit"
-                  className="btn btn-primary w-100 fw-bold py-2 mt-2"
+                  variant="primary"
+                  className="w-100 fw-bold py-2 mt-2"
                 >
                   Đặt sân
-                </button>
+                </Button>
               </form>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
     </div>
