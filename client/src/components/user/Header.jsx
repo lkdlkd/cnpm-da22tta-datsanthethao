@@ -49,8 +49,8 @@ const Header = ({ users }) => {
             <a href="/danh-sach-san" className="nav-link">Danh sách sân bãi</a>
             <a href="/danh-sach-san-da-dat" className="nav-link">Danh sách sân đã đặt</a>
 
-            <a href="#" className="nav-link">Giới thiệu</a>
-            <a href="#" className="nav-link">Chính sách</a>
+            <a href="/gioi-thieu" className="nav-link">Giới thiệu</a>
+            <a href="/chinh-sach" className="nav-link">Chính sách</a>
             <a href="/lien-he" className="nav-link">Liên hệ</a>
           </nav>
         </div>
@@ -178,8 +178,8 @@ const Header = ({ users }) => {
             <a href="/danh-sach-san" className="nav-link">Danh sách sân bãi</a>
             <a href="/danh-sach-san-da-dat" className="nav-link">Danh sách sân đã đặt</a>
 
-            <a href="#" className="nav-link">Giới thiệu</a>
-            <a href="#" className="nav-link">Chính sách</a>
+            <a href="/gioi-thieu" className="nav-link">Giới thiệu</a>
+            <a href="/chinh-sach" className="nav-link">Chính sách</a>
             <a href="/lien-he" className="nav-link">Liên hệ</a>
           </nav>
           <form className="mt-3 px-3" onSubmit={handleSearch}>
