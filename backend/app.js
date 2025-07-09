@@ -5,6 +5,9 @@ const connectDB = require('./config/db'); // Import connectDB
 const authRoutes = require('./routes/authRoutes'); // Import authRoutes
 const path = require("path");
 const uploadRouter = require("./routes/upload"); // Import router từ upload.js
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+const YAML = require('yaml');
 
 const app = express();
 
@@ -18,9 +21,16 @@ app.use(express.json());
 // Middleware để phục vụ file tĩnh (nếu cần)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Đọc file swagger.yaml
+const swaggerFile = fs.readFileSync(path.join(__dirname, 'swagger.yaml'), 'utf8');
+const swaggerDocument = YAML.parse(swaggerFile);
+
 // Sử dụng router cho auth
 app.use('/api', authRoutes);
 app.use("/api", uploadRouter);
+
+// Thêm route swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => {
     res.send('Server is running!');
