@@ -4,7 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db'); // Import connectDB
 const authRoutes = require('./routes/authRoutes'); // Import authRoutes
 const path = require("path");
-const uploadRouter = require("./upload"); // Import router từ upload.js
+const uploadRouter = require("./routes/upload"); // Import router từ upload.js
 
 const app = express();
 

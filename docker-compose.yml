@@ -1,0 +1,20 @@
+version: '3'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules  # ngăn node_modules từ máy host ghi đè
+    env_file:
+      - ./backend/.env
+    restart: always
+
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+    restart: always
