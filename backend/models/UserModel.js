@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // Đổi sang bcryptjs
 const AutoIncrement = require('mongoose-sequence')(mongoose); // Import mongoose-sequence
 
 const userSchema = new mongoose.Schema({
