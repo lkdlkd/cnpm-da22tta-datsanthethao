@@ -8,11 +8,15 @@ const uploadRouter = require("./routes/upload"); // Import router từ upload.js
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 const YAML = require('yaml');
+const { startSanBongCronJob } = require('./controllers/cronResetSanBong');
 
 const app = express();
 
 // Kết nối cơ sở dữ liệu
 connectDB();
+
+// Khởi động cronjob reset trạng thái sân
+startSanBongCronJob();
 
 // Middleware
 app.use(cors());

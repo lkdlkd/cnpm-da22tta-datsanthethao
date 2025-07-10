@@ -11,10 +11,21 @@ const Header = ({ users }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getDanhSachSan().then((data) => {
-      const list = Array.from(new Set((data || []).map((f) => f.Danhmuc).filter(Boolean)));
-      setDanhMucList(list);
-    });
+    getDanhSachSan()
+      .then((data) => {
+        const list = Array.from(new Set((data || []).map((f) => f.Danhmuc).filter(Boolean)));
+        setDanhMucList(list);
+      })
+      .catch((err) => {
+        console.log(err?.status);
+        // Nếu lỗi liên quan token hết hạn hoặc không hợp lệ thì đăng xuất
+        if (
+          err?.status === 401 || err?.status === 403
+        ) {
+          localStorage.removeItem("token");
+          window.location.href = "/dang-nhap";
+        }
+      });
   }, []);
 
   const handleSearch = (e) => {
@@ -90,9 +101,8 @@ const Header = ({ users }) => {
               </span>
               {isDropdownOpen && (
                 <div
-                  className={`position-absolute bg-white shadow border rounded ${
-                    window.innerWidth < 768 ? "w-100 mt-2" : ""
-                  }`}
+                  className={`position-absolute bg-white shadow border rounded ${window.innerWidth < 768 ? "w-100 mt-2" : ""
+                    }`}
                   style={{
                     inset: window.innerWidth < 768 ? "auto auto auto auto" : "0px 0px auto auto",
                     margin: 0,
@@ -167,7 +177,7 @@ const Header = ({ users }) => {
         >
           <i className="bi bi-list fs-3"></i>
         </button>
-        
+
       </div>
 
       {/* Mobile Menu */}
@@ -194,7 +204,7 @@ const Header = ({ users }) => {
               Tìm kiếm
             </button>
           </form>
-          
+
         </div>
       )}
 

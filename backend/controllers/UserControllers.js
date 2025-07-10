@@ -66,7 +66,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role }, // Thêm role vào payload của token
             process.env.JWT_SECRET || "secretkey", // Sử dụng biến môi trường cho khóa bí mật
-            { expiresIn: "1d" } // Token hết hạn sau 1 ngày
+            { expiresIn: "7d" } // Token hết hạn sau 7 ngày
         );
         res.status(200).json({
             message: "Đăng nhập thành công",
