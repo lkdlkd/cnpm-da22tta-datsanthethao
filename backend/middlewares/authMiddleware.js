@@ -5,7 +5,9 @@ exports.authenticate = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1]; // Lấy token từ header Authorization
 
     if (!token) {
-        return res.status(401).json({ message: "Bạn chưa đăng nhập" });
+        return res.status(401).json({
+            status: 401, message: "Bạn chưa đăng nhập"
+        });
     }
 
     try {
@@ -13,7 +15,10 @@ exports.authenticate = (req, res, next) => {
         req.user = decoded; // Lưu thông tin user vào request
         next();
     } catch (error) {
-        return res.status(403).json({ message: "Token không hợp lệ" });
+        return res.status(403).json({
+            status: 403,
+            message: "Token không hợp lệ"
+        });
     }
 };
 
