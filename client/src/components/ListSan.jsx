@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getDanhSachSan } from "../services/api"; // import hàm getDanhSachSan
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-const url = "http://localhost:5000"; // URL gốc của backend
+const url = process.env.REACT_APP_API_URL || "http://localhost:5000"; // URL gốc của backend
 
 const ListSan = () => {
   const [fields, setFields] = useState([]);
