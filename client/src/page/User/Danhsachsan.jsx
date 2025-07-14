@@ -4,7 +4,7 @@ import { getDanhSachSan } from "../../services/api";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 
-const url = "http://localhost:5000"; // URL gốc của backend
+const url = process.env.REACT_APP_API_URL || "http://localhost:5000"; // URL gốc của backend
 
 const Danhsachsan = () => {
   const [fields, setFields] = useState([]);

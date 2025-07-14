@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Cấu hình base URL cho API
 const API = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+    baseURL: `${process.env.REACT_APP_API_URL}/api` || 'http://localhost:5000/api',
 });
 
 // Thêm token vào header nếu có
