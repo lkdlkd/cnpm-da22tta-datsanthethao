@@ -18,6 +18,7 @@ router.put('/:id', authenticate, authorize(['admin']), fieldController.updateFie
 router.delete('/:id', authenticate, authorize(['admin']), fieldController.deleteField);
 
 // Image upload routes
+router.post('/:id/upload', authenticate, authorize(['admin']), upload.array('images', 10), fieldController.uploadFieldImages);
 router.post('/:id/images', authenticate, authorize(['admin']), upload.array('images', 10), fieldController.uploadFieldImages);
 router.delete('/:id/images', authenticate, authorize(['admin']), fieldController.deleteFieldImage);
 router.put('/:id/images/reorder', authenticate, authorize(['admin']), fieldController.updateFieldImagesOrder);

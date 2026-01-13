@@ -5,7 +5,7 @@ const path = require('path');
 // Lấy danh sách tất cả sân (có phân trang)
 exports.getAllFields = async (req, res) => {
     try {
-        const { fieldType, status, minPrice, maxPrice, location, search, page , limit  } = req.query;
+        const { fieldType, status, minPrice, maxPrice, location, search, page, limit } = req.query;
         
         let query = {};
         
@@ -26,6 +26,12 @@ exports.getAllFields = async (req, res) => {
             query.pricePerHour = {};
             if (minPrice) query.pricePerHour.$gte = Number(minPrice);
             if (maxPrice) query.pricePerHour.$lte = Number(maxPrice);
+        }
+
+        // Nếu không có phân trang, trả về tất cả
+        if (!page || !limit) {
+            const fields = await Field.find(query).sort({ createdAt: -1 });
+            return res.json({ data: fields });
         }
 
         // Tính toán phân trang
@@ -144,7 +150,7 @@ exports.uploadFieldImages = async (req, res) => {
 
         // Tạo URLs cho các ảnh đã upload
         const imageUrls = req.files.map(file => {
-            return `/uploads/fields/${file.filename}`;
+            return `http://localhost:5000/uploads/fields/${file.filename}`;
         });
 
         // Thêm URLs vào mảng images của sân

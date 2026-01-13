@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Container, 
-    Row, 
-    Col, 
-    Table, 
-    Button, 
-    Modal, 
-    Form, 
+import {
+    Container,
+    Row,
+    Col,
+    Table,
+    Button,
+    Modal,
+    Form,
     InputGroup,
     Badge,
     Card,
@@ -39,6 +39,10 @@ const Quanlysan = () => {
         status: 'active'
     });
 
+    const [imageLinks, setImageLinks] = useState(['']);
+    const [uploadMode, setUploadMode] = useState('link'); // 'link' or 'file'
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
     useEffect(() => {
         fetchFields();
     }, []);
@@ -59,7 +63,7 @@ const Quanlysan = () => {
         setModalMode(mode);
         setError('');
         setSuccess('');
-        
+
         if (mode === 'edit' && field) {
             setCurrentField(field);
             setFormData({
@@ -73,6 +77,7 @@ const Quanlysan = () => {
                 images: Array.isArray(field.images) ? field.images.join(', ') : '',
                 status: field.status
             });
+            setImageLinks(Array.isArray(field.images) && field.images.length > 0 ? field.images : ['']);
         } else {
             setCurrentField(null);
             setFormData({
@@ -86,6 +91,7 @@ const Quanlysan = () => {
                 images: '',
                 status: 'active'
             });
+            setImageLinks(['']);
         }
         setShowModal(true);
     };
@@ -104,17 +110,120 @@ const Quanlysan = () => {
         });
     };
 
+    const handleImageLinkChange = (index, value) => {
+        const newLinks = [...imageLinks];
+        newLinks[index] = value;
+        setImageLinks(newLinks);
+    };
+
+    const addImageLink = () => {
+        setImageLinks([...imageLinks, '']);
+    };
+
+    const removeImageLink = (index) => {
+        if (imageLinks.length > 1) {
+            const newLinks = imageLinks.filter((_, i) => i !== index);
+            setImageLinks(newLinks);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setSelectedFiles([...selectedFiles, ...files]);
+    };
+
+    const removeFile = (index) => {
+        const newFiles = selectedFiles.filter((_, i) => i !== index);
+        setSelectedFiles(newFiles);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
+            let imageUrls = [];
+
+            // Xử lý theo chế độ upload
+            if (uploadMode === 'link') {
+                imageUrls = imageLinks.map(img => img.trim()).filter(img => img);
+            } else if (uploadMode === 'file' && selectedFiles.length > 0) {
+                // Upload files lên server
+                const formDataUpload = new FormData();
+                selectedFiles.forEach(file => {
+                    formDataUpload.append('images', file);
+                });
+
+                if (modalMode === 'edit' && currentField) {
+                    // EDIT MODE: Upload vào sân đang sửa (backend tự động lưu)
+                    await fieldService.uploadFieldImages(
+                        currentField._id,
+                        formDataUpload
+                    );
+                    
+                    // Backend đã lưu images rồi, chỉ cần update thông tin khác (không gửi images)
+                    const dataToSend = {
+                        name: formData.name,
+                        fieldType: formData.fieldType,
+                        location: formData.location,
+                        address: formData.address,
+                        description: formData.description,
+                        pricePerHour: Number(formData.pricePerHour),
+                        facilities: formData.facilities.split(',').map(f => f.trim()).filter(f => f),
+                        status: formData.status
+                        // Không gửi images vì đã upload xong
+                    };
+                    
+                    await fieldService.updateField(currentField._id, dataToSend);
+                    setSuccess('Cập nhật sân thành công!');
+                    await fetchFields();
+                    handleCloseModal();
+                    setTimeout(() => setSuccess(''), 3000);
+                    setLoading(false);
+                    return;
+                } else {
+                    // ADD MODE: Tạo sân mới trước, sau đó upload ảnh
+                    const response = await fieldService.createField({
+                        name: formData.name,
+                        fieldType: formData.fieldType,
+                        location: formData.location,
+                        address: formData.address,
+                        description: formData.description,
+                        pricePerHour: Number(formData.pricePerHour),
+                        facilities: formData.facilities.split(',').map(f => f.trim()).filter(f => f),
+                        status: formData.status,
+                        images: []
+                    });
+
+                    // Upload ảnh cho field vừa tạo (backend tự động lưu images)
+                    if (response.data.data && response.data.data._id) {
+                        await fieldService.uploadFieldImages(
+                            response.data.data._id,
+                            formDataUpload
+                        );
+                    }
+
+                    setSuccess('Thêm sân thành công!');
+                    await fetchFields();
+                    handleCloseModal();
+                    setTimeout(() => setSuccess(''), 3000);
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // Chế độ link URL (không upload file)
             const dataToSend = {
-                ...formData,
+                name: formData.name,
+                fieldType: formData.fieldType,
+                location: formData.location,
+                address: formData.address,
+                description: formData.description,
                 pricePerHour: Number(formData.pricePerHour),
                 facilities: formData.facilities.split(',').map(f => f.trim()).filter(f => f),
-                images: formData.images.split(',').map(img => img.trim()).filter(img => img)
+                status: formData.status,
+                images: imageUrls
             };
 
             if (modalMode === 'add') {
@@ -164,7 +273,7 @@ const Quanlysan = () => {
 
     const filteredFields = fields.filter(field => {
         const matchSearch = field.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          field.location.toLowerCase().includes(searchTerm.toLowerCase());
+            field.location.toLowerCase().includes(searchTerm.toLowerCase());
         const matchType = !filterType || field.fieldType === filterType;
         return matchSearch && matchType;
     });
@@ -249,8 +358,8 @@ const Quanlysan = () => {
                                             <td>{index + 1}</td>
                                             <td>
                                                 {field.images && field.images.length > 0 ? (
-                                                    <img 
-                                                        src={field.images[0]} 
+                                                    <img
+                                                        src={field.images[0]}
                                                         alt={field.name}
                                                         style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
                                                         onError={(e) => { e.target.src = 'https://via.placeholder.com/80x60?text=No+Image' }}
@@ -275,16 +384,16 @@ const Quanlysan = () => {
                                             </td>
                                             <td>{getStatusBadge(field.status)}</td>
                                             <td>
-                                                <Button 
-                                                    variant="warning" 
-                                                    size="sm" 
+                                                <Button
+                                                    variant="warning"
+                                                    size="sm"
                                                     className="me-2"
                                                     onClick={() => handleShowModal('edit', field)}
                                                 >
                                                     ✏️ Sửa
                                                 </Button>
-                                                <Button 
-                                                    variant="danger" 
+                                                <Button
+                                                    variant="danger"
                                                     size="sm"
                                                     onClick={() => handleDelete(field._id)}
                                                 >
@@ -316,7 +425,7 @@ const Quanlysan = () => {
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
                         {error && <Alert variant="danger">{error}</Alert>}
-                        
+
                         <Row>
                             <Col md={8}>
                                 <Form.Group className="mb-3">
@@ -418,35 +527,151 @@ const Quanlysan = () => {
 
                         <Form.Group className="mb-3">
                             <Form.Label>Hình Ảnh Sân</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="images"
-                                value={formData.images}
-                                onChange={handleInputChange}
-                                placeholder="VD: https://example.com/image1.jpg, https://example.com/image2.jpg"
-                            />
-                            <Form.Text className="text-muted">
-                                Nhập các URL hình ảnh cách nhau bởi dấu phẩy
-                            </Form.Text>
-                            {formData.images && (
-                                <div className="mt-3">
-                                    <strong>Xem trước:</strong>
-                                    <div className="d-flex flex-wrap gap-2 mt-2">
-                                        {formData.images.split(',').map((img, idx) => {
-                                            const trimmedImg = img.trim();
-                                            if (!trimmedImg) return null;
-                                            return (
-                                                <img 
-                                                    key={idx}
-                                                    src={trimmedImg}
-                                                    alt={`Preview ${idx + 1}`}
-                                                    style={{ width: '100px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #dee2e6' }}
-                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/100x80?text=Invalid' }}
-                                                />
-                                            );
-                                        })}
-                                    </div>
-                                </div>
+                            
+                            {/* Toggle giữa Link và File Upload */}
+                            <div className="mb-3">
+                                <Button
+                                    variant={uploadMode === 'link' ? 'primary' : 'outline-primary'}
+                                    size="sm"
+                                    onClick={() => setUploadMode('link')}
+                                    className="me-2"
+                                >
+                                    🔗 Thêm Link
+                                </Button>
+                                <Button
+                                    variant={uploadMode === 'file' ? 'primary' : 'outline-primary'}
+                                    size="sm"
+                                    onClick={() => setUploadMode('file')}
+                                >
+                                    📁 Upload File
+                                </Button>
+                            </div>
+
+                            {uploadMode === 'link' ? (
+                                <>
+                                    <Form.Text className="text-muted d-block mb-2">
+                                        Thêm link hình ảnh của sân (có thể thêm nhiều ảnh)
+                                    </Form.Text>
+                                    {imageLinks.map((link, index) => (
+                                <InputGroup className="mb-2" key={index}>
+                                    <InputGroup.Text>🖼️ #{index + 1}</InputGroup.Text>
+                                    <Form.Control
+                                        type="url"
+                                        value={link}
+                                        onChange={(e) => handleImageLinkChange(index, e.target.value)}
+                                        placeholder="https://example.com/image.jpg"
+                                    />
+                                    {imageLinks.length > 1 && (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={() => removeImageLink(index)}
+                                        >
+                                            ❌
+                                        </Button>
+                                    )}
+                                </InputGroup>
+                            ))}
+
+                            <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={addImageLink}
+                                className="mt-2"
+                            >
+                                ➕ Thêm Ảnh
+                            </Button>
+
+                                    {imageLinks.some(link => link.trim()) && (
+                                        <div className="mt-3">
+                                            <strong>Xem trước:</strong>
+                                            <div className="d-flex flex-wrap gap-2 mt-2">
+                                                {imageLinks.map((img, idx) => {
+                                                    const trimmedImg = img.trim();
+                                                    if (!trimmedImg) return null;
+                                                    return (
+                                                        <div key={idx} style={{ position: 'relative' }}>
+                                                            <img
+                                                                src={trimmedImg}
+                                                                alt={`Preview ${idx + 1}`}
+                                                                style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #dee2e6' }}
+                                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/120x90?text=Invalid+URL' }}
+                                                            />
+                                                            <Badge
+                                                                bg="dark"
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '5px',
+                                                                    right: '5px',
+                                                                    fontSize: '10px'
+                                                                }}
+                                                            >
+                                                                #{idx + 1}
+                                                            </Badge>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <Form.Text className="text-muted d-block mb-2">
+                                        Chọn ảnh từ máy tính (có thể chọn nhiều ảnh cùng lúc)
+                                    </Form.Text>
+                                    <Form.Control
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="mb-2"
+                                    />
+
+                                    {selectedFiles.length > 0 && (
+                                        <div className="mt-3">
+                                            <strong>Đã chọn {selectedFiles.length} file:</strong>
+                                            <div className="d-flex flex-wrap gap-2 mt-2">
+                                                {selectedFiles.map((file, idx) => (
+                                                    <div key={idx} style={{ position: 'relative' }}>
+                                                        <img
+                                                            src={URL.createObjectURL(file)}
+                                                            alt={`Preview ${idx + 1}`}
+                                                            style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #dee2e6' }}
+                                                        />
+                                                        <Badge
+                                                            bg="dark"
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '5px',
+                                                                right: '5px',
+                                                                fontSize: '10px'
+                                                            }}
+                                                        >
+                                                            #{idx + 1}
+                                                        </Badge>
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            style={{
+                                                                position: 'absolute',
+                                                                bottom: '5px',
+                                                                right: '5px',
+                                                                fontSize: '10px',
+                                                                padding: '2px 6px'
+                                                            }}
+                                                            onClick={() => removeFile(idx)}
+                                                        >
+                                                            ❌
+                                                        </Button>
+                                                        <div style={{ fontSize: '11px', marginTop: '4px', textAlign: 'center' }}>
+                                                            {file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </Form.Group>
 

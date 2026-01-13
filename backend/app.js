@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Middleware để phục vụ file tĩnh (nếu cần)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads/fields", express.static(path.join(__dirname, "uploads/fields")));
 
 // Đọc file swagger.yaml
 const swaggerFile = fs.readFileSync(path.join(__dirname, 'swagger.yaml'), 'utf8');

@@ -44,7 +44,10 @@ export const fieldService = {
     getFieldById: (id) => axiosInstance.get(`/fields/${id}`),
     createField: (data) => axiosInstance.post('/fields', data),
     updateField: (id, data) => axiosInstance.put(`/fields/${id}`, data),
-    deleteField: (id) => axiosInstance.delete(`/fields/${id}`)
+    deleteField: (id) => axiosInstance.delete(`/fields/${id}`),
+    uploadFieldImages: (id, formData) => axiosInstance.post(`/fields/${id}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
 };
 
 // TimeSlot Service
