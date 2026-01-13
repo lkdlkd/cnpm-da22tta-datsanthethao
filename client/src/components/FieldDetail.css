@@ -1,0 +1,60 @@
+.field-detail-page {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.breadcrumb {
+    background-color: transparent;
+}
+
+.breadcrumb-item a {
+    text-decoration: none;
+    color: #667eea;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.sticky-booking {
+    position: sticky;
+    top: 20px;
+}
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.time-slot-btn {
+    padding: 15px 10px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.time-slot-btn .slot-price {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+.time-slot-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.review-item:last-child {
+    border-bottom: none !important;
+}
+
+@media (max-width: 992px) {
+    .sticky-booking {
+        position: relative;
+        top: 0;
+    }
+}

@@ -1,87 +1,199 @@
-import React, { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import React from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import './GioiThieu.css';
 
 const GioiThieu = () => {
-    useEffect(() => {
-        AOS.init({ duration: 1000, once: true });
-    }, []);
-
     return (
-        <div className="pt-5">
+        <Container fluid className="gioi-thieu-page py-5">
             {/* Hero Section */}
-            <section
-                className="text-white text-center py-5"
-                style={{
-                    background: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1599059815524-cf03b59b720b') center/cover no-repeat",
-                    borderBottom: "5px solid #198754",
-                }}
-            >
-                <div className="container py-5">
-                    <h1 className="display-4 fw-bold mb-3">LBD Sport</h1>
-                    <p className="lead fs-5">
-                        Nơi hội tụ đam mê – Thắp sáng tinh thần thể thao
-                    </p>
-                </div>
-            </section>
-
-            {/* Nội dung */}
-            <div className="container py-5">
-                <div className="row g-4">
-                    <div className="col-md-6 col-lg-6" data-aos="fade-up">
-                        <div className="p-4 bg-white rounded-4 shadow-lg border-start border-4 border-success h-100 hover-shadow transition">
-                            <h4 className="text-success fw-bold mb-3">
-                                <i className="bi bi-people-fill me-2"></i>Về Chúng Tôi
-                            </h4>
-                            <p className="text-muted">
-                                LBD Sport là chuỗi cửa hàng thể thao hàng đầu tại Trà Vinh, chuyên cung cấp sản phẩm chính hãng, chất lượng cao, và luôn tiên phong trong việc mang đến trải nghiệm mua sắm vượt trội.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="200">
-                        <div className="p-4 bg-white rounded-4 shadow-lg border-start border-4 border-primary h-100 hover-shadow transition">
-                            <h4 className="text-primary fw-bold mb-3">
-                                <i className="bi bi-bullseye me-2"></i>Sứ Mệnh
-                            </h4>
-                            <p className="text-muted">
-                                Truyền cảm hứng vận động bằng cách mang đến sản phẩm thể thao chất lượng, giá cả hợp lý và sự tận tâm trong từng dịch vụ.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="400">
-                        <div className="p-4 bg-white rounded-4 shadow-lg border-start border-4 border-warning h-100 hover-shadow transition">
-                            <h4 className="text-warning fw-bold mb-3">
-                                <i className="bi bi-gem me-2"></i>Giá Trị Cốt Lõi
-                            </h4>
-                            <ul className="list-unstyled text-muted">
-                                <li><i className="bi bi-check-circle-fill text-success me-2"></i>Chất lượng là nền tảng</li>
-                                <li><i className="bi bi-check-circle-fill text-success me-2"></i>Khách hàng là trung tâm</li>
-                                <li><i className="bi bi-check-circle-fill text-success me-2"></i>Đổi mới & phát triển liên tục</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="600">
-                        <div className="p-4 bg-white rounded-4 shadow-lg border-start border-4 border-danger h-100 hover-shadow transition">
-                            <h4 className="text-danger fw-bold mb-3">
-                                <i className="bi bi-shield-check me-2"></i>Cam Kết
-                            </h4>
-                            <blockquote className="blockquote text-muted fst-italic mb-0">
-                                “Luôn nỗ lực không ngừng để mang lại giá trị thực, sản phẩm chính hãng và dịch vụ hậu mãi tận tâm.”
-                            </blockquote>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="text-center mt-5" data-aos="fade-up" data-aos-delay="800">
-                    <p className="text-muted fs-5 fst-italic">
-                        LBD Sport - Nơi sự chuyên nghiệp và đam mê gặp nhau
-                    </p>
-                </div>
+            <div className="hero-section text-center mb-5">
+                <h1 className="display-4 fw-bold text-primary mb-3">⚽ Về Chúng Tôi</h1>
+                <p className="lead text-muted">
+                    Hệ thống đặt sân bóng đá hiện đại và chuyên nghiệp
+                </p>
             </div>
-        </div>
+
+            {/* Mission Section */}
+            <Row className="mb-5">
+                <Col lg={6} className="mb-4">
+                    <Card className="h-100 shadow-sm border-0">
+                        <Card.Body className="p-4">
+                            <div className="text-center mb-3">
+                                <span className="display-4">🎯</span>
+                            </div>
+                            <h3 className="text-center mb-3">Sứ Mệnh</h3>
+                            <p className="text-muted">
+                                Chúng tôi cam kết mang đến trải nghiệm đặt sân bóng đá thuận tiện, 
+                                nhanh chóng và hiện đại nhất cho cộng đồng yêu bóng đá. Với công nghệ 
+                                tiên tiến, chúng tôi giúp bạn dễ dàng tìm kiếm và đặt sân chỉ trong vài cú click.
+                            </p>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col lg={6} className="mb-4">
+                    <Card className="h-100 shadow-sm border-0">
+                        <Card.Body className="p-4">
+                            <div className="text-center mb-3">
+                                <span className="display-4">👁️</span>
+                            </div>
+                            <h3 className="text-center mb-3">Tầm Nhìn</h3>
+                            <p className="text-muted">
+                                Trở thành nền tảng đặt sân bóng đá số 1 Việt Nam, kết nối hàng triệu 
+                                người yêu bóng đá với các sân chất lượng. Chúng tôi hướng đến việc xây 
+                                dựng một cộng đồng thể thao năng động và phát triển bền vững.
+                            </p>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* Features Section */}
+            <div className="mb-5">
+                <h2 className="text-center mb-4">✨ Điểm Nổi Bật</h2>
+                <Row>
+                    <Col md={6} lg={3} className="mb-4">
+                        <Card className="text-center h-100 shadow-sm border-0 feature-card">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <span className="display-3">🚀</span>
+                                </div>
+                                <h5>Đặt Sân Nhanh Chóng</h5>
+                                <p className="text-muted small">
+                                    Chỉ 3 bước đơn giản để hoàn tất đặt sân trong vài phút
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={6} lg={3} className="mb-4">
+                        <Card className="text-center h-100 shadow-sm border-0 feature-card">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <span className="display-3">💳</span>
+                                </div>
+                                <h5>Thanh Toán Linh Hoạt</h5>
+                                <p className="text-muted small">
+                                    Hỗ trợ đa dạng phương thức: Tiền mặt, Chuyển khoản
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={6} lg={3} className="mb-4">
+                        <Card className="text-center h-100 shadow-sm border-0 feature-card">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <span className="display-3">⭐</span>
+                                </div>
+                                <h5>Sân Chất Lượng Cao</h5>
+                                <p className="text-muted small">
+                                    Đối tác với hơn 100+ sân bóng uy tín trên toàn quốc
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={6} lg={3} className="mb-4">
+                        <Card className="text-center h-100 shadow-sm border-0 feature-card">
+                            <Card.Body>
+                                <div className="mb-3">
+                                    <span className="display-3">🔔</span>
+                                </div>
+                                <h5>Thông Báo Tức Thì</h5>
+                                <p className="text-muted small">
+                                    Cập nhật trạng thái đặt sân real-time qua thông báo
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            {/* Stats Section */}
+            <div className="stats-section py-5 bg-light rounded mb-5">
+                <Row className="text-center">
+                    <Col md={3} className="mb-4 mb-md-0">
+                        <h2 className="display-4 text-primary fw-bold">100+</h2>
+                        <p className="text-muted">Sân bóng đối tác</p>
+                    </Col>
+                    <Col md={3} className="mb-4 mb-md-0">
+                        <h2 className="display-4 text-success fw-bold">10K+</h2>
+                        <p className="text-muted">Người dùng</p>
+                    </Col>
+                    <Col md={3} className="mb-4 mb-md-0">
+                        <h2 className="display-4 text-warning fw-bold">50K+</h2>
+                        <p className="text-muted">Đơn đặt thành công</p>
+                    </Col>
+                    <Col md={3}>
+                        <h2 className="display-4 text-danger fw-bold">4.8/5</h2>
+                        <p className="text-muted">Đánh giá trung bình</p>
+                    </Col>
+                </Row>
+            </div>
+
+            {/* Values Section */}
+            <div className="mb-5">
+                <h2 className="text-center mb-4">💎 Giá Trị Cốt Lõi</h2>
+                <Row>
+                    <Col md={4} className="mb-4">
+                        <Card className="h-100 shadow-sm border-0">
+                            <Card.Body>
+                                <h5 className="text-primary">🤝 Uy Tín</h5>
+                                <p className="text-muted">
+                                    Đặt uy tín và chất lượng lên hàng đầu trong mọi dịch vụ. 
+                                    Cam kết minh bạch và trung thực với khách hàng.
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4} className="mb-4">
+                        <Card className="h-100 shadow-sm border-0">
+                            <Card.Body>
+                                <h5 className="text-success">💡 Sáng Tạo</h5>
+                                <p className="text-muted">
+                                    Không ngừng cải tiến và áp dụng công nghệ mới để mang lại 
+                                    trải nghiệm tốt nhất cho người dùng.
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4} className="mb-4">
+                        <Card className="h-100 shadow-sm border-0">
+                            <Card.Body>
+                                <h5 className="text-warning">❤️ Tận Tâm</h5>
+                                <p className="text-muted">
+                                    Luôn lắng nghe và đặt sự hài lòng của khách hàng làm mục tiêu 
+                                    phấn đấu hàng đầu.
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            {/* Team Section */}
+            <div className="text-center mb-5">
+                <h2 className="mb-4">👥 Đội Ngũ Phát Triển</h2>
+                <p className="lead text-muted mb-4">
+                    Chúng tôi là một đội ngũ trẻ, năng động và đam mê công nghệ, 
+                    cam kết xây dựng nền tảng đặt sân bóng tốt nhất cho cộng đồng.
+                </p>
+                <Card className="shadow-sm border-0 mx-auto" style={{maxWidth: '600px'}}>
+                    <Card.Body className="p-4">
+                        <p className="mb-2"><strong>🎓 Dự án:</strong> Hệ thống đặt sân bóng đá</p>
+                        <p className="mb-2"><strong>🏫 Trường:</strong> Đại học Công nghệ Thông tin</p>
+                        <p className="mb-2"><strong>📚 Khóa:</strong> DA22TTA</p>
+                        <p className="mb-0"><strong>📅 Năm:</strong> 2025-2026</p>
+                    </Card.Body>
+                </Card>
+            </div>
+
+            {/* CTA Section */}
+            <div className="cta-section text-center py-5 bg-primary text-white rounded">
+                <h2 className="mb-3">Sẵn sàng đặt sân?</h2>
+                <p className="lead mb-4">Tham gia cùng hàng ngàn người yêu bóng đá khác!</p>
+                <a href="/danh-sach-san" className="btn btn-light btn-lg px-5">
+                    🎯 Đặt Sân Ngay
+                </a>
+            </div>
+        </Container>
     );
 };
 

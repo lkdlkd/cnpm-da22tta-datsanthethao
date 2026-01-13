@@ -1,0 +1,328 @@
+.layout-user {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .header-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .nav-menu {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo span {
+    font-size: 2rem;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-menu a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-menu a:hover {
+    color: #667eea;
+}
+
+.nav-menu a.active {
+    color: #667eea;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #667eea;
+    transition: width 0.3s;
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* User Dropdown Styles */
+.user-dropdown {
+    position: relative;
+}
+
+.user-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.user-profile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.user-icon {
+    font-size: 1.2rem;
+}
+
+.user-name {
+    font-size: 0.95rem;
+}
+
+.dropdown-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+}
+
+.user-profile-btn:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.user-dropdown .dropdown-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 1002 !important;
+    background: transparent !important;
+    display: block !important;
+}
+
+.user-dropdown .dropdown-menu {
+    position: absolute !important;
+    display: block !important;
+    top: calc(100% + 10px) !important;
+    right: 0 !important;
+    left: auto !important;
+    background: white !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+    min-width: 250px !important;
+    max-width: 300px !important;
+    overflow: visible !important;
+    z-index: 1003 !important;
+    transform: none !important;
+    animation: dropdownFadeIn 0.3s ease !important;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-dropdown .dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 20px !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    background: white !important;
+    border: none !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background: #f8f9fa !important;
+    color: #667eea !important;
+}
+
+.user-dropdown .dropdown-item span {
+    font-size: 1.1rem !important;
+}
+
+.user-dropdown .dropdown-divider {
+    height: 1px !important;
+    background: #eee !important;
+    margin: 8px 0 !important;
+}
+
+.user-dropdown .logout-item {
+    color: #dc3545 !important;
+}
+
+.user-dropdown .logout-item:hover {
+    background: #fff5f5 !important;
+    color: #c82333 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .user-profile-btn {
+        padding: 6px 12px;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .dropdown-menu {
+        right: -10px;
+        min-width: 200px;
+    }
+}
+
+.user-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e3f2fd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+
+.logout-btn {
+    padding: 10px 20px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: #d32f2f;
+}
+
+.main-content {
+    flex: 1;
+}
+
+.footer {
+    background: #2c3e50;
+    color: white;
+    padding: 40px 20px 20px;
+    margin-top: 50px;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.footer-section h3 {
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.footer-section a {
+    display: block;
+    color: #bdc3c7;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+}
+
+.footer-section a:hover {
+    color: #fff;
+}
+
+.footer-section p {
+    color: #bdc3c7;
+    margin-bottom: 10px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #34495e;
+    color: #bdc3c7;
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

@@ -1,174 +1,111 @@
 import axios from 'axios';
 
-// Cấu hình base URL cho API
-const API = axios.create({
-    baseURL: `${process.env.REACT_APP_API_URL}/api` || 'http://localhost:5000/api',
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
+// Tạo axios instance với cấu hình mặc định
+const axiosInstance = axios.create({
+    baseURL: `${API_URL}/api`,
+    headers: {
+        'Content-Type': 'application/json'
+    }
 });
 
-// Thêm token vào header nếu có
-API.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// Interceptor để tự động thêm token vào mỗi request
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-});
+);
 
-// Đăng ký
-export const registerUser = async (formData) => {
-    try {
-        const response = await API.post('/auth/register', formData);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Auth Service
+export const authService = {
+    register: (data) => axiosInstance.post('/auth/register', data),
+    login: (data) => axiosInstance.post('/auth/login', data),
+    getCurrentUser: () => axiosInstance.get('/auth/me'),
+    updateProfile: (data) => axiosInstance.put('/auth/profile', data),
+    changePassword: (data) => axiosInstance.put('/auth/change-password', data),
+    // Admin functions
+    getAllUsers: (params) => axiosInstance.get('/auth/users', { params }),
+    updateUserByAdmin: (id, data) => axiosInstance.put(`/auth/users/${id}`, data),
+    deleteUser: (id) => axiosInstance.delete(`/auth/users/${id}`)
 };
 
-// Đăng nhập
-export const loginUser = async (email, matKhau) => {
-    try {
-        const response = await API.post('/auth/login', { email, matKhau });
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Field Service
+export const fieldService = {
+    getAllFields: (params) => axiosInstance.get('/fields', { params }),
+    getPopularFields: () => axiosInstance.get('/fields/popular'),
+    getFieldById: (id) => axiosInstance.get(`/fields/${id}`),
+    createField: (data) => axiosInstance.post('/fields', data),
+    updateField: (id, data) => axiosInstance.put(`/fields/${id}`, data),
+    deleteField: (id) => axiosInstance.delete(`/fields/${id}`)
 };
 
-// Lấy danh sách sân bóng (user)
-export const getDanhSachSan = async () => {
-    try {
-        const response = await API.get('/danhsachsan');
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// TimeSlot Service
+export const timeSlotService = {
+    getTimeSlotsByFieldAndDate: (fieldId, date) =>
+        axiosInstance.get(`/timeslots/field/${fieldId}`, { params: { date } }),
+    createTimeSlot: (data) => axiosInstance.post('/timeslots', data),
+    generateTimeSlots: (data) => axiosInstance.post('/timeslots/generate', data),
+    updateTimeSlot: (id, data) => axiosInstance.put(`/timeslots/${id}`, data),
+    deleteTimeSlot: (id) => axiosInstance.delete(`/timeslots/${id}`)
 };
 
-// Lấy thông tin sân bóng theo id
-export const getSanTheoId = async (id) => {
-    try {
-        const response = await API.get(`/sanbong/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-// Đặt sân
-export const datSan = async (data) => {
-    try {
-        const response = await API.post('/datsan', data);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Booking Service
+export const bookingService = {
+    createBooking: (data) => axiosInstance.post('/bookings', data),
+    getUserBookings: (params) => axiosInstance.get('/bookings/my-bookings', { params }),
+    getBookingById: (id) => axiosInstance.get(`/bookings/${id}`),
+    cancelBooking: (id, data) => axiosInstance.put(`/bookings/${id}/cancel`, data),
+    getAllBookings: (params) => axiosInstance.get('/bookings', { params }),
+    confirmBooking: (id) => axiosInstance.put(`/bookings/${id}/confirm`)
 };
 
-// Lấy danh sách đã đặt của user
-export const getDanhSachDaDat = async () => {
-    try {
-        const response = await API.get('/danhsachdadat');
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Payment Service
+export const paymentService = {
+    createPayment: (data) => axiosInstance.post('/payments', data),
+    getUserPayments: () => axiosInstance.get('/payments/my-payments'),
+    getPaymentByBooking: (bookingId) => axiosInstance.get(`/payments/booking/${bookingId}`),
+    confirmCashPayment: (id) => axiosInstance.put(`/payments/${id}/confirm-cash`)
 };
 
-// ADMIN - Quản lý sân bóng
-export const themSan = async (data) => {
-    try {
-        const response = await API.post('/addsan', data);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Review Service
+export const reviewService = {
+    getReviewsByField: (fieldId, params) =>
+        axiosInstance.get(`/reviews/field/${fieldId}`, { params }),
+    createReview: (data) => axiosInstance.post('/reviews', data),
+    getUserReviews: () => axiosInstance.get('/reviews/my-reviews'),
+    deleteReview: (id) => axiosInstance.delete(`/reviews/${id}`),
+    replyToReview: (id, data) => axiosInstance.put(`/reviews/${id}/reply`, data),
+    getAllReviews: (params) => axiosInstance.get('/reviews', { params })
 };
 
-export const suaSan = async (id, data) => {
-    try {
-        const response = await API.put(`/suasan/${id}`, data);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Service Service
+export const serviceService = {
+    getAllServices: (params) => axiosInstance.get('/services', { params }),
+    getServiceById: (id) => axiosInstance.get(`/services/${id}`),
+    getServicesByCategory: (category) => axiosInstance.get(`/services/category/${category}`),
+    checkAvailability: (params) => axiosInstance.get('/services/check-availability', { params }),
+    getServicesStats: () => axiosInstance.get('/services/stats'),
+    createService: (data) => axiosInstance.post('/services', data),
+    updateService: (id, data) => axiosInstance.put(`/services/${id}`, data),
+    updateStock: (id, data) => axiosInstance.put(`/services/${id}/stock`, data),
+    deleteService: (id) => axiosInstance.delete(`/services/${id}`)
 };
 
-export const xoaSan = async (id) => {
-    try {
-        const response = await API.delete(`/xoasan/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
+// Notification Service
+export const notificationService = {
+    getUserNotifications: (params) => axiosInstance.get('/notifications', { params }),
+    markAsRead: (id) => axiosInstance.put(`/notifications/${id}/read`),
+    markAllAsRead: () => axiosInstance.put('/notifications/read-all'),
+    deleteNotification: (id) => axiosInstance.delete(`/notifications/${id}`),
+    createNotification: (data) => axiosInstance.post('/notifications', data)
 };
 
-export const adminXacNhanDatSan = async (id, data) => {
-    try {
-        const response = await API.put(`/${id}/xacnhandatsan`, data);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-
-// ADMIN - Quản lý user
-export const xoaUser = async (id) => {
-    try {
-        const response = await API.delete(`/xoauser/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-
-export const updateUser = async (id, data) => {
-    try {
-        const response = await API.put(`/updateuser/${id}`, data);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-
-export const getUsers = async () => {
-    try {
-        const response = await API.get('/user');
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-
-export const uploadImage = async (file) => {
-    try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await API.post('/upload', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
-
-        return response.data; // Trả về URL của ảnh đã upload
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi khi tải ảnh lên' };
-    }
-};
-
-export const capNhatThongTinCaNhan = async (data) => {
-    try {
-        const response = await API.put('/cap-nhat-thong-tin', data);
-        return response.data; // Trả về thông tin đã cập nhật
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
-
-export const doiMatKhau = async (data) => {
-    try {
-        const response = await API.put('/doi-mat-khau', data); // Gửi yêu cầu đổi mật khẩu
-        return response.data; // Trả về kết quả đổi mật khẩu
-    } catch (error) {
-        throw error.response ? error.response.data : { message: 'Lỗi kết nối đến máy chủ' };
-    }
-};
+export default axiosInstance;

@@ -1,477 +1,488 @@
-import React, { useEffect, useState } from "react";
-import { getDanhSachSan, themSan, suaSan, xoaSan, uploadImage } from "../../services/api";
-import Swal from "sweetalert2";
-import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-
-const url = process.env.REACT_APP_API_URL || "http://localhost:5000"; // URL gốc của backend
-const defaultForm = {
-  tenSan: "",
-  loaiSan: "5 người",
-  diaChi: "",
-  hinhAnh: "",
-  giaTheoKhungGio: [],
-  tinhTrang: "Đang hoạt động",
-  Danhmuc: "",
-};
+import React, { useState, useEffect } from 'react';
+import { 
+    Container, 
+    Row, 
+    Col, 
+    Table, 
+    Button, 
+    Modal, 
+    Form, 
+    InputGroup,
+    Badge,
+    Card,
+    Alert,
+    Spinner
+} from 'react-bootstrap';
+import { fieldService } from '../../services/api';
+import './AdminCommon.css';
 
 const Quanlysan = () => {
-  const [fields, setFields] = useState([]);
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editField, setEditField] = useState(null);
-  const [editForm, setEditForm] = useState(defaultForm);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [imageUrl, setImageUrl] = useState(""); // Lưu URL ảnh đã upload
+    const [fields, setFields] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+    const [currentField, setCurrentField] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterType, setFilterType] = useState('');
 
-  const pageSize = 10;
-
-  // Lấy danh sách sân bóng
-  const fetchFields = async () => {
-    try {
-      const data = await getDanhSachSan();
-      setFields(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setFields([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchFields();
-  }, []);
-
-  // Xóa sân bóng
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Bạn có chắc muốn xóa sân này?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Xóa",
-      cancelButtonText: "Hủy",
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
+    const [formData, setFormData] = useState({
+        name: '',
+        fieldType: '5vs5',
+        location: '',
+        address: '',
+        description: '',
+        pricePerHour: '',
+        facilities: '',
+        images: '',
+        status: 'active'
     });
-    if (result.isConfirmed) {
-      try {
-        await xoaSan(id);
+
+    useEffect(() => {
         fetchFields();
-        Swal.fire("Đã xóa!", "Sân đã được xóa thành công.", "success");
-      } catch (err) {
-        Swal.fire("Lỗi!", "Xóa thất bại!", "error");
-      }
-    }
-  };
+    }, []);
 
-  // Hiện modal cập nhật/thêm mới
-  const handleShowUpdate = (field) => {
-    setEditField(field);
-    setEditForm(field ? { ...field } : defaultForm);
-    setShowModal(true);
-  };
-
-  // Xử lý thêm/sửa sân bóng
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    const isEdit = editField && editField._id;
-    const confirmResult = await Swal.fire({
-      title: isEdit ? "Xác nhận sửa sân?" : "Xác nhận thêm sân?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: isEdit ? "Sửa" : "Thêm",
-      cancelButtonText: "Hủy",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-    });
-    if (confirmResult.isConfirmed) {
-      try {
-        if (isEdit) {
-          await suaSan(editField._id, editForm);
-        } else {
-          await themSan(editForm);
+    const fetchFields = async () => {
+        setLoading(true);
+        try {
+            const response = await fieldService.getAllFields();
+            setFields(response.data.data || []);
+        } catch (err) {
+            setError('Không thể tải danh sách sân');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleShowModal = (mode, field = null) => {
+        setModalMode(mode);
+        setError('');
+        setSuccess('');
+        
+        if (mode === 'edit' && field) {
+            setCurrentField(field);
+            setFormData({
+                name: field.name,
+                fieldType: field.fieldType,
+                location: field.location,
+                address: field.address,
+                description: field.description || '',
+                pricePerHour: field.pricePerHour,
+                facilities: Array.isArray(field.facilities) ? field.facilities.join(', ') : '',
+                images: Array.isArray(field.images) ? field.images.join(', ') : '',
+                status: field.status
+            });
+        } else {
+            setCurrentField(null);
+            setFormData({
+                name: '',
+                fieldType: '5vs5',
+                location: '',
+                address: '',
+                description: '',
+                pricePerHour: '',
+                facilities: '',
+                images: '',
+                status: 'active'
+            });
+        }
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
         setShowModal(false);
-        fetchFields();
-        Swal.fire(
-          isEdit ? "Đã sửa!" : "Đã thêm!",
-          isEdit ? "Sân đã được cập nhật." : "Sân đã được thêm mới.",
-          "success"
-        );
-      } catch (err) {
-        Swal.fire("Lỗi!", "Lưu thất bại!", "error");
-      }
-    }
-  };
+        setCurrentField(null);
+        setError('');
+    };
 
-  // Tải ảnh lên
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
 
-    try {
-      const data = await uploadImage(file);
-      setEditForm({ ...editForm, hinhAnh: data.url });
-      setImageUrl(`${url}${data.url}`);
-      Swal.fire("Thành công!", "Ảnh đã được tải lên.", "success");
-    } catch (err) {
-      Swal.fire("Lỗi!", err.message || "Không thể tải ảnh lên.", "error");
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
 
-  // Lọc theo từ khóa tìm kiếm
-  const filteredFields = fields.filter(
-    (f) =>
-      f.tenSan?.toLowerCase().includes(search.toLowerCase()) ||
-      f.diaChi?.toLowerCase().includes(search.toLowerCase())
-  );
+        try {
+            const dataToSend = {
+                ...formData,
+                pricePerHour: Number(formData.pricePerHour),
+                facilities: formData.facilities.split(',').map(f => f.trim()).filter(f => f),
+                images: formData.images.split(',').map(img => img.trim()).filter(img => img)
+            };
 
-  // Phân trang
-  const totalPages = Math.ceil(filteredFields.length / pageSize);
-  const paginatedFields = filteredFields.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+            if (modalMode === 'add') {
+                await fieldService.createField(dataToSend);
+                setSuccess('Thêm sân thành công!');
+            } else {
+                await fieldService.updateField(currentField._id, dataToSend);
+                setSuccess('Cập nhật sân thành công!');
+            }
 
-  // Khi search thay đổi thì về trang 1
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search]);
+            await fetchFields();
+            handleCloseModal();
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Có lỗi xảy ra');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <main className="container py-4">
-      <h2 className="mb-4 text-primary">
-        <i className="bi bi-house-door-fill me-2"></i>Quản lý sân bóng
-      </h2>
-      <Card className="mb-4 shadow-sm">
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-center">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Tìm kiếm sân bóng"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ maxWidth: "400px" }}
-            />
-            <Button variant="primary" onClick={() => handleShowUpdate(null)}>
-              Thêm sân
-            </Button>
-          </div>
-        </Card.Body>
-      </Card>
-      <Card className="shadow-sm">
-        <Card.Body>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>ID Sân</th>
-                <th>Tên sân</th>
-                <th>Loại sân</th>
-                <th>Danh mục</th>
-                <th>Địa chỉ</th>
-                <th>Hình ảnh</th>
-                <th>Tình trạng</th>
-                <th>Chức năng</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedFields.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center text-muted">
-                    Không có dữ liệu
-                  </td>
-                </tr>
-              ) : (
-                paginatedFields.map((field, idx) => (
-                  <tr key={field._id || idx}>
-                    <td>{(currentPage - 1) * pageSize + idx + 1}</td>
-                    <td>{field._id}</td>
-                    <td>{field.tenSan}</td>
-                    <td>{field.loaiSan}</td>
-                    <td>{field.Danhmuc}</td>
-                    <td>{field.diaChi}</td>
-                    <td>
-                      {field.hinhAnh && (
-                        <img
-                          src={`${url}${field.hinhAnh}`}
-                          alt={field.tenSan}
-                          className="rounded"
-                          style={{ width: 80, height: 50, objectFit: "cover" }}
-                        />
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${field.tinhTrang === "Đang hoạt động"
-                            ? "bg-success"
-                            : "bg-warning"
-                          }`}
-                      >
-                        {field.tinhTrang}
-                      </span>
-                    </td>
-                    <td>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => handleShowUpdate(field)}
-                      >
-                        Sửa
-                      </Button>{" "}
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDelete(field._id)}
-                      >
-                        Xóa
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </Table>
-        </Card.Body>
-      </Card>
-      {totalPages > 1 && (
-        <nav className="mt-3">
-          <ul className="pagination justify-content-center">
-            <li className={`page-item${currentPage === 1 ? " disabled" : ""}`}>
-              <Button
-                variant="link"
-                className="page-link"
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                &laquo;
-              </Button>
-            </li>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <li
-                key={i}
-                className={`page-item${currentPage === i + 1 ? " active" : ""
-                  }`}
-              >
-                <Button
-                  variant="link"
-                  className="page-link"
-                  onClick={() => setCurrentPage(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              </li>
-            ))}
-            <li
-              className={`page-item${currentPage === totalPages ? " disabled" : ""
-                }`}
-            >
-              <Button
-                variant="link"
-                className="page-link"
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                &raquo;
-              </Button>
-            </li>
-          </ul>
-        </nav>
-      )}
+    const handleDelete = async (id) => {
+        if (!window.confirm('Bạn có chắc muốn xóa sân này?')) return;
 
-      {/* Modal thêm/sửa sân */}
-      {showModal && (
-        <div
-          className="modal d-block"
-          tabIndex="-1"
-          style={{ background: "rgba(0,0,0,0.3)" }}
-        >
-          <div className="modal-dialog">
-            <form className="modal-content" onSubmit={handleUpdate}>
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  {editField ? "Sửa sân bóng" : "Thêm sân bóng"}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-2">
-                  <label className="form-label">Tên sân</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={editForm.tenSan}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, tenSan: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Loại sân</label>
-                  <select
-                    className="form-select"
-                    value={editForm.loaiSan}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, loaiSan: e.target.value })
-                    }
-                  >
-                    <option value="2 người">2 người</option>
-                    <option value="5 người">5 người</option>
-                    <option value="7 người">7 người</option>
-                    <option value="11 người">11 người</option>
-                  </select>
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Địa chỉ</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={editForm.diaChi}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, diaChi: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Hình ảnh</label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e)}
-                  />
-                  {editForm.hinhAnh && (
-                    <img
-                      //src={`${url}${san?.hinhAnh}`}
+        setLoading(true);
+        try {
+            await fieldService.deleteField(id);
+            setSuccess('Xóa sân thành công!');
+            await fetchFields();
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Không thể xóa sân');
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                      src={`${url}${editForm.hinhAnh}`} // Sử dụng editForm.hinhAnh thay vì san?.hinhAnh
-                      alt="Preview"
-                      className="mt-2 rounded border"
-                      style={{ width: 90, height: 60, objectFit: "cover" }}
-                    />
-                  )}
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Tình trạng</label>
-                  <select
-                    className="form-select"
-                    value={editForm.tinhTrang}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, tinhTrang: e.target.value })
-                    }
-                  >
-                    <option value="Đang hoạt động">Đang hoạt động</option>
-                    <option value="Bảo trì">Bảo trì</option>
-                  </select>
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Danh mục</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={editForm.Danhmuc || ""}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, Danhmuc: e.target.value })
-                    }
-                    placeholder="Nhập danh mục (vd: Sân cỏ nhân tạo, Sân mini...)"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label className="form-label">Khung giờ & Giá</label>
-                  {editForm.giaTheoKhungGio && editForm.giaTheoKhungGio.length > 0 && (
-                    <ul className="list-group mb-2">
-                      {editForm.giaTheoKhungGio.map((g, i) => (
-                        <li key={i} className="list-group-item d-flex align-items-center gap-2">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Khung giờ (vd: 06:00-07:30)"
-                            style={{ maxWidth: 140 }}
-                            value={g.khungGio}
-                            onChange={e => {
-                              const arr = [...editForm.giaTheoKhungGio];
-                              arr[i].khungGio = e.target.value;
-                              setEditForm({ ...editForm, giaTheoKhungGio: arr });
-                            }}
-                          />
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder="Giá"
-                            style={{ maxWidth: 100 }}
-                            value={g.gia}
-                            onChange={e => {
-                              const arr = [...editForm.giaTheoKhungGio];
-                              arr[i].gia = e.target.value;
-                              setEditForm({ ...editForm, giaTheoKhungGio: arr });
-                            }}
-                          />
-                          <select
-                            className="form-select"
-                            style={{ maxWidth: 110 }}
-                            value={g.Trangthai}
-                            onChange={e => {
-                              const arr = [...editForm.giaTheoKhungGio];
-                              arr[i].Trangthai = e.target.value;
-                              setEditForm({ ...editForm, giaTheoKhungGio: arr });
-                            }}
-                          >
-                            <option value="Còn sân">Còn sân</option>
-                            <option value="Hết sân">Hết sân</option>
-                          </select>
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-danger"
-                            onClick={() => {
-                              const arr = [...editForm.giaTheoKhungGio];
-                              arr.splice(i, 1);
-                              setEditForm({ ...editForm, giaTheoKhungGio: arr });
-                            }}
-                          >
-                            <i className="bi bi-x"></i>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() =>
-                      setEditForm({
-                        ...editForm,
-                        giaTheoKhungGio: [
-                          ...editForm.giaTheoKhungGio,
-                          { khungGio: "", gia: "", Trangthai: "Còn sân" },
-                        ],
-                      })
-                    }
-                  >
-                    <i className="bi bi-plus-circle"></i> Thêm khung giờ
-                  </button>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Đóng
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Lưu thay đổi
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </main>
-  );
+    const getStatusBadge = (status) => {
+        const statusMap = {
+            active: { variant: 'success', text: 'Hoạt động' },
+            maintenance: { variant: 'warning', text: 'Bảo trì' },
+            inactive: { variant: 'secondary', text: 'Không hoạt động' }
+        };
+        const { variant, text } = statusMap[status] || statusMap.active;
+        return <Badge bg={variant}>{text}</Badge>;
+    };
+
+    const filteredFields = fields.filter(field => {
+        const matchSearch = field.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          field.location.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchType = !filterType || field.fieldType === filterType;
+        return matchSearch && matchType;
+    });
+
+    return (
+        <Container fluid className="admin-page">
+            <h2>🏟️ Quản Lý Sân Bóng</h2>
+
+            {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
+            {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
+
+            <Card className="mb-4 filter-section">
+                <Card.Body>
+                    <Row className="align-items-end">
+                        <Col md={4}>
+                            <Form.Group>
+                                <Form.Label>Tìm kiếm</Form.Label>
+                                <InputGroup>
+                                    <InputGroup.Text>🔍</InputGroup.Text>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Tìm theo tên hoặc khu vực..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                        </Col>
+                        <Col md={3}>
+                            <Form.Group>
+                                <Form.Label>Loại sân</Form.Label>
+                                <Form.Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+                                    <option value="">Tất cả</option>
+                                    <option value="5vs5">Sân 5 người</option>
+                                    <option value="7vs7">Sân 7 người</option>
+                                    <option value="11vs11">Sân 11 người</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col md={5} className="text-end">
+                            <Button variant="primary" size="lg" onClick={() => handleShowModal('add')}>
+                                ➕ Thêm Sân Mới
+                            </Button>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
+
+            <Card>
+                <Card.Body>
+                    {loading && !showModal ? (
+                        <div className="text-center py-5">
+                            <Spinner animation="border" variant="primary" />
+                            <p className="mt-2">Đang tải...</p>
+                        </div>
+                    ) : (
+                        <Table striped bordered hover responsive>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Hình Ảnh</th>
+                                    <th>Tên Sân</th>
+                                    <th>Loại Sân</th>
+                                    <th>Khu Vực</th>
+                                    <th>Địa Chỉ</th>
+                                    <th>Giá/Giờ</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredFields.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="10" className="text-center">
+                                            Không có dữ liệu
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredFields.map((field, index) => (
+                                        <tr key={field._id}>
+                                            <td>{index + 1}</td>
+                                            <td>
+                                                {field.images && field.images.length > 0 ? (
+                                                    <img 
+                                                        src={field.images[0]} 
+                                                        alt={field.name}
+                                                        style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/80x60?text=No+Image' }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '80px', height: '60px', background: '#e9ecef', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: '#6c757d' }}>
+                                                        Chưa có ảnh
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td><strong>{field.name}</strong></td>
+                                            <td>
+                                                <Badge bg="info">{field.fieldType}</Badge>
+                                            </td>
+                                            <td>{field.location}</td>
+                                            <td>{field.address}</td>
+                                            <td className="text-end">
+                                                <strong>{(field.pricePerHour || 0).toLocaleString()}đ</strong>
+                                            </td>
+                                            <td className="text-center">
+                                                ⭐ {(field.rating || 0).toFixed(1)} ({field.totalReviews || 0})
+                                            </td>
+                                            <td>{getStatusBadge(field.status)}</td>
+                                            <td>
+                                                <Button 
+                                                    variant="warning" 
+                                                    size="sm" 
+                                                    className="me-2"
+                                                    onClick={() => handleShowModal('edit', field)}
+                                                >
+                                                    ✏️ Sửa
+                                                </Button>
+                                                <Button 
+                                                    variant="danger" 
+                                                    size="sm"
+                                                    onClick={() => handleDelete(field._id)}
+                                                >
+                                                    🗑️ Xóa
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </Table>
+                    )}
+
+                    <div className="mt-3">
+                        <small className="text-muted">
+                            Tổng số: <strong>{filteredFields.length}</strong> sân
+                        </small>
+                    </div>
+                </Card.Body>
+            </Card>
+
+            {/* Modal Thêm/Sửa Sân */}
+            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        {modalMode === 'add' ? '➕ Thêm Sân Mới' : '✏️ Chỉnh Sửa Sân'}
+                    </Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleSubmit}>
+                    <Modal.Body>
+                        {error && <Alert variant="danger">{error}</Alert>}
+                        
+                        <Row>
+                            <Col md={8}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Tên Sân <span className="text-danger">*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="VD: Sân Bóng Mỹ Đình"
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={4}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Loại Sân <span className="text-danger">*</span></Form.Label>
+                                    <Form.Select
+                                        name="fieldType"
+                                        value={formData.fieldType}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="5vs5">Sân 5 người</option>
+                                        <option value="7vs7">Sân 7 người</option>
+                                        <option value="11vs11">Sân 11 người</option>
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Khu Vực <span className="text-danger">*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleInputChange}
+                                        placeholder="VD: Hà Nội"
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Giá/Giờ (VNĐ) <span className="text-danger">*</span></Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="pricePerHour"
+                                        value={formData.pricePerHour}
+                                        onChange={handleInputChange}
+                                        placeholder="VD: 500000"
+                                        min="0"
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Địa Chỉ <span className="text-danger">*</span></Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleInputChange}
+                                placeholder="VD: Số 1 Đường ABC, Quận XYZ"
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Mô Tả</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                placeholder="Mô tả về sân bóng..."
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Tiện Ích</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="facilities"
+                                value={formData.facilities}
+                                onChange={handleInputChange}
+                                placeholder="VD: Đèn chiếu sáng, Phòng thay đồ, Bãi đỗ xe (Cách nhau bởi dấu phẩy)"
+                            />
+                            <Form.Text className="text-muted">
+                                Nhập các tiện ích cách nhau bởi dấu phẩy
+                            </Form.Text>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Hình Ảnh Sân</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="images"
+                                value={formData.images}
+                                onChange={handleInputChange}
+                                placeholder="VD: https://example.com/image1.jpg, https://example.com/image2.jpg"
+                            />
+                            <Form.Text className="text-muted">
+                                Nhập các URL hình ảnh cách nhau bởi dấu phẩy
+                            </Form.Text>
+                            {formData.images && (
+                                <div className="mt-3">
+                                    <strong>Xem trước:</strong>
+                                    <div className="d-flex flex-wrap gap-2 mt-2">
+                                        {formData.images.split(',').map((img, idx) => {
+                                            const trimmedImg = img.trim();
+                                            if (!trimmedImg) return null;
+                                            return (
+                                                <img 
+                                                    key={idx}
+                                                    src={trimmedImg}
+                                                    alt={`Preview ${idx + 1}`}
+                                                    style={{ width: '100px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #dee2e6' }}
+                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/100x80?text=Invalid' }}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Trạng Thái <span className="text-danger">*</span></Form.Label>
+                            <Form.Select
+                                name="status"
+                                value={formData.status}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                <option value="active">Hoạt động</option>
+                                <option value="maintenance">Bảo trì</option>
+                                <option value="inactive">Không hoạt động</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Hủy
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Spinner animation="border" size="sm" className="me-2" />
+                                    Đang xử lý...
+                                </>
+                            ) : (
+                                modalMode === 'add' ? '➕ Thêm Sân' : '💾 Cập Nhật'
+                            )}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+        </Container>
+    );
 };
 
 export default Quanlysan;

@@ -1,0 +1,43 @@
+.lien-he-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.contact-item {
+    padding: 0.5rem 0;
+}
+
+.contact-item h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.social-links .btn {
+    transition: transform 0.2s ease;
+}
+
+.social-links .btn:hover {
+    transform: scale(1.05);
+}
+
+.map-container {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.contact-form .form-control:focus,
+.contact-form .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+@media (max-width: 768px) {
+    .lien-he-page h1 {
+        font-size: 2rem;
+    }
+    
+    .contact-item {
+        font-size: 0.9rem;
+    }
+}

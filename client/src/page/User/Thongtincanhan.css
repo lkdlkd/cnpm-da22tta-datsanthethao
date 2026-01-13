@@ -1,0 +1,69 @@
+.thong-tin-ca-nhan {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.stat-item span {
+    color: #6c757d;
+}
+
+.stat-item strong {
+    font-size: 1.1rem;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #e7f3ff;
+    border-left: 3px solid #0d6efd;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notifications-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+}
+
+@media (max-width: 992px) {
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+}

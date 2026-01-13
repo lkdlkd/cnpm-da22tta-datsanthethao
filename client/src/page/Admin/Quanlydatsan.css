@@ -1,0 +1,28 @@
+.quanlydatsan-page {
+    padding: 20px;
+}
+
+.quanlydatsan-page h2 {
+    color: #2c3e50;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.modal-header {
+    background-color: #667eea;
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}

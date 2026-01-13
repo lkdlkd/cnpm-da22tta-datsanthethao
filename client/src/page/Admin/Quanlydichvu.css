@@ -1,0 +1,59 @@
+.service-stats {
+    margin-bottom: 2rem;
+}
+
+.service-stats .card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.service-stats .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.service-table .table {
+    margin-bottom: 0;
+}
+
+.service-table .badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.7em;
+}
+
+.service-table td {
+    vertical-align: middle;
+}
+
+.service-table .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.filter-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.stock-badge-success {
+    background-color: #28a745;
+}
+
+.stock-badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.stock-badge-danger {
+    background-color: #dc3545;
+}
+
+.pagination-wrapper {
+    margin-top: 1.5rem;
+}
+
+.pagination-wrapper .btn {
+    min-width: 40px;
+}

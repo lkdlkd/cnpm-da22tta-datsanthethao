@@ -1,0 +1,38 @@
+.service-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sticky-bottom {
+    position: sticky;
+    bottom: 20px;
+    z-index: 100;
+}
+
+.service-card .badge {
+    font-size: 0.75rem;
+}
+
+.service-card h6 {
+    color: #333;
+    font-weight: 600;
+}
+
+.tab-content {
+    padding-top: 1rem;
+}
+
+.nav-tabs .nav-link {
+    color: #666;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+}
