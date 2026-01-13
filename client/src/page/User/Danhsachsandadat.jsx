@@ -253,9 +253,23 @@ const Danhsachsandadat = () => {
     };
 
     const getPaymentBadge = (status) => {
-        return status === 'paid' 
-            ? <Badge bg="success">Đã thanh toán</Badge>
-            : <Badge bg="warning">Chưa thanh toán</Badge>;
+        const statusMap = {
+            paid: { bg: 'success', text: '✅ Đã thanh toán' },
+            pending: { bg: 'warning', text: '⏳ Chờ thanh toán' },
+            unpaid: { bg: 'danger', text: '❌ Chưa thanh toán' }
+        };
+        const badge = statusMap[status] || { bg: 'secondary', text: status };
+        return <Badge bg={badge.bg}>{badge.text}</Badge>;
+    };
+
+    const getPaymentMethodBadge = (method) => {
+        if (!method) return <Badge bg="secondary">N/A</Badge>;
+        const methodMap = {
+            cash: { bg: 'info', text: '💵 Tiền mặt' },
+            banking: { bg: 'primary', text: '🏦 Chuyển khoản' }
+        };
+        const badge = methodMap[method] || { bg: 'secondary', text: method };
+        return <Badge bg={badge.bg}>{badge.text}</Badge>;
     };
 
     // Cấu hình ngân hàng
@@ -366,10 +380,15 @@ const Danhsachsandadat = () => {
                                                 {booking.totalPrice.toLocaleString()}đ
                                             </span>
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="mb-1">
                                             <strong>💳 Thanh toán:</strong>{' '}
                                             {getPaymentBadge(booking.paymentStatus)}
                                         </p>
+                                        {booking.services && booking.services.length > 0 && (
+                                            <p className="mb-0 text-muted small">
+                                                🛍️ {booking.services.length} dịch vụ bổ sung
+                                            </p>
+                                        )}
                                     </div>
                                 </Card.Body>
                                 <Card.Footer className="bg-white">
@@ -565,16 +584,41 @@ const Danhsachsandadat = () => {
                                     
                                     <hr />
                                     <h5>💰 Thanh Toán</h5>
-                                    <p>
+                                    <Row>
+                                        <Col md={6}>
+                                            <p><strong>Phương thức:</strong></p>
+                                            {paymentInfo ? (
+                                                <div>{getPaymentMethodBadge(paymentInfo.paymentMethod)}</div>
+                                            ) : (
+                                                <Badge bg="secondary">Đang tải...</Badge>
+                                            )}
+                                        </Col>
+                                        <Col md={6}>
+                                            <p><strong>Trạng thái:</strong></p>
+                                            <div>{getPaymentBadge(selectedBooking.paymentStatus)}</div>
+                                        </Col>
+                                    </Row>
+                                    <hr className="my-2" />
+                                    <p className="mb-2">
                                         <strong>Tổng tiền:</strong>{' '}
                                         <span className="text-primary fs-5 fw-bold">
                                             {selectedBooking.totalPrice.toLocaleString()}đ
                                         </span>
                                     </p>
-                                    <p>
-                                        <strong>Trạng thái:</strong>{' '}
-                                        {getPaymentBadge(selectedBooking.paymentStatus)}
-                                    </p>
+                                    {paymentInfo && paymentInfo.paidAt && (
+                                        <p className="mb-2">
+                                            <strong>Thời gian thanh toán:</strong>{' '}
+                                            <span className="text-success">
+                                                {new Date(paymentInfo.paidAt).toLocaleString('vi-VN')}
+                                            </span>
+                                        </p>
+                                    )}
+                                    {paymentInfo && paymentInfo.transactionId && (
+                                        <p className="mb-0">
+                                            <strong>Mã giao dịch:</strong>{' '}
+                                            <code className="bg-light p-1">{paymentInfo.transactionId}</code>
+                                        </p>
+                                    )}
                                 </Card.Body>
                             </Card>
 

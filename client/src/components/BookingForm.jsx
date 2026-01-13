@@ -11,7 +11,7 @@ import {
     Spinner
 } from 'react-bootstrap';
 import { useAuth } from './AuthContext';
-import { bookingService, paymentService } from '../services/api';
+import { bookingService } from '../services/api';
 import './BookingForm.css';
 
 const BookingForm = () => {
@@ -82,7 +82,8 @@ const BookingForm = () => {
                 totalPrice: getTotalPrice(),
                 customerName: formData.customerName,
                 customerPhone: formData.customerPhone,
-                notes: formData.notes
+                notes: formData.notes,
+                paymentMethod: formData.paymentMethod // Backend tự động tạo payment
             };
 
             // Add services if any
@@ -95,14 +96,7 @@ const BookingForm = () => {
             }
 
             const bookingResponse = await bookingService.createBooking(bookingData);
-
             const booking = bookingResponse.data.data;
-
-            await paymentService.createPayment({
-                booking: booking._id,
-                amount: getTotalPrice(),
-                paymentMethod: formData.paymentMethod
-            });
 
             // Clear saved services
             sessionStorage.removeItem('selectedServices');

@@ -5,7 +5,7 @@ const Notification = require('../models/Notification');
 // Tạo booking mới
 exports.createBooking = async (req, res) => {
     try {
-        const { field, timeSlot, bookingDate, startTime, endTime, totalPrice, customerName, customerPhone, notes, services } = req.body;
+        const { field, timeSlot, bookingDate, startTime, endTime, totalPrice, customerName, customerPhone, notes, services, paymentMethod } = req.body;
 
         // Kiểm tra khung giờ còn trống
         const slot = await TimeSlot.findById(timeSlot);
@@ -56,6 +56,17 @@ exports.createBooking = async (req, res) => {
         slot.status = 'booked';
         await slot.save();
 
+        // Tạo payment record tự động
+        const Payment = require('../models/Payment');
+        const payment = new Payment({
+            booking: booking._id,
+            user: req.userId,
+            amount: totalPrice,
+            paymentMethod: paymentMethod || 'cash',
+            status: 'pending'
+        });
+        await payment.save();
+
         // Tạo thông báo
         await Notification.create({
             user: req.userId,
@@ -66,7 +77,11 @@ exports.createBooking = async (req, res) => {
             relatedModel: 'Booking'
         });
 
-        res.status(201).json({ message: 'Đặt sân thành công', data: booking });
+        res.status(201).json({ 
+            message: 'Đặt sân thành công', 
+            data: booking,
+            payment: payment 
+        });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
     }

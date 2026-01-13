@@ -34,18 +34,18 @@ const paymentSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    refundAmount: {
-        type: Number,
-        default: 0
-    },
-    refundDate: {
-        type: Date,
-        default: null
-    },
-    description: {
-        type: String,
-        default: ''
-    }
+    // refundAmount: {
+    //     type: Number,
+    //     default: 0
+    // },
+    // refundDate: {
+    //     type: Date,
+    //     default: null
+    // },
+    // description: {
+    //     type: String,
+    //     default: ''
+    // }
 }, {
     timestamps: true
 });
