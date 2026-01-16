@@ -1,0 +1,1809 @@
+{
+	"info": {
+		"_postman_id": "dat-san-the-thao-api",
+		"name": "Đặt Sân Thể Thao - API Tests",
+		"description": "Collection test tất cả API hệ thống đặt sân thể thao",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "fieldId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "serviceId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "timeSlotId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "reviewId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notificationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "1.1 Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has success field', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});",
+									"",
+									"pm.test('Response has user data', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.data).to.have.property('user');",
+									"    pm.collectionVariables.set('userId', res.data.user._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fullName\": \"Nguyễn Văn Test\",\n    \"email\": \"test_user_{{$timestamp}}@example.com\",\n    \"password\": \"password123\",\n    \"phoneNumber\": \"0901234567\",\n    \"address\": \"TP.HCM\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "1.2 Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has token', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('token');",
+									"    pm.collectionVariables.set('token', res.data.token);",
+									"});",
+									"",
+									"pm.test('Response has user info', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.data).to.have.property('user');",
+									"    pm.expect(res.data.user).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.3 Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has admin token', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.collectionVariables.set('adminToken', res.data.token);",
+									"});",
+									"",
+									"pm.test('User is admin', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.data.user.role).to.equal('admin');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.4 Update Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Profile updated successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fullName\": \"Nguyễn Văn Updated\",\n    \"phoneNumber\": \"0909876543\",\n    \"address\": \"Quận 1, TP.HCM\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "1.5 Change Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200 or 400', function() {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+									"});",
+									"",
+									"pm.test('Response has success field', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res).to.have.property('success');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"password123\",\n    \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "change-password"]
+						}
+					}
+				},
+				{
+					"name": "1.6 Get All Users (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is array of users', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "users"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Fields",
+			"item": [
+				{
+					"name": "2.1 Get All Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has fields array', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"    if (res.data.length > 0) {",
+									"        pm.collectionVariables.set('fieldId', res.data[0]._id);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Response has pagination', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res).to.have.property('pagination');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/fields?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "2.2 Get Field By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has field data', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('name');",
+									"    pm.expect(res.data).to.have.property('pricePerHour');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/fields/{{fieldId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields", "{{fieldId}}"]
+						}
+					}
+				},
+				{
+					"name": "2.3 Search Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Search returns results', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/fields?search=san&fieldType=5vs5",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields"],
+							"query": [
+								{"key": "search", "value": "san"},
+								{"key": "fieldType", "value": "5vs5"}
+							]
+						}
+					}
+				},
+				{
+					"name": "2.4 Create Field (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Field created successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('_id');",
+									"    pm.collectionVariables.set('fieldId', res.data._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sân Bóng Test {{$timestamp}}\",\n    \"fieldType\": \"5vs5\",\n    \"location\": \"Quận 1\",\n    \"address\": \"123 Nguyễn Huệ, Quận 1, TP.HCM\",\n    \"description\": \"Sân bóng đá mini 5 người chất lượng cao\",\n    \"pricePerHour\": 300000,\n    \"facilities\": [\"Đèn cao áp\", \"Phòng thay đồ\", \"Bãi giữ xe\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/fields",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields"]
+						}
+					}
+				},
+				{
+					"name": "2.5 Update Field (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Field updated successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sân Bóng Updated\",\n    \"pricePerHour\": 350000,\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/fields/{{fieldId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields", "{{fieldId}}"]
+						}
+					}
+				},
+				{
+					"name": "2.6 Delete Field (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Field deleted successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/fields/{{fieldId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["fields", "{{fieldId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Time Slots",
+			"item": [
+				{
+					"name": "3.1 Get Time Slots By Field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has time slots', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"    if (res.data.length > 0) {",
+									"        pm.collectionVariables.set('timeSlotId', res.data[0]._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/timeslots/field/{{fieldId}}?date=2026-01-20",
+							"host": ["{{baseUrl}}"],
+							"path": ["timeslots", "field", "{{fieldId}}"],
+							"query": [
+								{"key": "date", "value": "2026-01-20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "3.2 Create Time Slot (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Time slot created', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    if (res.data._id) {",
+									"        pm.collectionVariables.set('timeSlotId', res.data._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"field\": \"{{fieldId}}\",\n    \"startTime\": \"06:00\",\n    \"endTime\": \"07:00\",\n    \"price\": 200000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/timeslots",
+							"host": ["{{baseUrl}}"],
+							"path": ["timeslots"]
+						}
+					}
+				},
+				{
+					"name": "3.3 Generate Time Slots (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200 or 201', function() {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test('Time slots generated', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"field\": \"{{fieldId}}\",\n    \"startHour\": 6,\n    \"endHour\": 22,\n    \"duration\": 60,\n    \"defaultPrice\": 200000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/timeslots/generate",
+							"host": ["{{baseUrl}}"],
+							"path": ["timeslots", "generate"]
+						}
+					}
+				},
+				{
+					"name": "3.4 Update Time Slot (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Time slot updated', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 250000,\n    \"isAvailable\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/timeslots/{{timeSlotId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["timeslots", "{{timeSlotId}}"]
+						}
+					}
+				},
+				{
+					"name": "3.5 Delete Time Slot (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Time slot deleted', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/timeslots/{{timeSlotId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["timeslots", "{{timeSlotId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Bookings",
+			"item": [
+				{
+					"name": "4.1 Create Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Booking created successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('_id');",
+									"    pm.expect(res.data).to.have.property('bookingCode');",
+									"    pm.collectionVariables.set('bookingId', res.data._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"field\": \"{{fieldId}}\",\n    \"bookingDate\": \"2026-01-25\",\n    \"startTime\": \"08:00\",\n    \"endTime\": \"09:00\",\n    \"customerName\": \"Nguyễn Văn Test\",\n    \"customerPhone\": \"0901234567\",\n    \"notes\": \"Đặt sân để đá giao hữu\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings"]
+						}
+					}
+				},
+				{
+					"name": "4.2 Get My Bookings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has bookings array', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/my-bookings?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "my-bookings"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "4.3 Get Booking By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has booking details', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('bookingCode');",
+									"    pm.expect(res.data).to.have.property('status');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "4.4 Get All Bookings (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has all bookings', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings?page=1&limit=10&status=pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"},
+								{"key": "status", "value": "pending"}
+							]
+						}
+					}
+				},
+				{
+					"name": "4.5 Confirm Booking (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Booking confirmed', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}", "confirm"]
+						}
+					}
+				},
+				{
+					"name": "4.6 Cancel Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Booking cancelled', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cancelReason\": \"Thay đổi kế hoạch\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings/{{bookingId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "{{bookingId}}", "cancel"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Services",
+			"item": [
+				{
+					"name": "5.1 Get All Services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has services array', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"    if (res.data.length > 0) {",
+									"        pm.collectionVariables.set('serviceId', res.data[0]._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services",
+							"host": ["{{baseUrl}}"],
+							"path": ["services"]
+						}
+					}
+				},
+				{
+					"name": "5.2 Get Services By Category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has services', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services/category/drinks",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "category", "drinks"]
+						}
+					}
+				},
+				{
+					"name": "5.3 Get Services Stats (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has stats', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/services/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "stats"]
+						}
+					}
+				},
+				{
+					"name": "5.4 Create Service (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Service created successfully', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.collectionVariables.set('serviceId', res.data._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Thuê bóng\",\n    \"description\": \"Bóng size 5 chính hãng\",\n    \"price\": 50000,\n    \"unit\": \"quả\",\n    \"category\": \"equipment\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services",
+							"host": ["{{baseUrl}}"],
+							"path": ["services"]
+						}
+					}
+				},
+				{
+					"name": "5.5 Update Service (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Service updated', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 60000,\n    \"isAvailable\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services/{{serviceId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "{{serviceId}}"]
+						}
+					}
+				},
+				{
+					"name": "5.6 Update Stock (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Stock updated', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock\": 100\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services/{{serviceId}}/stock",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "{{serviceId}}", "stock"]
+						}
+					}
+				},
+				{
+					"name": "5.7 Delete Service (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Service deleted', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/services/{{serviceId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "{{serviceId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Reviews",
+			"item": [
+				{
+					"name": "6.1 Get Reviews By Field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has reviews', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"    if (res.data.length > 0) {",
+									"        pm.collectionVariables.set('reviewId', res.data[0]._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/field/{{fieldId}}?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "field", "{{fieldId}}"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "6.2 Get All Reviews (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has all reviews', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"]
+						}
+					}
+				},
+				{
+					"name": "6.3 Create Review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Review created', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.collectionVariables.set('reviewId', res.data._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"field\": \"{{fieldId}}\",\n    \"booking\": \"{{bookingId}}\",\n    \"rating\": 5,\n    \"comment\": \"Sân rất đẹp, chất lượng tốt!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews"]
+						}
+					}
+				},
+				{
+					"name": "6.4 Reply To Review (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Reply added', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reply\": \"Cảm ơn bạn đã đánh giá! Rất vui khi bạn hài lòng với dịch vụ.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}/reply",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}", "reply"]
+						}
+					}
+				},
+				{
+					"name": "6.5 Delete Review",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Review deleted', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reviews", "{{reviewId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Payments",
+			"item": [
+				{
+					"name": "7.1 Get Payment By Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has payment info', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payments/booking/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "booking", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "7.2 Confirm Cash Payment (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Payment confirmed', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Đã nhận tiền mặt\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/{{bookingId}}/confirm-cash",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "{{bookingId}}", "confirm-cash"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Notifications",
+			"item": [
+				{
+					"name": "8.1 Get User Notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has notifications', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"    if (res.data.length > 0) {",
+									"        pm.collectionVariables.set('notificationId', res.data[0]._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications"]
+						}
+					}
+				},
+				{
+					"name": "8.2 Mark Notification As Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Notification marked as read', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "{{notificationId}}", "read"]
+						}
+					}
+				},
+				{
+					"name": "8.3 Mark All Notifications As Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('All notifications marked as read', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/read-all",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "read-all"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Revenue (Admin)",
+			"item": [
+				{
+					"name": "9.1 Get Revenue Stats",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has revenue stats', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.have.property('summary');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/revenue/stats?startDate=2026-01-01&endDate=2026-12-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["revenue", "stats"],
+							"query": [
+								{"key": "startDate", "value": "2026-01-01"},
+								{"key": "endDate", "value": "2026-12-31"}
+							]
+						}
+					}
+				},
+				{
+					"name": "9.2 Get Daily Revenue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has daily revenue', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/revenue/daily?startDate=2026-01-01&endDate=2026-01-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["revenue", "daily"],
+							"query": [
+								{"key": "startDate", "value": "2026-01-01"},
+								{"key": "endDate", "value": "2026-01-31"}
+							]
+						}
+					}
+				},
+				{
+					"name": "9.3 Get Top Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has top fields', function() {",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.success).to.be.true;",
+									"    pm.expect(res.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/revenue/top-fields?limit=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["revenue", "top-fields"],
+							"query": [
+								{"key": "limit", "value": "5"}
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

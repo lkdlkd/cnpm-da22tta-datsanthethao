@@ -12,6 +12,7 @@ import {
     InputGroup,
     Alert
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { serviceService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -21,11 +22,11 @@ const Quanlydichvu = () => {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    
+
     // Filter & Search
     const [searchText, setSearchText] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    
+
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [pagination, setPagination] = useState({
@@ -34,7 +35,7 @@ const Quanlydichvu = () => {
         limit: 10,
         totalPages: 0
     });
-    
+
     // Modal states
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
@@ -47,7 +48,7 @@ const Quanlydichvu = () => {
         stock: 0,
         isAvailable: true
     });
-    
+
     // Stock modal
     const [showStockModal, setShowStockModal] = useState(false);
     const [stockUpdate, setStockUpdate] = useState({
@@ -132,29 +133,66 @@ const Quanlydichvu = () => {
         try {
             if (modalMode === 'create') {
                 await serviceService.createService(currentService);
-                alert('Tạo dịch vụ thành công!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Tạo dịch vụ thành công!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             } else {
                 await serviceService.updateService(currentService._id, currentService);
-                alert('Cập nhật dịch vụ thành công!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Cập nhật dịch vụ thành công!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
             setShowModal(false);
             fetchServices(currentPage);
             fetchStats();
         } catch (err) {
-            alert(err.response?.data?.message || 'Có lỗi xảy ra');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Có lỗi xảy ra'
+            });
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa dịch vụ này?')) return;
-        
+        const result = await Swal.fire({
+            title: 'Xóa dịch vụ',
+            text: 'Bạn có chắc muốn xóa dịch vụ này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             await serviceService.deleteService(id);
-            alert('Xóa dịch vụ thành công!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Xóa dịch vụ thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             fetchServices(currentPage);
             fetchStats();
         } catch (err) {
-            alert(err.response?.data?.message || 'Không thể xóa dịch vụ');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Không thể xóa dịch vụ'
+            });
         }
     };
 
@@ -175,12 +213,22 @@ const Quanlydichvu = () => {
                 quantity: parseInt(stockUpdate.quantity),
                 action: stockUpdate.action
             });
-            alert('Cập nhật tồn kho thành công!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Cập nhật tồn kho thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             setShowStockModal(false);
             fetchServices(currentPage);
             fetchStats();
         } catch (err) {
-            alert(err.response?.data?.message || 'Không thể cập nhật tồn kho');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Không thể cập nhật tồn kho'
+            });
         }
     };
 
@@ -224,7 +272,7 @@ const Quanlydichvu = () => {
                 >
                     ‹ Trước
                 </Button>
-                
+
                 {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
                     <Button
                         key={page}
@@ -256,7 +304,7 @@ const Quanlydichvu = () => {
                 <Col>
                     <h2>
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
-                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z" />
                         </svg>
                         Quản Lý Dịch Vụ
                     </h2>
@@ -343,14 +391,14 @@ const Quanlydichvu = () => {
                         <Col md={5} className="d-flex align-items-end">
                             <Button variant="primary" onClick={handleSearch} className="me-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                                 </svg>
                                 Tìm kiếm
                             </Button>
                             <Button variant="outline-secondary" onClick={handleReset}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
-                                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
                                 </svg>
                                 Đặt lại
                             </Button>

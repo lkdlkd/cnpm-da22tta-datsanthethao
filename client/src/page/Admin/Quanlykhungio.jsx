@@ -11,6 +11,7 @@ import {
     Alert,
     Badge
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { timeSlotService, fieldService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -57,7 +58,7 @@ const Quanlykhungio = () => {
     const fetchFields = async () => {
         try {
             const response = await fieldService.getAllFields();
-            
+
             // Check for success flag in response
             if (response.data && response.data.success !== false) {
                 // Handle paginated response
@@ -79,7 +80,7 @@ const Quanlykhungio = () => {
         setLoading(true);
         try {
             const response = await timeSlotService.getTimeSlotsByFieldAndDate(selectedField, selectedDate);
-            
+
             // Check for success flag in response
             if (response.data && response.data.success !== false) {
                 // Handle different response structures
@@ -117,7 +118,7 @@ const Quanlykhungio = () => {
                 endHour: generateForm.endHour,
                 slotDuration: generateForm.slotDuration
             });
-            
+
             if (response.data && response.data.success !== false) {
                 setSuccess(response.data.message || 'Tạo khung giờ thành công!');
                 setShowModal(false);
@@ -135,48 +136,92 @@ const Quanlykhungio = () => {
     };
 
     const handleDeleteSlot = async (slotId, slotStatus) => {
-        const confirmMsg = slotStatus === 'booked' 
-            ? 'Khung giờ này đã có người đặt! Bạn có chắc muốn xóa?' 
+        const confirmMsg = slotStatus === 'booked'
+            ? 'Khung giờ này đã có người đặt! Bạn có chắc muốn xóa?'
             : 'Bạn có chắc muốn xóa khung giờ này?';
-            
-        if (!window.confirm(confirmMsg)) return;
-        
+
+        const result = await Swal.fire({
+            title: 'Xóa khung giờ',
+            text: confirmMsg,
+            icon: slotStatus === 'booked' ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             const response = await timeSlotService.deleteTimeSlot(slotId);
-            
+
             if (response.data && response.data.success !== false) {
-                setSuccess(response.data.message || 'Xóa khung giờ thành công!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: response.data.message || 'Xóa khung giờ thành công!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
                 fetchTimeSlots();
-                setTimeout(() => setSuccess(''), 3000);
             } else {
-                setError(response.data?.message || 'Không thể xóa khung giờ');
-                setTimeout(() => setError(''), 3000);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: response.data?.message || 'Không thể xóa khung giờ'
+                });
             }
         } catch (err) {
             const errorMsg = err.response?.data?.message || err.message || 'Không thể xóa khung giờ';
-            setError(errorMsg);
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: errorMsg
+            });
         }
     };
 
     const handleResetSlot = async (slotId) => {
-        if (!window.confirm('Bạn có chắc muốn reset khung giờ này về trạng thái trống?')) return;
-        
+        const result = await Swal.fire({
+            title: 'Reset khung giờ',
+            text: 'Bạn có chắc muốn reset khung giờ này về trạng thái trống?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Reset',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             const response = await timeSlotService.updateTimeSlot(slotId, { status: 'available' });
-            
+
             if (response.data && response.data.success !== false) {
-                setSuccess(response.data.message || 'Reset khung giờ thành công!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: response.data.message || 'Reset khung giờ thành công!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
                 fetchTimeSlots();
-                setTimeout(() => setSuccess(''), 3000);
             } else {
-                setError(response.data?.message || 'Không thể reset khung giờ');
-                setTimeout(() => setError(''), 3000);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: response.data?.message || 'Không thể reset khung giờ'
+                });
             }
         } catch (err) {
             const errorMsg = err.response?.data?.message || err.message || 'Không thể reset khung giờ';
-            setError(errorMsg);
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: errorMsg
+            });
         }
     };
 
@@ -194,8 +239,8 @@ const Quanlykhungio = () => {
         <Container fluid className="quanlykhungio-page">
             <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
-                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
                 </svg>
                 Quản Lý Khung Giờ Sân
             </h2>
@@ -237,8 +282,8 @@ const Quanlykhungio = () => {
                             </Form.Group>
                         </Col>
                         <Col md={4} className="d-flex align-items-end">
-                            <Button 
-                                variant="primary" 
+                            <Button
+                                variant="primary"
                                 className="w-100 mb-3"
                                 onClick={() => setShowModal(true)}
                                 disabled={!selectedField || !selectedDate}
@@ -268,7 +313,7 @@ const Quanlykhungio = () => {
                             </div>
                         ) : timeSlots.length === 0 ? (
                             <Alert variant="warning">
-                                Chưa có khung giờ nào cho sân này trong ngày đã chọn. 
+                                Chưa có khung giờ nào cho sân này trong ngày đã chọn.
                                 Vui lòng tạo khung giờ mới.
                             </Alert>
                         ) : (
@@ -293,15 +338,15 @@ const Quanlykhungio = () => {
                                             <td>{getStatusBadge(slot.status)}</td>
                                             <td>
                                                 <div className="action-btn-group">
-                                                    <button 
+                                                    <button
                                                         className="action-btn confirm"
                                                         onClick={() => handleResetSlot(slot._id)}
                                                         disabled={slot.status === 'available'}
                                                         title={slot.status === 'available' ? 'Đã sẵn sàng' : 'Reset về trạng thái trống'}
-                                                        style={slot.status === 'available' ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
+                                                        style={slot.status === 'available' ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
                                                     >
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn delete"
                                                         onClick={() => handleDeleteSlot(slot._id, slot.status)}
                                                         title="Xóa khung giờ"
@@ -330,7 +375,7 @@ const Quanlykhungio = () => {
                         <li>Nhấn "Cấu Hình & Tạo" để tạo thêm khung giờ mới</li>
                     </ol>
                     <Alert variant="info">
-                        <strong>Lưu ý:</strong> Các khung giờ sẽ được tạo tự động với trạng thái "available". 
+                        <strong>Lưu ý:</strong> Các khung giờ sẽ được tạo tự động với trạng thái "available".
                         Giá sẽ lấy theo giá mặc định của sân.
                         <ul className="mt-2 mb-0">
                             <li><strong>Reset:</strong> Chuyển khung giờ đã đặt về trạng thái trống</li>
@@ -353,7 +398,7 @@ const Quanlykhungio = () => {
                             min="0"
                             max="23"
                             value={generateForm.startHour}
-                            onChange={(e) => setGenerateForm({...generateForm, startHour: Number(e.target.value)})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, startHour: Number(e.target.value) })}
                         />
                     </Form.Group>
 
@@ -364,7 +409,7 @@ const Quanlykhungio = () => {
                             min="1"
                             max="24"
                             value={generateForm.endHour}
-                            onChange={(e) => setGenerateForm({...generateForm, endHour: Number(e.target.value)})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, endHour: Number(e.target.value) })}
                         />
                     </Form.Group>
 
@@ -372,7 +417,7 @@ const Quanlykhungio = () => {
                         <Form.Label>Thời Lượng Mỗi Slot (giờ)</Form.Label>
                         <Form.Select
                             value={generateForm.slotDuration}
-                            onChange={(e) => setGenerateForm({...generateForm, slotDuration: Number(e.target.value)})}
+                            onChange={(e) => setGenerateForm({ ...generateForm, slotDuration: Number(e.target.value) })}
                         >
                             <option value="1">1 giờ</option>
                             <option value="1.5">1.5 giờ</option>
@@ -400,4 +445,4 @@ const Quanlykhungio = () => {
 };
 
 export default Quanlykhungio;
-                                 
+

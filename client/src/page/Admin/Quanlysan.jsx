@@ -13,6 +13,7 @@ import {
     Alert,
     Spinner
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { fieldService, timeSlotService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -310,17 +311,36 @@ const Quanlysan = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa sân này?')) return;
+        const result = await Swal.fire({
+            title: 'Xóa sân',
+            text: 'Bạn có chắc muốn xóa sân này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
 
         setLoading(true);
         try {
             await fieldService.deleteField(id);
-            setSuccess('Xóa sân thành công!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Xóa sân thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             await fetchFields(currentPage);
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Không thể xóa sân');
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Không thể xóa sân'
+            });
         } finally {
             setLoading(false);
         }
@@ -594,7 +614,7 @@ const Quanlysan = () => {
                                                         className="action-btn confirm"
                                                         onClick={() => handleShowTimeSlotModal(field)}
                                                         title="Tạo khung giờ"
-                                                        style={{background: '#e8f5e9'}}
+                                                        style={{ background: '#e8f5e9' }}
                                                     >
                                                     </button>
                                                     <button
@@ -1011,7 +1031,7 @@ const Quanlysan = () => {
                 <Modal.Body>
                     {selectedFieldForTimeSlot && (
                         <Alert variant="info" className="mb-3">
-                            <strong>Sân:</strong> {selectedFieldForTimeSlot.name} ({selectedFieldForTimeSlot.fieldType})<br/>
+                            <strong>Sân:</strong> {selectedFieldForTimeSlot.name} ({selectedFieldForTimeSlot.fieldType})<br />
                             <strong>Giá:</strong> {selectedFieldForTimeSlot.pricePerHour?.toLocaleString()}đ/giờ
                         </Alert>
                     )}
@@ -1021,7 +1041,7 @@ const Quanlysan = () => {
                         <Form.Control
                             type="date"
                             value={timeSlotForm.date}
-                            onChange={(e) => setTimeSlotForm({...timeSlotForm, date: e.target.value})}
+                            onChange={(e) => setTimeSlotForm({ ...timeSlotForm, date: e.target.value })}
                             min={new Date().toISOString().split('T')[0]}
                             required
                         />
@@ -1036,7 +1056,7 @@ const Quanlysan = () => {
                                     min="0"
                                     max="23"
                                     value={timeSlotForm.startHour}
-                                    onChange={(e) => setTimeSlotForm({...timeSlotForm, startHour: Number(e.target.value)})}
+                                    onChange={(e) => setTimeSlotForm({ ...timeSlotForm, startHour: Number(e.target.value) })}
                                 />
                             </Form.Group>
                         </Col>
@@ -1048,7 +1068,7 @@ const Quanlysan = () => {
                                     min="1"
                                     max="24"
                                     value={timeSlotForm.endHour}
-                                    onChange={(e) => setTimeSlotForm({...timeSlotForm, endHour: Number(e.target.value)})}
+                                    onChange={(e) => setTimeSlotForm({ ...timeSlotForm, endHour: Number(e.target.value) })}
                                 />
                             </Form.Group>
                         </Col>
@@ -1058,7 +1078,7 @@ const Quanlysan = () => {
                         <Form.Label>Thời Lượng Mỗi Khung Giờ</Form.Label>
                         <Form.Select
                             value={timeSlotForm.slotDuration}
-                            onChange={(e) => setTimeSlotForm({...timeSlotForm, slotDuration: Number(e.target.value)})}
+                            onChange={(e) => setTimeSlotForm({ ...timeSlotForm, slotDuration: Number(e.target.value) })}
                         >
                             <option value="1">1 giờ</option>
                             <option value="1.5">1.5 giờ</option>
@@ -1068,9 +1088,9 @@ const Quanlysan = () => {
 
                     <Alert variant="success">
                         <strong>Sẽ tạo khoảng {Math.floor((timeSlotForm.endHour - timeSlotForm.startHour) / timeSlotForm.slotDuration)} khung giờ</strong>
-                        <div className="mt-2" style={{fontSize: '0.9rem'}}>
-                            📅 Ngày: {timeSlotForm.date ? new Date(timeSlotForm.date).toLocaleDateString('vi-VN') : 'Chưa chọn'}<br/>
-                            ⏰ Từ {timeSlotForm.startHour}:00 đến {timeSlotForm.endHour}:00<br/>
+                        <div className="mt-2" style={{ fontSize: '0.9rem' }}>
+                            📅 Ngày: {timeSlotForm.date ? new Date(timeSlotForm.date).toLocaleDateString('vi-VN') : 'Chưa chọn'}<br />
+                            ⏰ Từ {timeSlotForm.startHour}:00 đến {timeSlotForm.endHour}:00<br />
                             💰 Giá mỗi khung: {(selectedFieldForTimeSlot?.pricePerHour * timeSlotForm.slotDuration)?.toLocaleString()}đ
                         </div>
                     </Alert>
@@ -1079,8 +1099,8 @@ const Quanlysan = () => {
                     <Button variant="secondary" onClick={() => setShowTimeSlotModal(false)}>
                         Hủy
                     </Button>
-                    <Button 
-                        variant="primary" 
+                    <Button
+                        variant="primary"
                         onClick={handleGenerateTimeSlots}
                         disabled={loading || !timeSlotForm.date}
                     >

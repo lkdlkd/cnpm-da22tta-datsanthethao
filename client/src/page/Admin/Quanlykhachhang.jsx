@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Container, 
-    Row, 
-    Col, 
-    Table, 
-    Button, 
-    Modal, 
+import {
+    Container,
+    Row,
+    Col,
+    Table,
+    Button,
+    Modal,
     Form,
     InputGroup,
     Badge,
@@ -13,6 +13,7 @@ import {
     Alert,
     Spinner
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { authService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -48,9 +49,9 @@ const Quanlykhachhang = () => {
             if (filterRole) params.role = filterRole;
             if (filterActive !== '') params.isActive = filterActive;
             if (searchTerm) params.search = searchTerm;
-            
+
             const response = await authService.getAllUsers(params);
-            
+
             // Xử lý response structure mới
             if (response.data.success !== false) {
                 const userData = response.data.data || response.data || [];
@@ -61,8 +62,8 @@ const Quanlykhachhang = () => {
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message ||
-                                err.message ||
-                                'Không thể tải danh sách khách hàng';
+                err.message ||
+                'Không thể tải danh sách khách hàng';
             setError(errorMessage);
             setUsers([]);
         } finally {
@@ -107,7 +108,7 @@ const Quanlykhachhang = () => {
 
         try {
             const response = await authService.updateUserByAdmin(currentUser._id, formData);
-            
+
             // Kiểm tra success flag
             if (response.data.success !== false) {
                 setSuccess(response.data.message || 'Cập nhật thông tin thành công!');
@@ -119,8 +120,8 @@ const Quanlykhachhang = () => {
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message ||
-                                err.message ||
-                                'Có lỗi xảy ra khi cập nhật thông tin';
+                err.message ||
+                'Có lỗi xảy ra khi cập nhật thông tin';
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -128,28 +129,50 @@ const Quanlykhachhang = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa khách hàng này?')) return;
+        const result = await Swal.fire({
+            title: 'Xóa khách hàng',
+            text: 'Bạn có chắc muốn xóa khách hàng này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
 
         setLoading(true);
         setError('');
         try {
             const response = await authService.deleteUser(id);
-            
+
             // Kiểm tra success flag
             if (response.data.success !== false) {
-                setSuccess(response.data.message || 'Xóa khách hàng thành công!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: response.data.message || 'Xóa khách hàng thành công!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
                 await fetchUsers();
-                setTimeout(() => setSuccess(''), 3000);
             } else {
-                setError(response.data.message || 'Xóa thất bại');
-                setTimeout(() => setError(''), 3000);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: response.data.message || 'Xóa thất bại'
+                });
             }
         } catch (err) {
             const errorMessage = err.response?.data?.message ||
-                                err.message ||
-                                'Không thể xóa khách hàng';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
+                err.message ||
+                'Không thể xóa khách hàng';
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: errorMessage
+            });
         } finally {
             setLoading(false);
         }
@@ -165,7 +188,7 @@ const Quanlykhachhang = () => {
     };
 
     const getStatusBadge = (isActive) => {
-        return isActive 
+        return isActive
             ? <Badge bg="success">Hoạt động</Badge>
             : <Badge bg="secondary">Đã khóa</Badge>;
     };
@@ -174,9 +197,9 @@ const Quanlykhachhang = () => {
         <Container fluid className="quanlykhachhang-page">
             <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
-                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                    <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
-                    <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                    <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z" />
+                    <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
                 </svg>
                 Quản Lý Khách Hàng
             </h2>
@@ -199,7 +222,7 @@ const Quanlykhachhang = () => {
                                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                         style={{ paddingRight: '45px' }}
                                     />
-                                    <button 
+                                    <button
                                         style={{
                                             position: 'absolute',
                                             right: '8px',
@@ -217,7 +240,7 @@ const Quanlykhachhang = () => {
                                         title="Tìm kiếm"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -285,24 +308,24 @@ const Quanlykhachhang = () => {
                                             <td>{getStatusBadge(user.isActive)}</td>
                                             <td>
                                                 <div className="action-btn-group">
-                                                    <button 
+                                                    <button
                                                         className="action-btn view"
                                                         onClick={() => handleShowModal(user)}
                                                         title="Xem chi tiết"
                                                     >
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn edit"
                                                         onClick={() => handleShowModal(user)}
                                                         title="Chỉnh sửa"
                                                     >
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn delete"
                                                         onClick={() => handleDelete(user._id)}
                                                         disabled={user.role === 'admin'}
                                                         title="Xóa"
-                                                        style={user.role === 'admin' ? {opacity: 0.5, cursor: 'not-allowed'} : {}}
+                                                        style={user.role === 'admin' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                                                     >
                                                     </button>
                                                 </div>
@@ -330,7 +353,7 @@ const Quanlykhachhang = () => {
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
                         {error && <Alert variant="danger">{error}</Alert>}
-                        
+
                         {currentUser && (
                             <Alert variant="info">
                                 <strong>Email:</strong> {currentUser.email}

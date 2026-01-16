@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Container, 
-    Row, 
-    Col, 
-    Table, 
-    Button, 
+import {
+    Container,
+    Row,
+    Col,
+    Table,
+    Button,
     Badge,
     Card,
     Alert,
     Form,
     Modal
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { reviewService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -35,7 +36,7 @@ const Quanlydanhgia = () => {
     const [showReplyModal, setShowReplyModal] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
     const [replyContent, setReplyContent] = useState('');
-    
+
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -56,7 +57,7 @@ const Quanlydanhgia = () => {
                 ...(filterRating && { rating: filterRating })
             };
             const response = await reviewService.getAllReviews(params);
-            
+
             if (response.data.data) {
                 setReviews(response.data.data);
                 setTotalReviews(response.data.pagination.total || 0);
@@ -97,16 +98,35 @@ const Quanlydanhgia = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Xác nhận xóa đánh giá này?')) return;
+        const result = await Swal.fire({
+            title: 'Xóa đánh giá',
+            text: 'Xác nhận xóa đánh giá này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             await reviewService.deleteReview(id);
-            setSuccess('Xóa đánh giá thành công!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Xóa đánh giá thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             await fetchReviews();
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError('Không thể xóa đánh giá');
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Không thể xóa đánh giá'
+            });
         }
     };
 
@@ -152,7 +172,7 @@ const Quanlydanhgia = () => {
                 >
                     ‹ Trước
                 </Button>
-                
+
                 {startPage > 1 && (
                     <>
                         <Button
@@ -206,7 +226,7 @@ const Quanlydanhgia = () => {
         <Container fluid className="quanlydanhgia-page">
             <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
-                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
                 </svg>
                 Quản Lý Đánh Giá
             </h2>
@@ -220,7 +240,7 @@ const Quanlydanhgia = () => {
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>Lọc theo đánh giá</Form.Label>
-                                <Form.Select 
+                                <Form.Select
                                     value={filterRating}
                                     onChange={(e) => setFilterRating(e.target.value)}
                                 >
@@ -304,19 +324,19 @@ const Quanlydanhgia = () => {
                                             </td>
                                             <td>
                                                 <div className="action-btn-group">
-                                                    <button 
+                                                    <button
                                                         className="action-btn view"
                                                         onClick={() => openReplyModal(review)}
                                                         title="Xem chi tiết"
                                                     >
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn edit"
                                                         onClick={() => openReplyModal(review)}
                                                         title={review.reply ? "Sửa phản hồi" : "Thêm phản hồi"}
                                                     >
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="action-btn delete"
                                                         onClick={() => handleDelete(review._id)}
                                                         title="Xóa đánh giá"
@@ -330,9 +350,9 @@ const Quanlydanhgia = () => {
                             </tbody>
                         </Table>
                     </div>
-                    
+
                     {renderPagination()}
-                    
+
                     <div className="p-3 border-top">
                         <small className="text-muted">
                             Hiển thị <strong>{totalReviews > 0 ? indexOfFirstItem + 1 : 0}</strong> - <strong>{Math.min(indexOfLastItem, totalReviews)}</strong> của <strong>{totalReviews}</strong> đánh giá
@@ -342,8 +362,8 @@ const Quanlydanhgia = () => {
             </Card>
 
             {/* Modal Phản Hồi */}
-            <Modal 
-                show={showReplyModal} 
+            <Modal
+                show={showReplyModal}
                 onHide={() => setShowReplyModal(false)}
             >
                 <Modal.Header closeButton>
@@ -358,7 +378,7 @@ const Quanlydanhgia = () => {
                                 <div className="mt-2"><strong>Nội dung:</strong></div>
                                 <p className="mb-0 text-muted">{selectedReview.comment}</p>
                             </div>
-                            
+
                             <Form.Group>
                                 <Form.Label>Nội dung phản hồi <span className="text-danger">*</span></Form.Label>
                                 <Form.Control

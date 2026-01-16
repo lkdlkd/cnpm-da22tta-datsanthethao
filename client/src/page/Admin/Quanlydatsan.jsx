@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Container, 
-    Row, 
-    Col, 
-    Table, 
-    Button, 
+import {
+    Container,
+    Row,
+    Col,
+    Table,
+    Button,
     Badge,
     Card,
     Alert,
     Form,
     Modal
 } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 import { bookingService, paymentService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
@@ -34,7 +35,7 @@ const Quanlydatsan = () => {
     const [filterStatus, setFilterStatus] = useState('');
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
-    
+
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -55,7 +56,7 @@ const Quanlydatsan = () => {
                 ...(filterStatus && { status: filterStatus })
             };
             const response = await bookingService.getAllBookings(params);
-            
+
             // Xử lý response từ backend
             if (response.data.data && response.data.data.bookings) {
                 // Backend trả về { bookings: [], total, page, totalPages }
@@ -79,35 +80,121 @@ const Quanlydatsan = () => {
     };
 
     const handleConfirm = async (id) => {
-        if (!window.confirm('Xác nhận đơn đặt này?')) return;
+        const result = await Swal.fire({
+            title: 'Xác nhận đơn đặt',
+            text: 'Bạn có chắc chắn muốn xác nhận đơn đặt này?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             await bookingService.confirmBooking(id);
-            setSuccess('Xác nhận đơn thành công!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Xác nhận đơn thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             await fetchBookings();
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError('Không thể xác nhận đơn');
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: 'Không thể xác nhận đơn'
+            });
         }
     };
 
     const handleConfirmPayment = async (booking) => {
-        if (!window.confirm(`Xác nhận đã nhận tiền cho đơn ${booking.bookingCode}?`)) return;
+        const result = await Swal.fire({
+            title: 'Xác nhận thanh toán',
+            text: `Xác nhận đã nhận tiền cho đơn ${booking.bookingCode}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
-            // Lấy payment của booking
-            const paymentResponse = await paymentService.getPaymentByBooking(booking._id);
-            const payment = paymentResponse.data;
+            // Sử dụng trực tiếp payment._id từ booking đã populated
+            const paymentId = booking.payment?._id;
+
+            if (!paymentId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Không tìm thấy thông tin thanh toán cho đơn này'
+                });
+                return;
+            }
 
             // Xác nhận thanh toán
-            await paymentService.confirmCashPayment(payment._id);
-            setSuccess('Xác nhận thanh toán thành công!');
+            await paymentService.confirmCashPayment(paymentId);
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Xác nhận thanh toán thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
             await fetchBookings();
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Không thể xác nhận thanh toán');
-            setTimeout(() => setError(''), 3000);
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Không thể xác nhận thanh toán'
+            });
+        }
+    };
+
+    const handleAdminCancel = async (booking) => {
+        const { value: reason, isConfirmed } = await Swal.fire({
+            title: 'Hủy đơn đặt',
+            text: `Nhập lý do hủy đơn ${booking.bookingCode}:`,
+            input: 'textarea',
+            inputPlaceholder: 'Nhập lý do hủy...',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Hủy đơn',
+            cancelButtonText: 'Đóng',
+            inputValidator: (value) => {
+                if (!value || !value.trim()) {
+                    return 'Vui lòng nhập lý do hủy!';
+                }
+            }
+        });
+
+        if (!isConfirmed) return;
+
+        try {
+            await bookingService.cancelBooking(booking._id, { cancelReason: reason });
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Hủy đơn thành công!',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            await fetchBookings();
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: err.response?.data?.message || 'Không thể hủy đơn'
+            });
         }
     };
 
@@ -124,7 +211,7 @@ const Quanlydatsan = () => {
 
     const getPaymentBadge = (status, method) => {
         const methodText = method === 'banking' ? ' (CK)' : method === 'cash' ? ' (Tiền mặt)' : '';
-        return status === 'paid' 
+        return status === 'paid'
             ? <Badge bg="success">Đã thanh toán{methodText}</Badge>
             : <Badge bg="warning">Chưa thanh toán{methodText}</Badge>;
     };
@@ -166,7 +253,7 @@ const Quanlydatsan = () => {
                 >
                     ‹ Trước
                 </Button>
-                
+
                 {startPage > 1 && (
                     <>
                         <Button
@@ -220,8 +307,8 @@ const Quanlydatsan = () => {
         <Container fluid className="quanlydatsan-page">
             <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
-                    <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
-                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                    <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z" />
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
                 </svg>
                 Quản Lý Đặt Sân
             </h2>
@@ -235,7 +322,7 @@ const Quanlydatsan = () => {
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>Lọc theo trạng thái</Form.Label>
-                                <Form.Select 
+                                <Form.Select
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
                                 >
@@ -273,79 +360,87 @@ const Quanlydatsan = () => {
                                     <th>Thao Tác</th>
                                 </tr>
                             </thead>
-                        <tbody>
-                            {bookings.length === 0 ? (
-                                <tr>
-                                    <td colSpan="8" className="text-center py-4">
-                                        {loading ? (
-                                            <div>
-                                                <div className="spinner-border spinner-border-sm text-primary" role="status">
-                                                    <span className="visually-hidden">Loading...</span>
+                            <tbody>
+                                {bookings.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="8" className="text-center py-4">
+                                            {loading ? (
+                                                <div>
+                                                    <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span className="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <div className="mt-2">Đang tải...</div>
                                                 </div>
-                                                <div className="mt-2">Đang tải...</div>
-                                            </div>
-                                        ) : (
-                                            'Không có dữ liệu'
-                                        )}
-                                    </td>
-                                </tr>
-                            ) : (
-                                bookings.map((booking, index) => (
-                                    <tr key={booking._id}>
-                                        <td>{indexOfFirstItem + index + 1}</td>
-                                        <td><strong style={{ fontSize: '0.9rem' }}>{booking.bookingCode}</strong></td>
-                                        <td>
-                                            <div style={{ fontSize: '0.9rem' }}>{booking.customerName}</div>
-                                            <small className="text-muted">{booking.customerPhone}</small>
-                                        </td>
-                                        <td>
-                                            <div style={{ fontSize: '0.85rem' }}>{booking.field?.name || 'N/A'}</div>
-                                            <Badge bg="secondary" className="mt-1" style={{ fontSize: '0.75rem' }}>
-                                                {formatFieldType(booking.field?.fieldType) || 'N/A'}
-                                            </Badge>
-                                        </td>
-                                        <td style={{ fontSize: '0.85rem' }}>
-                                            {new Date(booking.bookingDate).toLocaleDateString('vi-VN')}
-                                        </td>
-                                        <td className="text-end" style={{ fontSize: '0.9rem' }}>
-                                            <strong className="text-success">{booking.totalPrice?.toLocaleString() || 0}đ</strong>
-                                        </td>
-                                        <td>{getStatusBadge(booking.status)}</td>
-                                        <td>
-                                            <div className="action-btn-group">
-                                                <button 
-                                                    className="action-btn view" 
-                                                    onClick={() => viewDetail(booking)}
-                                                    title="Xem chi tiết"
-                                                >
-                                                </button>
-                                                <button 
-                                                    className="action-btn confirm"
-                                                    onClick={() => handleConfirm(booking._id)}
-                                                    disabled={booking.status !== 'pending'}
-                                                    title={booking.status === 'pending' ? 'Xác nhận đơn' : 'Đã xác nhận'}
-                                                    style={booking.status !== 'pending' ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
-                                                >
-                                                </button>
-                                                <button 
-                                                    className="action-btn payment"
-                                                    onClick={() => handleConfirmPayment(booking)}
-                                                    disabled={booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash'}
-                                                    title={booking.paymentStatus === 'paid' ? 'Đã thanh toán' : (booking.payment?.paymentMethod === 'cash' ? 'Xác nhận thanh toán' : 'Không áp dụng')}
-                                                    style={(booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash') ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
-                                                >
-                                                </button>
-                                            </div>
+                                            ) : (
+                                                'Không có dữ liệu'
+                                            )}
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </Table>
+                                ) : (
+                                    bookings.map((booking, index) => (
+                                        <tr key={booking._id}>
+                                            <td>{indexOfFirstItem + index + 1}</td>
+                                            <td><strong style={{ fontSize: '0.9rem' }}>{booking.bookingCode}</strong></td>
+                                            <td>
+                                                <div style={{ fontSize: '0.9rem' }}>{booking.customerName}</div>
+                                                <small className="text-muted">{booking.customerPhone}</small>
+                                            </td>
+                                            <td>
+                                                <div style={{ fontSize: '0.85rem' }}>{booking.field?.name || 'N/A'}</div>
+                                                <Badge bg="secondary" className="mt-1" style={{ fontSize: '0.75rem' }}>
+                                                    {formatFieldType(booking.field?.fieldType) || 'N/A'}
+                                                </Badge>
+                                            </td>
+                                            <td style={{ fontSize: '0.85rem' }}>
+                                                {new Date(booking.bookingDate).toLocaleDateString('vi-VN')}
+                                            </td>
+                                            <td className="text-end" style={{ fontSize: '0.9rem' }}>
+                                                <strong className="text-success">{booking.totalPrice?.toLocaleString() || 0}đ</strong>
+                                            </td>
+                                            <td>{getStatusBadge(booking.status)}</td>
+                                            <td>
+                                                <div className="action-btn-group">
+                                                    <button
+                                                        className="action-btn view"
+                                                        onClick={() => viewDetail(booking)}
+                                                        title="Xem chi tiết"
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn confirm"
+                                                        onClick={() => handleConfirm(booking._id)}
+                                                        disabled={booking.status !== 'pending'}
+                                                        title={booking.status === 'pending' ? 'Xác nhận đơn' : 'Đã xác nhận'}
+                                                        style={booking.status !== 'pending' ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn payment"
+                                                        onClick={() => handleConfirmPayment(booking)}
+                                                        disabled={booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash'}
+                                                        title={booking.paymentStatus === 'paid' ? 'Đã thanh toán' : (booking.payment?.paymentMethod === 'cash' ? 'Xác nhận thanh toán' : 'Không áp dụng')}
+                                                        style={(booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash') ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn cancel"
+                                                        onClick={() => handleAdminCancel(booking)}
+                                                        disabled={booking.status === 'cancelled' || booking.status === 'completed'}
+                                                        title={booking.status === 'cancelled' ? 'Đã hủy' : booking.status === 'completed' ? 'Đã hoàn thành' : 'Hủy đơn'}
+                                                        style={(booking.status === 'cancelled' || booking.status === 'completed') ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                                                    >
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </Table>
                     </div>
-                    
+
                     {renderPagination()}
-                    
+
                     <div className="p-3 border-top">
                         <small className="text-muted">
                             Hiển thị <strong>{totalBookings > 0 ? indexOfFirstItem + 1 : 0}</strong> - <strong>{Math.min(indexOfLastItem, totalBookings)}</strong> của <strong>{totalBookings}</strong> đơn đặt
@@ -355,9 +450,9 @@ const Quanlydatsan = () => {
             </Card>
 
             {/* Modal Chi Tiết */}
-            <Modal 
-                show={showDetailModal} 
-                onHide={() => setShowDetailModal(false)} 
+            <Modal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
                 size="lg"
                 style={{ maxHeight: '90vh' }}
             >
@@ -390,7 +485,7 @@ const Quanlydatsan = () => {
                             <p><strong>Ngày:</strong> {new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN')}</p>
                             <p><strong>Giờ:</strong> {selectedBooking.startTime} - {selectedBooking.endTime}</p>
                             <p><strong>Giá sân:</strong> {selectedBooking.timeSlot?.price?.toLocaleString() || '0'}đ</p>
-                            
+
                             {selectedBooking.services && selectedBooking.services.length > 0 && (
                                 <>
                                     <hr />
@@ -412,8 +507,8 @@ const Quanlydatsan = () => {
                                                     <td>
                                                         <Badge bg="info">
                                                             {s.service?.category === 'equipment' ? 'Thiết bị' :
-                                                             s.service?.category === 'beverage' ? 'Đồ uống' :
-                                                             s.service?.category === 'referee' ? 'Trọng tài' : 'Khác'}
+                                                                s.service?.category === 'beverage' ? 'Đồ uống' :
+                                                                    s.service?.category === 'referee' ? 'Trọng tài' : 'Khác'}
                                                         </Badge>
                                                     </td>
                                                     <td className="text-center">{s.quantity} {s.service?.unit || ''}</td>
@@ -442,18 +537,18 @@ const Quanlydatsan = () => {
                             </p>
                             <p>
                                 <strong>Phương thức:</strong>{' '}
-                                {selectedBooking.payment?.paymentMethod === 'banking' ? 
-                                    <Badge bg="primary">Chuyển khoản</Badge> : 
-                                    selectedBooking.payment?.paymentMethod === 'cash' ? 
-                                    <Badge bg="success">Tiền mặt</Badge> : 
-                                    <Badge bg="secondary">N/A</Badge>
+                                {selectedBooking.payment?.paymentMethod === 'banking' ?
+                                    <Badge bg="primary">Chuyển khoản</Badge> :
+                                    selectedBooking.payment?.paymentMethod === 'cash' ?
+                                        <Badge bg="success">Tiền mặt</Badge> :
+                                        <Badge bg="secondary">N/A</Badge>
                                 }
                             </p>
                             <p>
                                 <strong>Trạng thái thanh toán:</strong>{' '}
                                 {getPaymentBadge(selectedBooking.paymentStatus, selectedBooking.payment?.paymentMethod)}
                             </p>
-                            
+
                             {selectedBooking.notes && (
                                 <>
                                     <hr />
@@ -466,12 +561,12 @@ const Quanlydatsan = () => {
                                     <hr />
                                     <h5>❌ Lý Do Hủy</h5>
                                     <Alert variant="danger">
-                                        <strong>Lý do:</strong> {selectedBooking.cancelReason}<br/>
+                                        <strong>Lý do:</strong> {selectedBooking.cancelReason}<br />
                                         <small><strong>Thời gian hủy:</strong> {new Date(selectedBooking.cancelledAt).toLocaleString('vi-VN')}</small>
                                     </Alert>
                                 </>
                             )}
-                            
+
                             <hr />
                             <Row className="text-muted">
                                 <Col md={6}>

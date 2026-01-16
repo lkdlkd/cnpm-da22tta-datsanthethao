@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-    Container, 
-    Row, 
-    Col, 
-    Card, 
-    Button, 
+import {
+    Container,
+    Row,
+    Col,
+    Card,
+    Button,
     Form,
     Alert,
     Spinner
@@ -32,7 +32,7 @@ const BookingForm = () => {
     const [bookingSuccess, setBookingSuccess] = useState(false);
     const [bookingInfo, setBookingInfo] = useState(null);
     const [selectedServices, setSelectedServices] = useState([]);
-    
+
     // Load services from sessionStorage on mount
     useEffect(() => {
         const savedServices = sessionStorage.getItem('selectedServices');
@@ -63,7 +63,7 @@ const BookingForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!field || !timeSlot) {
             setError('Thiếu thông tin đặt sân');
             return;
@@ -96,7 +96,7 @@ const BookingForm = () => {
             }
 
             const bookingResponse = await bookingService.createBooking(bookingData);
-            const booking = bookingResponse.data.data;
+            const booking = bookingResponse.data.data.booking;
 
             // Clear saved services
             sessionStorage.removeItem('selectedServices');
@@ -104,7 +104,7 @@ const BookingForm = () => {
             // Hiển thị thông tin thanh toán
             setBookingInfo(booking);
             setBookingSuccess(true);
-            
+
             // Chỉ navigate nếu thanh toán tiền mặt
             if (formData.paymentMethod === 'cash') {
                 setTimeout(() => {
@@ -141,7 +141,7 @@ const BookingForm = () => {
     const bankInfo = {
         bank_name: 'MB',
         account_number: process.env.REACT_APP_BANK_ACCOUNT_NUMBER || '0123456789',
-        account_name:  process.env.REACT_APP_BANK_ACCOUNT_NAME || 'CONG TY SAN BONG'
+        account_name: process.env.REACT_APP_BANK_ACCOUNT_NAME || 'CONG TY SAN BONG'
     };
 
     if (bookingSuccess && bookingInfo) {
@@ -163,13 +163,13 @@ const BookingForm = () => {
                                         <>
                                             <h5 className="mb-3">📱 Quét mã QR để thanh toán</h5>
                                             <div className="qr-code-container mb-4">
-                                                <img 
+                                                <img
                                                     src={`https://img.vietqr.io/image/${bankInfo.bank_name}-${bankInfo.account_number}-qronly.jpg?accountName=${encodeURIComponent(bankInfo.account_name)}&amount=${getTotalPrice()}&addInfo=${encodeURIComponent(bookingInfo.bookingCode)}`}
                                                     alt="QR Code"
                                                     style={{ maxWidth: '300px', width: '100%' }}
                                                 />
                                             </div>
-                                            
+
                                             <Card className="mb-3 bg-light">
                                                 <Card.Body>
                                                     <h6>Thông tin chuyển khoản:</h6>
@@ -194,15 +194,15 @@ const BookingForm = () => {
                                     )}
 
                                     <div className="d-grid gap-2 mt-4">
-                                        <Button 
-                                            variant="primary" 
+                                        <Button
+                                            variant="primary"
                                             size="lg"
                                             onClick={() => navigate('/danh-sach-san-da-dat')}
                                         >
                                             📋 Xem Đơn Đặt Của Tôi
                                         </Button>
-                                        <Button 
-                                            variant="outline-secondary" 
+                                        <Button
+                                            variant="outline-secondary"
                                             onClick={() => navigate('/home')}
                                         >
                                             🏠 Về Trang Chủ
@@ -303,7 +303,7 @@ const BookingForm = () => {
 
                                 <Form onSubmit={handleSubmit}>
                                     <h5 className="mb-3">👤 Thông Tin Khách Hàng</h5>
-                                    
+
                                     <Form.Group className="mb-3">
                                         <Form.Label>Họ và tên <span className="text-danger">*</span></Form.Label>
                                         <Form.Control
@@ -341,7 +341,7 @@ const BookingForm = () => {
                                     </Form.Group>
 
                                     <h5 className="mb-3">💳 Phương Thức Thanh Toán</h5>
-                                    
+
                                     <Form.Group className="mb-3">
                                         <Form.Check
                                             type="radio"
@@ -374,23 +374,23 @@ const BookingForm = () => {
                                             <p className="mb-1"><strong>Số tiền:</strong> <span className="text-danger fw-bold">{getTotalPrice().toLocaleString()}đ</span></p>
                                             <p className="mb-1"><strong>Nội dung CK:</strong> <code className="bg-warning p-1">Mã đơn (sẽ hiển thị sau khi đặt)</code></p>
                                             <hr />
-                                            <small className="text-muted"> 
+                                            <small className="text-muted">
                                                 ⚠️ QR code và mã đơn sẽ hiển thị sau khi xác nhận đặt sân. Hệ thống tự động xác nhận thanh toán sau 5-10 phút.
                                             </small>
                                         </Alert>
                                     )}
 
                                     <Alert variant="info">
-                                        <strong>Lưu ý:</strong> Vui lòng đến sân đúng giờ đã đặt. 
+                                        <strong>Lưu ý:</strong> Vui lòng đến sân đúng giờ đã đặt.
                                         {formData.paymentMethod === 'cash' && ' Thanh toán tiền mặt khi đến sân.'}
                                         {formData.paymentMethod === 'banking' && ' Vui lòng chuyển khoản trước 24h so với giờ đặt sân.'}
                                         {' '}Mọi thắc mắc xin liên hệ hotline: <strong>1900-xxxx</strong>
                                     </Alert>
 
                                     <div className="d-grid gap-2">
-                                        <Button 
-                                            variant="primary" 
-                                            type="submit" 
+                                        <Button
+                                            variant="primary"
+                                            type="submit"
                                             size="lg"
                                             disabled={loading}
                                         >
@@ -403,8 +403,8 @@ const BookingForm = () => {
                                                 '✅ Xác Nhận Đặt Sân'
                                             )}
                                         </Button>
-                                        <Button 
-                                            variant="outline-secondary" 
+                                        <Button
+                                            variant="outline-secondary"
                                             onClick={() => navigate(-1)}
                                             disabled={loading}
                                         >
