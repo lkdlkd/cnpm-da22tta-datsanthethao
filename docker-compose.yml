@@ -9,7 +9,7 @@ services:
       - /app/node_modules  # ngăn node_modules từ máy host ghi đè
     env_file:
       - ./backend/.env
-    restart: always
+    # restart: always
 
   client:
     build: ./client
@@ -17,4 +17,4 @@ services:
       - "3000:3000"
     volumes:
       - ./client:/app
-    restart: always
+    # restart: always
