@@ -2,43 +2,6 @@ const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
 const Notification = require('../models/Notification');
 
-// Tạo thanh toán
-exports.createPayment = async (req, res) => {
-    try {
-        const { booking: bookingId, amount, paymentMethod } = req.body;
-
-        const booking = await Booking.findById(bookingId);
-        if (!booking) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt' });
-        }
-
-        // Kiểm tra quyền
-        if (booking.user.toString() !== req.userId) {
-            return res.status(403).json({ message: 'Không có quyền thanh toán đơn này' });
-        }
-
-        const payment = new Payment({
-            booking: bookingId,
-            user: req.userId,
-            amount,
-            paymentMethod,
-            status: paymentMethod === 'cash' ? 'pending' : 'pending'
-        });
-
-        await payment.save();
-
-        // Nếu thanh toán tiền mặt, đánh dấu là chờ xác nhận
-        if (paymentMethod === 'cash') {
-            booking.paymentStatus = 'unpaid';
-        }
-
-        await booking.save();
-
-        res.status(201).json({ message: 'Tạo thanh toán thành công', payment });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
 
 // Xử lý callback từ cổng thanh toán
 exports.handlePaymentCallback = async (req, res) => {
@@ -47,7 +10,7 @@ exports.handlePaymentCallback = async (req, res) => {
 
         const payment = await Payment.findById(paymentId);
         if (!payment) {
-            return res.status(404).json({ message: 'Không tìm thấy thanh toán' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy thanh toán' });
         }
 
         payment.status = status;
@@ -77,9 +40,9 @@ exports.handlePaymentCallback = async (req, res) => {
             relatedModel: 'Payment'
         });
 
-        res.json({ message: 'Cập nhật thanh toán thành công', payment });
+        res.json({ success: true, message: 'Cập nhật thanh toán thành công', data: payment });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -91,12 +54,12 @@ exports.getPaymentByBooking = async (req, res) => {
             .populate('user', 'fullName email');
 
         if (!payment) {
-            return res.status(404).json({ message: 'Không tìm thấy thanh toán' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy thanh toán' });
         }
 
-        res.json(payment);
+        res.json({ success: true, data: payment });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -105,7 +68,7 @@ exports.confirmCashPayment = async (req, res) => {
     try {
         const payment = await Payment.findById(req.params.id);
         if (!payment) {
-            return res.status(404).json({ message: 'Không tìm thấy thanh toán' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy thanh toán' });
         }
 
         payment.status = 'success';
@@ -128,24 +91,9 @@ exports.confirmCashPayment = async (req, res) => {
             relatedModel: 'Payment'
         });
 
-        res.json({ message: 'Xác nhận thanh toán thành công', payment });
+        res.json({ success: true, message: 'Xác nhận thanh toán thành công', data: payment });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Lấy lịch sử thanh toán của user
-exports.getUserPayments = async (req, res) => {
-    try {
-        const payments = await Payment.find({ user: req.userId })
-            .populate({
-                path: 'booking',
-                populate: { path: 'field', select: 'name fieldType' }
-            })
-            .sort({ createdAt: -1 });
-
-        res.json(payments);
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};

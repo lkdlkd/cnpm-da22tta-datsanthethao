@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { revenueService } from '../../services/api';
 import './AdminCommon.css';
 import './SelectArrow.css';
 import './Quanlydoanhthu.css';
@@ -8,65 +8,75 @@ const Quanlydoanhthu = () => {
     const [revenue, setRevenue] = useState({
         total: 0,
         monthly: 0,
-        daily: 0
+        daily: 0,
+        totalBookings: 0
     });
     const [bookings, setBookings] = useState([]);
+    const [statusStats, setStatusStats] = useState([]);
+    const [monthlyStats, setMonthlyStats] = useState([]);
+    const [topFields, setTopFields] = useState([]);
     const [filter, setFilter] = useState({
         startDate: '',
         endDate: '',
-        status: 'all'
+        status: 'completed' // Mặc định hiển thị booking hoàn thành
     });
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetchRevenue();
-        fetchBookings();
+        fetchRevenueStats();
+        fetchTopFields();
     }, [filter]);
 
-    const fetchRevenue = async () => {
+    const fetchRevenueStats = async () => {
+        setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/bookings', {
-                params: {
-                    startDate: filter.startDate,
-                    endDate: filter.endDate,
-                    status: filter.status !== 'all' ? filter.status : undefined
-                }
-            });
+            const params = {
+                status: filter.status
+            };
             
-            const bookingsData = response.data;
-            const total = bookingsData.reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
+            if (filter.startDate) params.startDate = filter.startDate;
+            if (filter.endDate) params.endDate = filter.endDate;
             
-            // Calculate monthly and daily revenue
-            const today = new Date();
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            const monthly = bookingsData
-                .filter(b => new Date(b.createdAt) >= startOfMonth)
-                .reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
+            const response = await revenueService.getRevenueStats(params);
             
-            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            const daily = bookingsData
-                .filter(b => new Date(b.createdAt) >= startOfDay)
-                .reduce((sum, booking) => sum + (booking.totalAmount || 0), 0);
-
-            setRevenue({ total, monthly, daily });
+            if (response.data.success) {
+                const { summary, statusStats, monthlyStats, bookings } = response.data.data;
+                setRevenue({
+                    total: summary.total || 0,
+                    monthly: summary.monthly || 0,
+                    daily: summary.daily || 0,
+                    totalBookings: summary.totalBookings || 0
+                });
+                setStatusStats(statusStats || []);
+                setMonthlyStats(monthlyStats || []);
+                setBookings(bookings || []);
+            }
         } catch (error) {
-            console.error('Error fetching revenue:', error);
+            console.error('Error fetching revenue stats:', error);
+            alert(error.response?.data?.message || 'Không thể tải thống kê doanh thu');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const fetchBookings = async () => {
+    const fetchTopFields = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/bookings', {
-                params: {
-                    startDate: filter.startDate,
-                    endDate: filter.endDate,
-                    status: filter.status !== 'all' ? filter.status : undefined
-                }
-            });
-            setBookings(response.data);
+            const params = {
+                limit: 5
+            };
+            
+            if (filter.startDate) params.startDate = filter.startDate;
+            if (filter.endDate) params.endDate = filter.endDate;
+            
+            const response = await revenueService.getTopFields(params);
+            
+            if (response.data.success) {
+                setTopFields(response.data.data || []);
+            }
         } catch (error) {
-            console.error('Error fetching bookings:', error);
+            console.error('Error fetching top fields:', error);
         }
     };
 
@@ -114,7 +124,7 @@ const Quanlydoanhthu = () => {
                                 </svg>
                             </div>
                             <h3>{formatCurrency(revenue.total)}</h3>
-                            <p className="text-muted">Tổng doanh thu</p>
+                            <p className="text-muted">Tổng doanh thu ({revenue.totalBookings} đơn)</p>
                         </div>
                     </div>
                 </div>
@@ -127,7 +137,7 @@ const Quanlydoanhthu = () => {
                                 </svg>
                             </div>
                             <h3>{formatCurrency(revenue.monthly)}</h3>
-                            <p className="text-muted">Doanh thu tháng</p>
+                            <p className="text-muted">Doanh thu tháng này</p>
                         </div>
                     </div>
                 </div>
@@ -183,56 +193,182 @@ const Quanlydoanhthu = () => {
                             </select>
                         </div>
                         <div className="col-md-3 d-flex align-items-end">
-                            <button className="btn btn-primary w-100" onClick={() => { fetchRevenue(); fetchBookings(); }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                                </svg>
-                                Lọc
+                            <button 
+                                className="btn btn-primary w-100" 
+                                onClick={() => {
+                                    fetchRevenueStats();
+                                    fetchTopFields();
+                                }}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Đang tải...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                        </svg>
+                                        Lọc
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Bookings Table - Compact */}
-            <div className="card">
-                <div className="card-body">
-                    <h5 className="mb-3">Danh sách đặt sân</h5>
-                    <div className="table-responsive">
-                        <table className="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Mã đơn</th>
-                                    <th>Khách hàng</th>
-                                    <th>Ngày đặt</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {bookings.map((booking) => (
-                                    <tr key={booking._id}>
-                                        <td>#{booking._id?.slice(-6)}</td>
-                                        <td>{booking.userId?.fullName || 'N/A'}</td>
-                                        <td>{formatDate(booking.bookingDate)}</td>
-                                        <td className="fw-bold text-success">{formatCurrency(booking.totalAmount)}</td>
-                                        <td>{getStatusBadge(booking.status)}</td>
-                                        <td>
-                                            <button 
-                                                className="action-btn view"
-                                                onClick={() => handleViewDetail(booking)}
-                                                title="Xem chi tiết"
-                                            >
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+            {/* Statistics Sections */}
+            <div className="row mb-4">
+                {/* Monthly Stats */}
+                <div className="col-md-6">
+                    <div className="card">
+                        <div className="card-body">
+                            <h5 className="mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '8px' }}>
+                                    <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2z"/>
+                                </svg>
+                                Doanh thu 6 tháng gần nhất
+                            </h5>
+                            {monthlyStats.length === 0 ? (
+                                <p className="text-muted text-center py-3">Chưa có dữ liệu</p>
+                            ) : (
+                                <div className="table-responsive">
+                                    <table className="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tháng/Năm</th>
+                                                <th className="text-end">Số đơn</th>
+                                                <th className="text-end">Doanh thu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {monthlyStats.map((stat, index) => (
+                                                <tr key={index}>
+                                                    <td>{stat._id.month}/{stat._id.year}</td>
+                                                    <td className="text-end">
+                                                        <span className="badge bg-info">{stat.count}</span>
+                                                    </td>
+                                                    <td className="text-end fw-bold text-success">
+                                                        {formatCurrency(stat.revenue || 0)}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Top Fields */}
+                <div className="col-md-6">
+                    <div className="card">
+                        <div className="card-body">
+                            <h5 className="mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '8px' }}>
+                                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                                    <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                </svg>
+                                Top 5 sân có doanh thu cao nhất
+                            </h5>
+                            {topFields.length === 0 ? (
+                                <p className="text-muted text-center py-3">Chưa có dữ liệu</p>
+                            ) : (
+                                <div className="top-fields-list">
+                                    {topFields.map((field, index) => (
+                                        <div key={field._id} className="top-field-item d-flex align-items-center mb-3 p-3 border rounded">
+                                            <div className="rank-badge me-3">
+                                                <span className={`badge ${index === 0 ? 'bg-warning' : index === 1 ? 'bg-secondary' : index === 2 ? 'bg-info' : 'bg-light text-dark'} rounded-circle`} style={{ fontSize: '16px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {index + 1}
+                                                </span>
+                                            </div>
+                                            <div className="flex-grow-1">
+                                                <div className="fw-bold">{field.fieldInfo?.name || 'N/A'}</div>
+                                                <small className="text-muted">
+                                                    {field.fieldInfo?.fieldType || 'N/A'} • {field.fieldInfo?.location || 'N/A'}
+                                                </small>
+                                            </div>
+                                            <div className="text-end">
+                                                <div className="fw-bold text-success">{formatCurrency(field.revenue || 0)}</div>
+                                                <small className="text-muted">{field.count || 0} đơn</small>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
+
+           
+
+            {/* Bookings Table - Compact */}
+            {loading ? (
+                <div className="card">
+                    <div className="card-body text-center py-5">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3">Đang tải dữ liệu...</p>
+                    </div>
+                </div>
+            ) : (
+                <div className="card">
+                    <div className="card-body">
+                        <h5 className="mb-3">
+                            Danh sách đặt sân 
+                            <span className="badge bg-primary ms-2">{bookings.length} đơn</span>
+                        </h5>
+                        <div className="table-responsive">
+                            <table className="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {bookings.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" className="text-center py-4">
+                                                <p className="text-muted mb-0">Không có dữ liệu</p>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        bookings.map((booking) => (
+                                            <tr key={booking._id}>
+                                                <td>#{booking._id?.slice(-6)}</td>
+                                                <td>{booking.user?.fullName || 'N/A'}</td>
+                                                <td>{formatDate(booking.bookingDate)}</td>
+                                                <td className="fw-bold text-success">{formatCurrency(booking.totalPrice)}</td>
+                                                <td>{getStatusBadge(booking.status)}</td>
+                                                <td>
+                                                    <button 
+                                                        className="action-btn view"
+                                                        onClick={() => handleViewDetail(booking)}
+                                                        title="Xem chi tiết"
+                                                    >
+                                                        
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Detail Modal */}
             {showDetailModal && selectedBooking && (
@@ -246,15 +382,15 @@ const Quanlydoanhthu = () => {
                             <div className="modal-body">
                                 <div className="row mb-3">
                                     <div className="col-md-6">
-                                        <strong>Khách hàng:</strong> {selectedBooking.userId?.fullName || 'N/A'}
+                                        <strong>Khách hàng:</strong> {selectedBooking.user?.fullName || 'N/A'}
                                     </div>
                                     <div className="col-md-6">
-                                        <strong>Email:</strong> {selectedBooking.userId?.email || 'N/A'}
+                                        <strong>Email:</strong> {selectedBooking.user?.email || 'N/A'}
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-6">
-                                        <strong>Điện thoại:</strong> {selectedBooking.userId?.phoneNumber || 'N/A'}
+                                        <strong>Điện thoại:</strong> {selectedBooking.user?.phoneNumber || 'N/A'}
                                     </div>
                                     <div className="col-md-6">
                                         <strong>Trạng thái:</strong> {getStatusBadge(selectedBooking.status)}
@@ -270,18 +406,18 @@ const Quanlydoanhthu = () => {
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-6">
-                                        <strong>Sân:</strong> {selectedBooking.fieldId?.name || 'N/A'}
+                                        <strong>Sân:</strong> {selectedBooking.field?.name || 'N/A'}
                                     </div>
                                     <div className="col-md-6">
-                                        <strong>Loại sân:</strong> {selectedBooking.fieldId?.type || 'N/A'}
+                                        <strong>Loại sân:</strong> {selectedBooking.field?.fieldType || 'N/A'}
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-6">
-                                        <strong>Khung giờ:</strong> {selectedBooking.timeSlotId?.startTime} - {selectedBooking.timeSlotId?.endTime}
+                                        <strong>Khung giờ:</strong> {selectedBooking.timeSlot?.startTime} - {selectedBooking.timeSlot?.endTime}
                                     </div>
                                     <div className="col-md-6">
-                                        <strong>Giá sân:</strong> {formatCurrency(selectedBooking.timeSlotId?.price || 0)}
+                                        <strong>Giá sân:</strong> {formatCurrency(selectedBooking.timeSlot?.price || 0)}
                                     </div>
                                 </div>
                                 
@@ -289,9 +425,9 @@ const Quanlydoanhthu = () => {
                                     <div className="mb-3">
                                         <strong>Dịch vụ:</strong>
                                         <ul>
-                                            {selectedBooking.services.map((service, index) => (
+                                            {selectedBooking.services.map((serviceItem, index) => (
                                                 <li key={index}>
-                                                    {service.serviceId?.name} - SL: {service.quantity} - {formatCurrency(service.price * service.quantity)}
+                                                    {serviceItem.service?.name} - SL: {serviceItem.quantity} - {formatCurrency((serviceItem.service?.price || 0) * serviceItem.quantity)}
                                                 </li>
                                             ))}
                                         </ul>
@@ -306,7 +442,7 @@ const Quanlydoanhthu = () => {
                                 
                                 <div className="row">
                                     <div className="col-md-12 text-end">
-                                        <h4>Tổng tiền: <span className="text-success">{formatCurrency(selectedBooking.totalAmount)}</span></h4>
+                                        <h4>Tổng tiền: <span className="text-success">{formatCurrency(selectedBooking.totalPrice)}</span></h4>
                                     </div>
                                 </div>
                             </div>

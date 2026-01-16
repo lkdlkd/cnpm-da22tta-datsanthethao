@@ -28,7 +28,7 @@ axiosInstance.interceptors.request.use(
 export const authService = {
     register: (data) => axiosInstance.post('/auth/register', data),
     login: (data) => axiosInstance.post('/auth/login', data),
-    getCurrentUser: () => axiosInstance.get('/auth/me'),
+    // getCurrentUser: () => axiosInstance.get('/auth/me'),
     updateProfile: (data) => axiosInstance.put('/auth/profile', data),
     changePassword: (data) => axiosInstance.put('/auth/change-password', data),
     // Admin functions
@@ -40,7 +40,6 @@ export const authService = {
 // Field Service
 export const fieldService = {
     getAllFields: (params) => axiosInstance.get('/fields', { params }),
-    getPopularFields: () => axiosInstance.get('/fields/popular'),
     getFieldById: (id) => axiosInstance.get(`/fields/${id}`),
     createField: (data) => axiosInstance.post('/fields', data),
     updateField: (id, data) => axiosInstance.put(`/fields/${id}`, data),
@@ -72,8 +71,6 @@ export const bookingService = {
 
 // Payment Service
 export const paymentService = {
-    createPayment: (data) => axiosInstance.post('/payments', data),
-    getUserPayments: () => axiosInstance.get('/payments/my-payments'),
     getPaymentByBooking: (bookingId) => axiosInstance.get(`/payments/booking/${bookingId}`),
     confirmCashPayment: (id) => axiosInstance.put(`/payments/${id}/confirm-cash`)
 };
@@ -83,7 +80,6 @@ export const reviewService = {
     getReviewsByField: (fieldId, params) =>
         axiosInstance.get(`/reviews/field/${fieldId}`, { params }),
     createReview: (data) => axiosInstance.post('/reviews', data),
-    getUserReviews: () => axiosInstance.get('/reviews/my-reviews'),
     deleteReview: (id) => axiosInstance.delete(`/reviews/${id}`),
     replyToReview: (id, data) => axiosInstance.put(`/reviews/${id}/reply`, data),
     getAllReviews: (params) => axiosInstance.get('/reviews', { params })
@@ -92,9 +88,7 @@ export const reviewService = {
 // Service Service
 export const serviceService = {
     getAllServices: (params) => axiosInstance.get('/services', { params }),
-    getServiceById: (id) => axiosInstance.get(`/services/${id}`),
     getServicesByCategory: (category) => axiosInstance.get(`/services/category/${category}`),
-    checkAvailability: (params) => axiosInstance.get('/services/check-availability', { params }),
     getServicesStats: () => axiosInstance.get('/services/stats'),
     createService: (data) => axiosInstance.post('/services', data),
     updateService: (id, data) => axiosInstance.put(`/services/${id}`, data),
@@ -107,8 +101,13 @@ export const notificationService = {
     getUserNotifications: (params) => axiosInstance.get('/notifications', { params }),
     markAsRead: (id) => axiosInstance.put(`/notifications/${id}/read`),
     markAllAsRead: () => axiosInstance.put('/notifications/read-all'),
-    deleteNotification: (id) => axiosInstance.delete(`/notifications/${id}`),
-    createNotification: (data) => axiosInstance.post('/notifications', data)
+};
+
+// Revenue Service
+export const revenueService = {
+    getRevenueStats: (params) => axiosInstance.get('/revenue/stats', { params }),
+    getDailyRevenue: (params) => axiosInstance.get('/revenue/daily', { params }),
+    getTopFields: (params) => axiosInstance.get('/revenue/top-fields', { params })
 };
 
 export default axiosInstance;

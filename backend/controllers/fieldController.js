@@ -2,36 +2,118 @@ const Field = require('../models/Field');
 const fs = require('fs');
 const path = require('path');
 
+// Helper function để loại bỏ dấu tiếng Việt
+const removeVietnameseTones = (str) => {
+    if (!str) return '';
+    str = str.toLowerCase();
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+    str = str.replace(/đ/g, 'd');
+    return str;
+};
+
 // Lấy danh sách tất cả sân (có phân trang)
 exports.getAllFields = async (req, res) => {
     try {
-        const { fieldType, status, minPrice, maxPrice, location, search, page, limit } = req.query;
-        
+        const { fieldType, status, minPrice, maxPrice, location, search, page, limit, sort } = req.query;
+
         let query = {};
-        
+
         if (fieldType) query.fieldType = fieldType;
         if (status) query.status = status;
-        if (location) query.location = { $regex: location, $options: 'i' };
         
-        // Tìm kiếm theo tên sân, địa điểm, địa chỉ
-        if (search) {
-            query.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { location: { $regex: search, $options: 'i' } },
-                { address: { $regex: search, $options: 'i' } }
-            ];
+        // Filter theo location với hỗ trợ tìm kiếm không dấu
+        if (location) {
+            const locationWords = location.trim().split(/\s+/).filter(word => word.length > 0);
+            
+            if (locationWords.length > 0) {
+                // Tạo regex pattern cho location filter, hỗ trợ cả có dấu và không dấu
+                const locationPatterns = locationWords.map(word => {
+                    const normalizedWord = removeVietnameseTones(word);
+                    let regexPattern = '';
+                    for (let char of normalizedWord) {
+                        switch(char) {
+                            case 'a': regexPattern += '[aàáạảãâầấậẩẫăằắặẳẵ]'; break;
+                            case 'e': regexPattern += '[eèéẹẻẽêềếệểễ]'; break;
+                            case 'i': regexPattern += '[iìíịỉĩ]'; break;
+                            case 'o': regexPattern += '[oòóọỏõôồốộổỗơờớợởỡ]'; break;
+                            case 'u': regexPattern += '[uùúụủũưừứựửữ]'; break;
+                            case 'y': regexPattern += '[yỳýỵỷỹ]'; break;
+                            case 'd': regexPattern += '[dđ]'; break;
+                            default: regexPattern += char;
+                        }
+                    }
+                    return regexPattern;
+                });
+                
+                // Join patterns để tìm tất cả các từ trong location
+                const fullPattern = locationPatterns.join('.*');
+                query.location = { $regex: fullPattern, $options: 'i' };
+            }
         }
-        
+
+        // Tìm kiếm theo tên sân, địa điểm, địa chỉ (tìm kiếm linh hoạt theo từng từ, hỗ trợ cả có dấu và không dấu)
+        if (search) {
+            // Tách search thành các từ riêng biệt và loại bỏ từ rỗng
+            const searchWords = search.trim().split(/\s+/).filter(word => word.length > 0);
+
+            if (searchWords.length > 0) {
+                // Tạo regex pattern cho mỗi từ, hỗ trợ tìm kiếm cả có dấu và không dấu
+                query.$and = searchWords.map(word => {
+                    const normalizedWord = removeVietnameseTones(word);
+
+                    // Tạo pattern regex linh hoạt cho từng ký tự
+                    let regexPattern = '';
+                    for (let char of normalizedWord) {
+                        switch (char) {
+                            case 'a': regexPattern += '[aàáạảãâầấậẩẫăằắặẳẵ]'; break;
+                            case 'e': regexPattern += '[eèéẹẻẽêềếệểễ]'; break;
+                            case 'i': regexPattern += '[iìíịỉĩ]'; break;
+                            case 'o': regexPattern += '[oòóọỏõôồốộổỗơờớợởỡ]'; break;
+                            case 'u': regexPattern += '[uùúụủũưừứựửữ]'; break;
+                            case 'y': regexPattern += '[yỳýỵỷỹ]'; break;
+                            case 'd': regexPattern += '[dđ]'; break;
+                            default: regexPattern += char;
+                        }
+                    }
+
+                    return {
+                        $or: [
+                            { name: { $regex: regexPattern, $options: 'i' } },
+                            { location: { $regex: regexPattern, $options: 'i' } },
+                            { address: { $regex: regexPattern, $options: 'i' } }
+                        ]
+                    };
+                });
+            }
+        }
+
         if (minPrice || maxPrice) {
             query.pricePerHour = {};
             if (minPrice) query.pricePerHour.$gte = Number(minPrice);
             if (maxPrice) query.pricePerHour.$lte = Number(maxPrice);
         }
 
+        // Determine sort order
+        let sortOption = { createdAt: -1, _id: -1 }; // default: mới nhất trước, _id để đảm bảo consistency
+        
+        if (sort === 'name') sortOption = { name: 1, _id: 1 };
+        else if (sort === 'price-asc') sortOption = { pricePerHour: 1, _id: 1 };
+        else if (sort === 'price-desc') sortOption = { pricePerHour: -1, _id: -1 };
+        else if (sort === 'rating') sortOption = { rating: -1, _id: -1 };
+        else if (sort === 'createdAt') sortOption = { createdAt: -1, _id: -1 };
+
         // Nếu không có phân trang, trả về tất cả
         if (!page || !limit) {
-            const fields = await Field.find(query).sort({ createdAt: -1 });
-            return res.json({ data: fields });
+            const fields = await Field.find(query).sort(sortOption);
+            return res.json({
+                success: true,
+                data: fields
+            });
         }
 
         // Tính toán phân trang
@@ -42,23 +124,30 @@ exports.getAllFields = async (req, res) => {
         // Lấy tổng số sân
         const total = await Field.countDocuments(query);
 
-        // Lấy dữ liệu với phân trang
+        // Lấy dữ liệu với phân trang và sắp xếp
         const fields = await Field.find(query)
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(limitNum);
 
-        res.json({ 
-            data: fields,
-            pagination: {
-                total,
-                page: pageNum,
-                limit: limitNum,
-                totalPages: Math.ceil(total / limitNum)
+        res.json({
+            success: true,
+            data: {
+                fields,
+                pagination: {
+                    total,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum)
+                }
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
     }
 };
 
@@ -67,11 +156,21 @@ exports.getFieldById = async (req, res) => {
     try {
         const field = await Field.findById(req.params.id);
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
-        res.json({ data: field });
+        res.json({
+            success: true,
+            data: field
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
     }
 };
 
@@ -80,9 +179,17 @@ exports.createField = async (req, res) => {
     try {
         const field = new Field(req.body);
         await field.save();
-        res.status(201).json({ message: 'Tạo sân thành công', data: field });
+        res.status(201).json({
+            success: true,
+            message: 'Tạo sân thành công',
+            data: field
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
     }
 };
 
@@ -94,14 +201,25 @@ exports.updateField = async (req, res) => {
             req.body,
             { new: true, runValidators: true }
         );
-        
+
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
-        
-        res.json({ message: 'Cập nhật thành công', data: field });
+
+        res.json({
+            success: true,
+            message: 'Cập nhật thành công',
+            data: field
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
     }
 };
 
@@ -110,42 +228,47 @@ exports.deleteField = async (req, res) => {
     try {
         const field = await Field.findByIdAndDelete(req.params.id);
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
-        res.json({ message: 'Xóa sân thành công' });
+        res.json({
+            success: true,
+            message: 'Xóa sân thành công'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server',
+            error: error.message
+        });
     }
 };
 
-// Lấy sân phổ biến (theo rating)
-exports.getPopularFields = async (req, res) => {
-    try {
-        const fields = await Field.find({ status: 'active' })
-            .sort({ rating: -1, totalReviews: -1 })
-            .limit(6);
-        res.json({ data: fields });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
 
 // Upload hình ảnh cho sân
 exports.uploadFieldImages = async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ message: 'Không có file nào được upload' });
+            return res.status(400).json({
+                success: false,
+                message: 'Không có file nào được upload'
+            });
         }
 
         const fieldId = req.params.id;
         const field = await Field.findById(fieldId);
-        
+
         if (!field) {
             // Xóa các file đã upload nếu không tìm thấy sân
             req.files.forEach(file => {
                 fs.unlinkSync(file.path);
             });
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
 
         // Tạo URLs cho các ảnh đã upload
@@ -157,10 +280,13 @@ exports.uploadFieldImages = async (req, res) => {
         field.images = [...(field.images || []), ...imageUrls];
         await field.save();
 
-        res.json({ 
-            message: 'Upload ảnh thành công', 
-            data: field,
-            uploadedImages: imageUrls 
+        res.json({
+            success: true,
+            message: 'Upload ảnh thành công',
+            data: {
+                field,
+                uploadedImages: imageUrls
+            }
         });
     } catch (error) {
         // Xóa các file đã upload nếu có lỗi
@@ -171,7 +297,11 @@ exports.uploadFieldImages = async (req, res) => {
                 }
             });
         }
-        res.status(500).json({ message: 'Lỗi khi upload ảnh', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi upload ảnh',
+            error: error.message
+        });
     }
 };
 
@@ -180,21 +310,30 @@ exports.deleteFieldImage = async (req, res) => {
     try {
         const { id } = req.params;
         const { imageUrl } = req.body;
-        
+
         if (!imageUrl) {
-            return res.status(400).json({ message: 'imageUrl là bắt buộc' });
+            return res.status(400).json({
+                success: false,
+                message: 'imageUrl là bắt buộc'
+            });
         }
-        
+
         const field = await Field.findById(id);
-        
+
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
 
         // Xóa URL khỏi mảng images
         const imageIndex = field.images.indexOf(imageUrl);
         if (imageIndex === -1) {
-            return res.status(404).json({ message: 'Không tìm thấy hình ảnh' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy hình ảnh'
+            });
         }
 
         field.images.splice(imageIndex, 1);
@@ -209,9 +348,17 @@ exports.deleteFieldImage = async (req, res) => {
             }
         }
 
-        res.json({ message: 'Xóa ảnh thành công', data: field });
+        res.json({
+            success: true,
+            message: 'Xóa ảnh thành công',
+            data: field
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi xóa ảnh', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi xóa ảnh',
+            error: error.message
+        });
     }
 };
 
@@ -222,20 +369,34 @@ exports.updateFieldImagesOrder = async (req, res) => {
         const { images } = req.body;
 
         if (!Array.isArray(images)) {
-            return res.status(400).json({ message: 'Images phải là một mảng' });
+            return res.status(400).json({
+                success: false,
+                message: 'Images phải là một mảng'
+            });
         }
 
         const field = await Field.findById(id);
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sân'
+            });
         }
 
         field.images = images;
         await field.save();
 
-        res.json({ message: 'Cập nhật thứ tự ảnh thành công', data: field });
+        res.json({
+            success: true,
+            message: 'Cập nhật thứ tự ảnh thành công',
+            data: field
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi khi cập nhật thứ tự ảnh', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi cập nhật thứ tự ảnh',
+            error: error.message
+        });
     }
 };
 
@@ -381,14 +542,16 @@ exports.seedFields = async (req, res) => {
         // Thêm 10 sân mới
         const createdFields = await Field.insertMany(sampleFields);
 
-        res.status(201).json({ 
-            message: `Đã tạo thành công ${createdFields.length} sân bóng`, 
-            data: createdFields 
+        res.status(201).json({
+            success: true,
+            message: `Đã tạo thành công ${createdFields.length} sân bóng`,
+            data: createdFields
         });
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Lỗi khi tạo sân mẫu', 
-            error: error.message 
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi tạo sân mẫu',
+            error: error.message
         });
     }
 };

@@ -10,21 +10,21 @@ exports.createReview = async (req, res) => {
         // Kiểm tra booking có tồn tại và đã hoàn thành
         const bookingData = await Booking.findById(booking);
         if (!bookingData) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn đặt' });
         }
 
         if (bookingData.user.toString() !== req.userId) {
-            return res.status(403).json({ message: 'Không có quyền đánh giá đơn này' });
+            return res.status(403).json({ success: false, message: 'Không có quyền đánh giá đơn này' });
         }
 
         if (bookingData.status !== 'completed') {
-            return res.status(400).json({ message: 'Chỉ có thể đánh giá sau khi hoàn thành' });
+            return res.status(400).json({ success: false, message: 'Chỉ có thể đánh giá sau khi hoàn thành' });
         }
 
         // Kiểm tra đã đánh giá chưa
         const existingReview = await Review.findOne({ booking });
         if (existingReview) {
-            return res.status(400).json({ message: 'Đã đánh giá đơn này rồi' });
+            return res.status(400).json({ success: false, message: 'Đã đánh giá đơn này rồi' });
         }
 
         const review = new Review({
@@ -47,9 +47,9 @@ exports.createReview = async (req, res) => {
         fieldData.totalReviews = reviews.length;
         await fieldData.save();
 
-        res.status(201).json({ message: 'Đánh giá thành công', review });
+        res.status(201).json({ success: true, message: 'Đánh giá thành công', data: review });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -80,6 +80,7 @@ exports.getReviewsByField = async (req, res) => {
             .limit(limitNum);
 
         res.json({
+            success: true,
             data: reviews,
             pagination: {
                 total,
@@ -89,22 +90,10 @@ exports.getReviewsByField = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Lấy đánh giá của user
-exports.getUserReviews = async (req, res) => {
-    try {
-        const reviews = await Review.find({ user: req.userId })
-            .populate('field', 'name fieldType images')
-            .sort({ createdAt: -1 });
-
-        res.json(reviews);
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
 
 // Trả lời đánh giá (Admin)
 exports.replyToReview = async (req, res) => {
@@ -113,7 +102,7 @@ exports.replyToReview = async (req, res) => {
         const review = await Review.findById(req.params.id);
 
         if (!review) {
-            return res.status(404).json({ message: 'Không tìm thấy đánh giá' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đánh giá' });
         }
 
         review.reply = {
@@ -122,9 +111,9 @@ exports.replyToReview = async (req, res) => {
         };
 
         await review.save();
-        res.json({ message: 'Phản hồi thành công', review });
+        res.json({ success: true, message: 'Phản hồi thành công', data: review });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -153,13 +142,17 @@ exports.getAllReviews = async (req, res) => {
             .limit(limitNum);
 
         res.json({
-            reviews,
-            total,
-            page: pageNum,
-            totalPages: Math.ceil(total / limitNum)
+            success: true,
+            data: reviews,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum)
+            }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -168,12 +161,12 @@ exports.deleteReview = async (req, res) => {
     try {
         const review = await Review.findById(req.params.id);
         if (!review) {
-            return res.status(404).json({ message: 'Không tìm thấy đánh giá' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đánh giá' });
         }
 
         // Kiểm tra quyền
         if (review.user.toString() !== req.userId && req.userRole !== 'admin') {
-            return res.status(403).json({ message: 'Không có quyền xóa đánh giá này' });
+            return res.status(403).json({ success: false, message: 'Không có quyền xóa đánh giá này' });
         }
 
         await review.deleteOne();
@@ -191,8 +184,8 @@ exports.deleteReview = async (req, res) => {
         }
         await fieldData.save();
 
-        res.json({ message: 'Xóa đánh giá thành công' });
+        res.json({ success: true, message: 'Xóa đánh giá thành công' });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };

@@ -42,6 +42,7 @@ const Quanlykhachhang = () => {
 
     const fetchUsers = async () => {
         setLoading(true);
+        setError('');
         try {
             const params = {};
             if (filterRole) params.role = filterRole;
@@ -49,9 +50,21 @@ const Quanlykhachhang = () => {
             if (searchTerm) params.search = searchTerm;
             
             const response = await authService.getAllUsers(params);
-            setUsers(response.data.data || []);
+            
+            // Xử lý response structure mới
+            if (response.data.success !== false) {
+                const userData = response.data.data || response.data || [];
+                setUsers(Array.isArray(userData) ? userData : []);
+            } else {
+                setError(response.data.message || 'Không thể tải danh sách khách hàng');
+                setUsers([]);
+            }
         } catch (err) {
-            setError('Không thể tải danh sách khách hàng');
+            const errorMessage = err.response?.data?.message ||
+                                err.message ||
+                                'Không thể tải danh sách khách hàng';
+            setError(errorMessage);
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -93,13 +106,22 @@ const Quanlykhachhang = () => {
         setError('');
 
         try {
-            await authService.updateUserByAdmin(currentUser._id, formData);
-            setSuccess('Cập nhật thông tin thành công!');
-            await fetchUsers();
-            handleCloseModal();
-            setTimeout(() => setSuccess(''), 3000);
+            const response = await authService.updateUserByAdmin(currentUser._id, formData);
+            
+            // Kiểm tra success flag
+            if (response.data.success !== false) {
+                setSuccess(response.data.message || 'Cập nhật thông tin thành công!');
+                await fetchUsers();
+                handleCloseModal();
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(response.data.message || 'Cập nhật thất bại');
+            }
         } catch (err) {
-            setError(err.response?.data?.message || 'Có lỗi xảy ra');
+            const errorMessage = err.response?.data?.message ||
+                                err.message ||
+                                'Có lỗi xảy ra khi cập nhật thông tin';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -109,13 +131,24 @@ const Quanlykhachhang = () => {
         if (!window.confirm('Bạn có chắc muốn xóa khách hàng này?')) return;
 
         setLoading(true);
+        setError('');
         try {
-            await authService.deleteUser(id);
-            setSuccess('Xóa khách hàng thành công!');
-            await fetchUsers();
-            setTimeout(() => setSuccess(''), 3000);
+            const response = await authService.deleteUser(id);
+            
+            // Kiểm tra success flag
+            if (response.data.success !== false) {
+                setSuccess(response.data.message || 'Xóa khách hàng thành công!');
+                await fetchUsers();
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(response.data.message || 'Xóa thất bại');
+                setTimeout(() => setError(''), 3000);
+            }
         } catch (err) {
-            setError(err.response?.data?.message || 'Không thể xóa khách hàng');
+            const errorMessage = err.response?.data?.message ||
+                                err.message ||
+                                'Không thể xóa khách hàng';
+            setError(errorMessage);
             setTimeout(() => setError(''), 3000);
         } finally {
             setLoading(false);

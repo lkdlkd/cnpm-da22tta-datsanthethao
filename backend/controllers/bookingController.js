@@ -10,7 +10,10 @@ exports.createBooking = async (req, res) => {
         // Kiểm tra khung giờ còn trống
         const slot = await TimeSlot.findById(timeSlot);
         if (!slot || slot.status !== 'available') {
-            return res.status(400).json({ message: 'Khung giờ không khả dụng' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Khung giờ không khả dụng' 
+            });
         }
 
         // Kiểm tra và cập nhật số lượng services nếu có
@@ -19,10 +22,16 @@ exports.createBooking = async (req, res) => {
             for (const serviceItem of services) {
                 const service = await Service.findById(serviceItem.service);
                 if (!service) {
-                    return res.status(400).json({ message: `Dịch vụ không tồn tại` });
+                    return res.status(400).json({ 
+                        success: false,
+                        message: `Dịch vụ không tồn tại` 
+                    });
                 }
                 if (service.stock < serviceItem.quantity) {
-                    return res.status(400).json({ message: `Dịch vụ ${service.name} không đủ số lượng` });
+                    return res.status(400).json({ 
+                        success: false,
+                        message: `Dịch vụ ${service.name} không đủ số lượng` 
+                    });
                 }
                 // Trừ số lượng tồn kho
                 service.stock -= serviceItem.quantity;
@@ -78,12 +87,19 @@ exports.createBooking = async (req, res) => {
         });
 
         res.status(201).json({ 
+            success: true,
             message: 'Đặt sân thành công', 
-            data: booking,
-            payment: payment 
+            data: {
+                booking,
+                payment
+            }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -134,16 +150,23 @@ exports.getUserBookings = async (req, res) => {
         }));
 
         res.json({
-            data: bookingsWithReview,
-            pagination: {
-                total,
-                page: pageNum,
-                limit: limitNum,
-                totalPages: Math.ceil(total / limitNum)
+            success: true,
+            data: {
+                bookings: bookingsWithReview,
+                pagination: {
+                    total,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum)
+                }
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -157,12 +180,22 @@ exports.getBookingById = async (req, res) => {
             .populate('services.service', 'name price unit category description');
 
         if (!booking) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Không tìm thấy đơn đặt' 
+            });
         }
 
-        res.json(booking);
+        res.json({
+            success: true,
+            data: booking
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -173,17 +206,26 @@ exports.cancelBooking = async (req, res) => {
         const booking = await Booking.findById(req.params.id);
 
         if (!booking) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Không tìm thấy đơn đặt' 
+            });
         }
 
         // Kiểm tra quyền hủy
         if (booking.user.toString() !== req.userId && req.userRole !== 'admin') {
-            return res.status(403).json({ message: 'Không có quyền hủy đơn này' });
+            return res.status(403).json({ 
+                success: false,
+                message: 'Không có quyền hủy đơn này' 
+            });
         }
 
         // Kiểm tra trạng thái
         if (booking.status === 'cancelled' || booking.status === 'completed') {
-            return res.status(400).json({ message: 'Không thể hủy đơn đặt này' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Không thể hủy đơn đặt này' 
+            });
         }
 
         booking.status = 'cancelled';
@@ -204,9 +246,17 @@ exports.cancelBooking = async (req, res) => {
             relatedModel: 'Booking'
         });
 
-        res.json({ message: 'Hủy đơn đặt thành công', booking });
+        res.json({ 
+            success: true,
+            message: 'Hủy đơn đặt thành công', 
+            data: booking 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -257,13 +307,23 @@ exports.getAllBookings = async (req, res) => {
         );
 
         res.json({
-            bookings: bookingsWithPayment,
-            total,
-            page: pageNum,
-            totalPages: Math.ceil(total / limitNum)
+            success: true,
+            data: {
+                bookings: bookingsWithPayment,
+                pagination: {
+                    total,
+                    page: pageNum,
+                    limit: limitNum,
+                    totalPages: Math.ceil(total / limitNum)
+                }
+            }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -277,7 +337,10 @@ exports.confirmBooking = async (req, res) => {
         );
 
         if (!booking) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Không tìm thấy đơn đặt' 
+            });
         }
 
         // Tạo thông báo
@@ -290,8 +353,16 @@ exports.confirmBooking = async (req, res) => {
             relatedModel: 'Booking'
         });
 
-        res.json({ message: 'Xác nhận đơn đặt thành công', booking });
+        res.json({ 
+            success: true,
+            message: 'Xác nhận đơn đặt thành công', 
+            data: booking 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };

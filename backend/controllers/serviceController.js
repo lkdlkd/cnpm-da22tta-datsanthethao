@@ -30,6 +30,7 @@ exports.getAllServices = async (req, res) => {
             .limit(limitNum);
         
         res.json({
+            success: true,
             data: services,
             pagination: {
                 total,
@@ -39,31 +40,19 @@ exports.getAllServices = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Lấy chi tiết dịch vụ
-exports.getServiceById = async (req, res) => {
-    try {
-        const service = await Service.findById(req.params.id);
-        if (!service) {
-            return res.status(404).json({ message: 'Không tìm thấy dịch vụ' });
-        }
-        res.json(service);
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
 
 // Tạo dịch vụ mới (Admin)
 exports.createService = async (req, res) => {
     try {
         const service = new Service(req.body);
         await service.save();
-        res.status(201).json({ message: 'Tạo dịch vụ thành công', service });
+        res.status(201).json({ success: true, message: 'Tạo dịch vụ thành công', data: service });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -77,12 +66,12 @@ exports.updateService = async (req, res) => {
         );
 
         if (!service) {
-            return res.status(404).json({ message: 'Không tìm thấy dịch vụ' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy dịch vụ' });
         }
 
-        res.json({ message: 'Cập nhật thành công', service });
+        res.json({ success: true, message: 'Cập nhật thành công', data: service });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -91,11 +80,11 @@ exports.deleteService = async (req, res) => {
     try {
         const service = await Service.findByIdAndDelete(req.params.id);
         if (!service) {
-            return res.status(404).json({ message: 'Không tìm thấy dịch vụ' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy dịch vụ' });
         }
-        res.json({ message: 'Xóa dịch vụ thành công' });
+        res.json({ success: true, message: 'Xóa dịch vụ thành công' });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -106,22 +95,22 @@ exports.updateStock = async (req, res) => {
         const service = await Service.findById(req.params.id);
         
         if (!service) {
-            return res.status(404).json({ message: 'Không tìm thấy dịch vụ' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy dịch vụ' });
         }
 
         if (action === 'add') {
             service.stock += quantity;
         } else if (action === 'subtract') {
             if (service.stock < quantity) {
-                return res.status(400).json({ message: 'Số lượng không đủ' });
+                return res.status(400).json({ success: false, message: 'Số lượng không đủ' });
             }
             service.stock -= quantity;
         }
 
         await service.save();
-        res.json({ message: 'Cập nhật tồn kho thành công', service });
+        res.json({ success: true, message: 'Cập nhật tồn kho thành công', data: service });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -135,9 +124,9 @@ exports.getServicesByCategory = async (req, res) => {
             stock: { $gt: 0 }
         }).sort({ name: 1 });
         
-        res.json(services);
+        res.json({ success: true, data: services });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -160,38 +149,16 @@ exports.getServicesStats = async (req, res) => {
         ]);
 
         res.json({
-            total,
-            available,
-            outOfStock,
-            byCategory
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
-
-// Kiểm tra tình trạng dịch vụ
-exports.checkAvailability = async (req, res) => {
-    try {
-        const { serviceId, quantity } = req.query;
-        const service = await Service.findById(serviceId);
-        
-        if (!service) {
-            return res.status(404).json({ message: 'Không tìm thấy dịch vụ' });
-        }
-
-        const isAvailable = service.isAvailable && service.stock >= parseInt(quantity);
-        
-        res.json({
-            isAvailable,
-            service: {
-                name: service.name,
-                price: service.price,
-                stock: service.stock,
-                unit: service.unit
+            success: true,
+            data: {
+                total,
+                available,
+                outOfStock,
+                byCategory
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
+

@@ -10,7 +10,10 @@ exports.register = async (req, res) => {
         // Kiểm tra email đã tồn tại
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email đã được sử dụng' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email đã được sử dụng' 
+            });
         }
 
         // Mã hóa mật khẩu
@@ -34,18 +37,25 @@ exports.register = async (req, res) => {
         );
 
         res.status(201).json({
+            success: true,
             message: 'Đăng ký thành công',
-            token,
-            user: {
-                id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-                phone: user.phone,
-                role: user.role
+            data: {
+                token,
+                user: {
+                    id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    phone: user.phone,
+                    role: user.role
+                }
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -57,18 +67,27 @@ exports.login = async (req, res) => {
         // Tìm user
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
+            return res.status(401).json({ 
+                success: false,
+                message: 'Email hoặc mật khẩu không đúng' 
+            });
         }
 
         // Kiểm tra mật khẩu
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
+            return res.status(401).json({ 
+                success: false,
+                message: 'Email hoặc mật khẩu không đúng' 
+            });
         }
 
         // Kiểm tra tài khoản có active không
         if (!user.isActive) {
-            return res.status(403).json({ message: 'Tài khoản đã bị khóa' });
+            return res.status(403).json({ 
+                success: false,
+                message: 'Tài khoản đã bị khóa' 
+            });
         }
 
         // Tạo token
@@ -79,34 +98,51 @@ exports.login = async (req, res) => {
         );
 
         res.json({
+            success: true,
             message: 'Đăng nhập thành công',
-            token,
-            user: {
-                id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-                phone: user.phone,
-                role: user.role,
-                avatar: user.avatar
+            data: {
+                token,
+                user: {
+                    id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    phone: user.phone,
+                    role: user.role,
+                    avatar: user.avatar
+                }
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
-// Lấy thông tin user hiện tại
-exports.getCurrentUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.userId).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
+// // Lấy thông tin user hiện tại
+// exports.getCurrentUser = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.userId).select('-password');
+//         if (!user) {
+//             return res.status(404).json({ 
+//                 success: false,
+//                 message: 'Không tìm thấy người dùng' 
+//             });
+//         }
+//         res.json({
+//             success: true,
+//             data: user
+//         });
+//     } catch (error) {
+//         res.status(500).json({ 
+//             success: false,
+//             message: 'Lỗi server', 
+//             error: error.message 
+//         });
+//     }
+// };
 
 // Cập nhật thông tin user
 exports.updateProfile = async (req, res) => {
@@ -119,9 +155,17 @@ exports.updateProfile = async (req, res) => {
             { new: true }
         ).select('-password');
 
-        res.json({ message: 'Cập nhật thành công', user });
+        res.json({ 
+            success: true,
+            message: 'Cập nhật thành công', 
+            data: user 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -134,15 +178,25 @@ exports.changePassword = async (req, res) => {
         const isValidPassword = await bcrypt.compare(currentPassword, user.password);
         
         if (!isValidPassword) {
-            return res.status(401).json({ message: 'Mật khẩu hiện tại không đúng' });
+            return res.status(401).json({ 
+                success: false,
+                message: 'Mật khẩu hiện tại không đúng' 
+            });
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
         await user.save();
 
-        res.json({ message: 'Đổi mật khẩu thành công' });
+        res.json({ 
+            success: true,
+            message: 'Đổi mật khẩu thành công' 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -167,9 +221,17 @@ exports.getAllUsers = async (req, res) => {
             .select('-password')
             .sort({ createdAt: -1 });
         
-        res.json({ data: users });
+        res.json({ 
+            success: true,
+            message: 'Lấy danh sách người dùng thành công',
+            data: users 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -186,12 +248,23 @@ exports.updateUserByAdmin = async (req, res) => {
         ).select('-password');
 
         if (!user) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Không tìm thấy người dùng' 
+            });
         }
 
-        res.json({ message: 'Cập nhật thành công', data: user });
+        res.json({ 
+            success: true,
+            message: 'Cập nhật thành công', 
+            data: user 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };
 
@@ -200,10 +273,20 @@ exports.deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Không tìm thấy người dùng' 
+            });
         }
-        res.json({ message: 'Xóa người dùng thành công' });
+        res.json({ 
+            success: true,
+            message: 'Xóa người dùng thành công' 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Lỗi server', 
+            error: error.message 
+        });
     }
 };

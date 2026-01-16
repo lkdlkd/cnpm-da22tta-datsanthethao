@@ -7,8 +7,6 @@ const { authenticate, authorize } = require('../middlewares/authMiddleware');
 router.get('/', serviceController.getAllServices);
 router.get('/stats', authenticate, authorize(['admin']), serviceController.getServicesStats);
 router.get('/category/:category', serviceController.getServicesByCategory);
-router.get('/check-availability', serviceController.checkAvailability);
-router.get('/:id', serviceController.getServiceById);
 
 // Admin routes
 router.post('/', authenticate, authorize(['admin']), serviceController.createService);

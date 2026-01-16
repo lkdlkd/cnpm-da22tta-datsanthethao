@@ -57,11 +57,11 @@ const Quanlydatsan = () => {
             const response = await bookingService.getAllBookings(params);
             
             // Xử lý response từ backend
-            if (response.data.bookings) {
+            if (response.data.data && response.data.data.bookings) {
                 // Backend trả về { bookings: [], total, page, totalPages }
-                setBookings(response.data.bookings);
-                setTotalBookings(response.data.total || 0);
-                setTotalPages(response.data.totalPages || 1);
+                setBookings(response.data.data.bookings);
+                setTotalBookings(response.data.data.pagination.total || 0);
+                setTotalPages(response.data.data.pagination.totalPages || 1);
             } else {
                 // Fallback nếu backend chưa hỗ trợ pagination
                 setBookings(response.data);

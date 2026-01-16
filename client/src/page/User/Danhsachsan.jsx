@@ -28,7 +28,6 @@ const formatFieldType = (fieldType) => {
 const Danhsachsan = () => {
     const navigate = useNavigate();
     const [fields, setFields] = useState([]);
-    const [filteredFields, setFilteredFields] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -54,10 +53,11 @@ const Danhsachsan = () => {
         fetchFields(1);
     }, []);
 
-    // Auto-fetch chỉ khi thay đổi sortBy (sắp xếp)
+    // Auto-fetch when filters or sortBy change
     useEffect(() => {
         if (fields.length > 0) {
-            applySorting();
+            setCurrentPage(1);
+            fetchFields(1);
         }
     }, [sortBy]);
 
@@ -74,45 +74,33 @@ const Danhsachsan = () => {
             if (minPrice) params.minPrice = minPrice;
             if (maxPrice) params.maxPrice = maxPrice;
             if (searchText) params.search = searchText;
+            
+            // Add sort parameter for backend sorting
+            if (sortBy) params.sort = sortBy;
 
             const response = await fieldService.getAllFields(params);
-            const fieldsData = response.data.data || [];
-            setFields(fieldsData);
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                const fieldsData = response.data.data.fields || [];
+                setFields(fieldsData);
 
-            // Apply client-side sorting
-            applySorting(fieldsData);
-
-            setPagination(response.data.pagination || {
-                total: 0,
-                page: page,
-                limit: itemsPerPage,
-                totalPages: 0
-            });
+                setPagination(response.data.data.pagination || {
+                    total: 0,
+                    page: page,
+                    limit: itemsPerPage,
+                    totalPages: 0
+                });
+            } else {
+                setError(response.data?.message || 'Không thể tải danh sách sân');
+            }
         } catch (err) {
-            setError('Không thể tải danh sách sân');
+            const errorMessage = err.response?.data?.message || err.message || 'Không thể tải danh sách sân';
+            setError(errorMessage);
+            console.error('Lỗi khi tải danh sách sân:', err);
         } finally {
             setLoading(false);
         }
-    };
-
-    const applySorting = (data = fields) => {
-        let sortedFields = [...data];
-        switch (sortBy) {
-            case 'price-asc':
-                sortedFields.sort((a, b) => a.pricePerHour - b.pricePerHour);
-                break;
-            case 'price-desc':
-                sortedFields.sort((a, b) => b.pricePerHour - a.pricePerHour);
-                break;
-            case 'rating':
-                sortedFields.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                break;
-            case 'name':
-            default:
-                sortedFields.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-        }
-        setFilteredFields(sortedFields);
     };
 
     const handleApplyFilters = () => {
@@ -434,7 +422,7 @@ const Danhsachsan = () => {
                         </div>
 
                         {/* Fields Grid */}
-                        {filteredFields.length === 0 ? (
+                        {fields.length === 0 ? (
                             <Alert variant="info" className="text-center">
                                 <h5>Không tìm thấy sân phù hợp</h5>
                                 <p className="mb-0">Thử thay đổi bộ lọc để xem nhiều kết quả hơn</p>
@@ -442,7 +430,7 @@ const Danhsachsan = () => {
                         ) : (
                             <>
                                 <Row>
-                                    {filteredFields.map((field) => (
+                                    {fields.map((field) => (
                                         <Col md={6} lg={4} key={field._id} className="mb-4">
                                             <Card className="field-card h-100">
                                                 <div className="field-image-wrapper">

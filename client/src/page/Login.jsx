@@ -28,7 +28,7 @@ export const Login = () => {
 
         try {
             const response = await authService.login(formData);
-            const { token, user } = response.data;
+            const { token, user } = response.data.data;
 
             // Cập nhật auth context
             updateAuth({

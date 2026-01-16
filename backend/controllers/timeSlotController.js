@@ -8,7 +8,7 @@ exports.getTimeSlotsByFieldAndDate = async (req, res) => {
         const { date } = req.query;
 
         if (!date) {
-            return res.status(400).json({ message: 'Vui lòng cung cấp ngày' });
+            return res.status(400).json({ success: false, message: 'Vui lòng cung cấp ngày' });
         }
 
         const timeSlots = await TimeSlot.find({
@@ -16,9 +16,9 @@ exports.getTimeSlotsByFieldAndDate = async (req, res) => {
             date: new Date(date)
         }).sort({ startTime: 1 });
 
-        res.json(timeSlots);
+        res.json({ success: true, data: timeSlots });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -27,9 +27,9 @@ exports.createTimeSlot = async (req, res) => {
     try {
         const timeSlot = new TimeSlot(req.body);
         await timeSlot.save();
-        res.status(201).json({ message: 'Tạo khung giờ thành công', timeSlot });
+        res.status(201).json({ success: true, message: 'Tạo khung giờ thành công', data: timeSlot });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -40,7 +40,7 @@ exports.generateTimeSlots = async (req, res) => {
 
         const field = await Field.findById(fieldId);
         if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy sân' });
         }
 
         const timeSlots = [];
@@ -63,9 +63,9 @@ exports.generateTimeSlots = async (req, res) => {
         }
 
         await TimeSlot.insertMany(timeSlots);
-        res.status(201).json({ message: 'Tạo khung giờ thành công', count: timeSlots.length });
+        res.status(201).json({ success: true, message: 'Tạo khung giờ thành công', data: { count: timeSlots.length } });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -79,12 +79,12 @@ exports.updateTimeSlot = async (req, res) => {
         );
         
         if (!timeSlot) {
-            return res.status(404).json({ message: 'Không tìm thấy khung giờ' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy khung giờ' });
         }
         
-        res.json({ message: 'Cập nhật thành công', timeSlot });
+        res.json({ success: true, message: 'Cập nhật thành công', data: timeSlot });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -93,10 +93,10 @@ exports.deleteTimeSlot = async (req, res) => {
     try {
         const timeSlot = await TimeSlot.findByIdAndDelete(req.params.id);
         if (!timeSlot) {
-            return res.status(404).json({ message: 'Không tìm thấy khung giờ' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy khung giờ' });
         }
-        res.json({ message: 'Xóa khung giờ thành công' });
+        res.json({ success: true, message: 'Xóa khung giờ thành công' });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };

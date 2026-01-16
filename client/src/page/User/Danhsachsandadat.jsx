@@ -71,15 +71,22 @@ const Danhsachsandadat = () => {
                 params.status = activeTab;
             }
             const response = await bookingService.getUserBookings(params);
-            setBookings(response.data.data || []);
-            setPagination(response.data.pagination || {
-                total: 0,
-                page: page,
-                limit: itemsPerPage,
-                totalPages: 0
-            });
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                setBookings(response.data.data.bookings || []);
+                setPagination(response.data.data.pagination || {
+                    total: 0,
+                    page: page,
+                    limit: itemsPerPage,
+                    totalPages: 0
+                });
+            } else {
+                console.error('Error fetching bookings:', response.data?.message);
+            }
         } catch (error) {
-            console.error('Error fetching bookings:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Không thể tải danh sách đặt sân';
+            console.error('Error fetching bookings:', errorMessage);
         } finally {
             setLoading(false);
         }
@@ -91,9 +98,17 @@ const Danhsachsandadat = () => {
         // Lấy thông tin thanh toán
         try {
             const paymentResponse = await paymentService.getPaymentByBooking(booking._id);
-            setPaymentInfo(paymentResponse.data);
+            
+            // Check for success flag in response
+            if (paymentResponse.data && paymentResponse.data.success !== false) {
+                setPaymentInfo(paymentResponse.data.data || paymentResponse.data);
+            } else {
+                console.error('Error fetching payment:', paymentResponse.data?.message);
+                setPaymentInfo(null);
+            }
         } catch (error) {
-            console.error('Error fetching payment:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Không thể tải thông tin thanh toán';
+            console.error('Error fetching payment:', errorMessage);
             setPaymentInfo(null);
         }
         
@@ -104,14 +119,21 @@ const Danhsachsandadat = () => {
         if (!window.confirm('Bạn có chắc muốn hủy đơn đặt này?')) return;
 
         try {
-            await bookingService.cancelBooking(bookingId, { 
+            const response = await bookingService.cancelBooking(bookingId, { 
                 cancelReason: 'Khách hàng yêu cầu hủy' 
             });
-            alert('Hủy đơn thành công!');
-            fetchBookings(currentPage);
-            setShowDetailModal(false);
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                alert('Hủy đơn thành công!');
+                fetchBookings(currentPage);
+                setShowDetailModal(false);
+            } else {
+                alert(response.data?.message || 'Không thể hủy đơn');
+            }
         } catch (error) {
-            alert(error.response?.data?.message || 'Không thể hủy đơn');
+            const errorMessage = error.response?.data?.message || error.message || 'Không thể hủy đơn';
+            alert(errorMessage);
         }
     };
 
@@ -150,18 +172,24 @@ const Danhsachsandadat = () => {
 
         setSubmittingReview(true);
         try {
-            await reviewService.createReview({
+            const response = await reviewService.createReview({
                 field: reviewBooking.field._id,
                 booking: reviewBooking._id,
                 rating,
                 comment: comment.trim()
             });
             
-            alert('Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.');
-            setShowReviewModal(false);
-            fetchBookings(currentPage); // Refresh để cập nhật trạng thái
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                alert('Đánh giá thành công! Cảm ơn bạn đã đóng góp ý kiến.');
+                setShowReviewModal(false);
+                fetchBookings(currentPage); // Refresh để cập nhật trạng thái
+            } else {
+                alert(response.data?.message || 'Không thể gửi đánh giá');
+            }
         } catch (error) {
-            alert(error.response?.data?.message || 'Không thể gửi đánh giá');
+            const errorMessage = error.response?.data?.message || error.message || 'Không thể gửi đánh giá';
+            alert(errorMessage);
         } finally {
             setSubmittingReview(false);
         }

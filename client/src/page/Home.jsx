@@ -65,15 +65,36 @@ const Home = () => {
             if (searchTerm) params.search = searchTerm;
 
             const response = await fieldService.getAllFields(params);
-            setFields(response.data.data || []);
-            setPagination(response.data.pagination || {
-                total: 0,
-                page: page,
-                limit: itemsPerPage,
-                totalPages: 0
-            });
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                // Handle both paginated and non-paginated response formats
+                const responseData = response.data.data;
+                const fieldsData = responseData?.fields || responseData || [];
+                
+                // Validate that fieldsData is an array
+                if (Array.isArray(fieldsData)) {
+                    setFields(fieldsData);
+                } else {
+                    console.error('Response data is not an array:', fieldsData);
+                    setFields([]);
+                }
+                
+                // Set pagination info
+                setPagination(responseData?.pagination || {
+                    total: Array.isArray(fieldsData) ? fieldsData.length : 0,
+                    page: page,
+                    limit: itemsPerPage,
+                    totalPages: Array.isArray(fieldsData) ? Math.ceil(fieldsData.length / itemsPerPage) : 0
+                });
+            } else {
+                console.error('Lỗi khi tải danh sách sân:', response.data?.message);
+                setFields([]);
+            }
         } catch (error) {
-            console.error('Lỗi khi tải danh sách sân:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Không thể tải danh sách sân';
+            console.error('Lỗi khi tải danh sách sân:', errorMessage);
+            setFields([]);
         } finally {
             setLoading(false);
         }

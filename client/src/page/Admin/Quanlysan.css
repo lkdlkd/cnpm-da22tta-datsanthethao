@@ -343,3 +343,54 @@
 .quanlysan-page .spinner-border {
     color: #0f2e71 !important;
 }
+
+/* Pagination Styles */
+.quanlysan-pagination {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 24px !important;
+    padding: 16px 0 !important;
+}
+
+.quanlysan-pagination .btn {
+    min-width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.2s ease !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+.quanlysan-pagination .btn-outline-primary {
+    color: #0f2e71 !important;
+    background: #ffffff !important;
+}
+
+.quanlysan-pagination .btn-outline-primary:hover:not(:disabled) {
+    background: #0f2e71 !important;
+    color: #ffffff !important;
+    border-color: #0f2e71 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(15, 46, 113, 0.2) !important;
+}
+
+.quanlysan-pagination .btn-primary {
+    background: #0f2e71 !important;
+    color: #ffffff !important;
+    border-color: #0f2e71 !important;
+    box-shadow: 0 2px 6px rgba(15, 46, 113, 0.3) !important;
+}
+
+.quanlysan-pagination .btn:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+.quanlysan-pagination span {
+    color: #718096 !important;
+    font-size: 0.9rem !important;
+    padding: 0 8px !important;
+}

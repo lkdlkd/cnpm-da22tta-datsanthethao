@@ -57,10 +57,10 @@ const Quanlydanhgia = () => {
             };
             const response = await reviewService.getAllReviews(params);
             
-            if (response.data.reviews) {
-                setReviews(response.data.reviews);
-                setTotalReviews(response.data.total || 0);
-                setTotalPages(response.data.totalPages || 1);
+            if (response.data.data) {
+                setReviews(response.data.data);
+                setTotalReviews(response.data.pagination.total || 0);
+                setTotalPages(response.data.pagination.totalPages || 1);
             } else {
                 setReviews(response.data);
                 setTotalReviews(response.data.length);

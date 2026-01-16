@@ -4,8 +4,6 @@ const paymentController = require('../controllers/paymentController');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
 // User routes
-router.post('/', authenticate, paymentController.createPayment);
-router.get('/my-payments', authenticate, paymentController.getUserPayments);
 router.get('/booking/:bookingId', authenticate, paymentController.getPaymentByBooking);
 
 // Payment gateway callback

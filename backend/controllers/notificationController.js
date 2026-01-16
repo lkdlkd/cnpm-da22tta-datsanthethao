@@ -17,9 +17,9 @@ exports.getUserNotifications = async (req, res) => {
             isRead: false
         });
 
-        res.json({ notifications, unreadCount });
+        res.json({ success: true, data: { notifications, unreadCount } });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -33,12 +33,12 @@ exports.markAsRead = async (req, res) => {
         );
 
         if (!notification) {
-            return res.status(404).json({ message: 'Không tìm thấy thông báo' });
+            return res.status(404).json({ success: false, message: 'Không tìm thấy thông báo' });
         }
 
-        res.json({ message: 'Đã đánh dấu đọc', notification });
+        res.json({ success: true, message: 'Đã đánh dấu đọc', data: notification });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
@@ -50,45 +50,10 @@ exports.markAllAsRead = async (req, res) => {
             { isRead: true, readAt: new Date() }
         );
 
-        res.json({ message: 'Đã đánh dấu tất cả đã đọc' });
+        res.json({ success: true, message: 'Đã đánh dấu tất cả đã đọc' });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
 };
 
-// Xóa thông báo
-exports.deleteNotification = async (req, res) => {
-    try {
-        const notification = await Notification.findOneAndDelete({
-            _id: req.params.id,
-            user: req.userId
-        });
 
-        if (!notification) {
-            return res.status(404).json({ message: 'Không tìm thấy thông báo' });
-        }
-
-        res.json({ message: 'Xóa thông báo thành công' });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};
-
-// Tạo thông báo (Admin)
-exports.createNotification = async (req, res) => {
-    try {
-        const { user, title, message, type } = req.body;
-        
-        const notification = new Notification({
-            user,
-            title,
-            message,
-            type
-        });
-
-        await notification.save();
-        res.status(201).json({ message: 'Tạo thông báo thành công', notification });
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
-    }
-};

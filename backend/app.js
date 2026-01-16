@@ -35,6 +35,7 @@ const paymentRoutes = require('./routes/payments');
 const reviewRoutes = require('./routes/reviews');
 const serviceRoutes = require('./routes/services');
 const notificationRoutes = require('./routes/notifications');
+const revenueRoutes = require('./routes/revenue');
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -45,6 +46,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/revenue', revenueRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is running!');

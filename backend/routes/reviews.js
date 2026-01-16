@@ -8,7 +8,6 @@ router.get('/field/:fieldId', reviewController.getReviewsByField);
 
 // User routes
 router.post('/', authenticate, reviewController.createReview);
-router.get('/my-reviews', authenticate, reviewController.getUserReviews);
 router.delete('/:id', authenticate, reviewController.deleteReview);
 
 // Admin routes

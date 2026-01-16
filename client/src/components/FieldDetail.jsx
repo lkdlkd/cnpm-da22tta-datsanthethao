@@ -67,9 +67,8 @@ const FieldDetail = () => {
         setTimeSlotsError('');
         try {
             const response = await timeSlotService.getTimeSlotsByFieldAndDate(id, selectedDate);
-            console.log('Time slots response:', response.data);
             // Backend trả về trực tiếp array, không có nested data
-            const slots = Array.isArray(response.data) ? response.data : [];
+            const slots = Array.isArray(response.data.data) ? response.data.data : [];
             setTimeSlots(slots);
             if (slots.length === 0) {
                 setTimeSlotsError('Chưa có khung giờ nào được tạo cho ngày này. Vui lòng liên hệ admin để tạo khung giờ.');

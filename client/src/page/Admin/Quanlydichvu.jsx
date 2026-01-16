@@ -89,7 +89,7 @@ const Quanlydichvu = () => {
     const fetchStats = async () => {
         try {
             const response = await serviceService.getServicesStats();
-            setStats(response.data);
+            setStats(response.data.data);
         } catch (err) {
             console.error('Error fetching stats:', err);
         }

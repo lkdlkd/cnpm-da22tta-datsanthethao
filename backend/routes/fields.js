@@ -6,7 +6,6 @@ const upload = require('../middlewares/uploadMiddleware');
 
 // Public routes
 router.get('/', fieldController.getAllFields);
-router.get('/popular', fieldController.getPopularFields);
 router.get('/:id', fieldController.getFieldById);
 
 // Seed route (dev only - nên xóa ở production)
@@ -19,7 +18,6 @@ router.delete('/:id', authenticate, authorize(['admin']), fieldController.delete
 
 // Image upload routes
 router.post('/:id/upload', authenticate, authorize(['admin']), upload.array('images', 10), fieldController.uploadFieldImages);
-router.post('/:id/images', authenticate, authorize(['admin']), upload.array('images', 10), fieldController.uploadFieldImages);
 router.delete('/:id/images', authenticate, authorize(['admin']), fieldController.deleteFieldImage);
 router.put('/:id/images/reorder', authenticate, authorize(['admin']), fieldController.updateFieldImagesOrder);
 

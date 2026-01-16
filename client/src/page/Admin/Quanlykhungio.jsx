@@ -57,9 +57,21 @@ const Quanlykhungio = () => {
     const fetchFields = async () => {
         try {
             const response = await fieldService.getAllFields();
-            setFields(response.data.data || []);
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                // Handle paginated response
+                const fieldsData = response.data.data?.fields || response.data.data || [];
+                setFields(Array.isArray(fieldsData) ? fieldsData : []);
+            } else {
+                const errorMsg = response.data?.message || 'Không thể tải danh sách sân';
+                setError(errorMsg);
+                setFields([]);
+            }
         } catch (err) {
-            setError('Không thể tải danh sách sân');
+            const errorMsg = err.response?.data?.message || err.message || 'Không thể tải danh sách sân';
+            setError(errorMsg);
+            setFields([]);
         }
     };
 
@@ -67,10 +79,24 @@ const Quanlykhungio = () => {
         setLoading(true);
         try {
             const response = await timeSlotService.getTimeSlotsByFieldAndDate(selectedField, selectedDate);
-            setTimeSlots(response.data || []);
+            
+            // Check for success flag in response
+            if (response.data && response.data.success !== false) {
+                // Handle different response structures
+                const slotsData = response.data.data || response.data.timeSlots || response.data || [];
+                setTimeSlots(Array.isArray(slotsData) ? slotsData : []);
+            } else {
+                setTimeSlots([]);
+                // Don't show error for empty result, just empty array
+            }
         } catch (err) {
-
             setTimeSlots([]);
+            // Don't show error for 404 (no slots found)
+            if (err.response?.status !== 404) {
+                const errorMsg = err.response?.data?.message || err.message || 'Không thể tải khung giờ';
+                setError(errorMsg);
+                setTimeout(() => setError(''), 3000);
+            }
         } finally {
             setLoading(false);
         }
@@ -79,23 +105,32 @@ const Quanlykhungio = () => {
     const handleGenerateSlots = async () => {
         if (!selectedField || !selectedDate) {
             setError('Vui lòng chọn sân và ngày');
+            setTimeout(() => setError(''), 3000);
             return;
         }
 
         try {
-            await timeSlotService.generateTimeSlots({
+            const response = await timeSlotService.generateTimeSlots({
                 fieldId: selectedField,
                 date: selectedDate,
                 startHour: generateForm.startHour,
                 endHour: generateForm.endHour,
                 slotDuration: generateForm.slotDuration
             });
-            setSuccess('Tạo khung giờ thành công!');
-            setShowModal(false);
-            fetchTimeSlots(); // Refresh danh sách
-            setTimeout(() => setSuccess(''), 3000);
+            
+            if (response.data && response.data.success !== false) {
+                setSuccess(response.data.message || 'Tạo khung giờ thành công!');
+                setShowModal(false);
+                fetchTimeSlots(); // Refresh danh sách
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(response.data?.message || 'Có lỗi xảy ra');
+                setTimeout(() => setError(''), 3000);
+            }
         } catch (err) {
-            setError(err.response?.data?.message || 'Có lỗi xảy ra');
+            const errorMsg = err.response?.data?.message || err.message || 'Có lỗi xảy ra';
+            setError(errorMsg);
+            setTimeout(() => setError(''), 3000);
         }
     };
 
@@ -107,12 +142,20 @@ const Quanlykhungio = () => {
         if (!window.confirm(confirmMsg)) return;
         
         try {
-            await timeSlotService.deleteTimeSlot(slotId);
-            setSuccess('Xóa khung giờ thành công!');
-            fetchTimeSlots();
-            setTimeout(() => setSuccess(''), 3000);
+            const response = await timeSlotService.deleteTimeSlot(slotId);
+            
+            if (response.data && response.data.success !== false) {
+                setSuccess(response.data.message || 'Xóa khung giờ thành công!');
+                fetchTimeSlots();
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(response.data?.message || 'Không thể xóa khung giờ');
+                setTimeout(() => setError(''), 3000);
+            }
         } catch (err) {
-            setError(err.response?.data?.message || 'Không thể xóa khung giờ');
+            const errorMsg = err.response?.data?.message || err.message || 'Không thể xóa khung giờ';
+            setError(errorMsg);
+            setTimeout(() => setError(''), 3000);
         }
     };
 
@@ -120,12 +163,20 @@ const Quanlykhungio = () => {
         if (!window.confirm('Bạn có chắc muốn reset khung giờ này về trạng thái trống?')) return;
         
         try {
-            await timeSlotService.updateTimeSlot(slotId, { status: 'available' });
-            setSuccess('Reset khung giờ thành công!');
-            fetchTimeSlots();
-            setTimeout(() => setSuccess(''), 3000);
+            const response = await timeSlotService.updateTimeSlot(slotId, { status: 'available' });
+            
+            if (response.data && response.data.success !== false) {
+                setSuccess(response.data.message || 'Reset khung giờ thành công!');
+                fetchTimeSlots();
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(response.data?.message || 'Không thể reset khung giờ');
+                setTimeout(() => setError(''), 3000);
+            }
         } catch (err) {
-            setError(err.response?.data?.message || 'Không thể reset khung giờ');
+            const errorMsg = err.response?.data?.message || err.message || 'Không thể reset khung giờ';
+            setError(errorMsg);
+            setTimeout(() => setError(''), 3000);
         }
     };
 
