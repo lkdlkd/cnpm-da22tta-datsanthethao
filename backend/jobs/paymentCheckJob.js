@@ -26,7 +26,7 @@ const startPaymentCheckJob = () => {
         console.log('=== Payment check job completed ===\n');
     });
     
-    console.log('✅ Payment check job scheduled (runs every 5 minutes)');
+    console.log('✅ Payment check job scheduled (runs every 1 minute)');
 };
 
 /**

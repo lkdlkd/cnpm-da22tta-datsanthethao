@@ -1,341 +1,1345 @@
 openapi: 3.0.0
 info:
-  title: API Đặt Sân Thể Thao
+  title: Hệ thống đặt sân thể thao API
+  description: API cho hệ thống quản lý đặt sân bóng đá
   version: 1.0.0
-  description: API cho hệ thống đặt sân bóng đá
+  contact:
+    name: API Support
+    email: support@datsanthethao.com
+
 servers:
   - url: http://localhost:5000/api
-paths:
-  /auth/register:
-    post:
-      summary: Đăng ký người dùng
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                hoTen:
-                  type: string
-                email:
-                  type: string
-                matKhau:
-                  type: string
-                soDienThoai:
-                  type: string
-      responses:
-        '201':
-          description: Đăng ký thành công
-        '400':
-          description: Lỗi dữ liệu đầu vào
-  /auth/login:
-    post:
-      summary: Đăng nhập người dùng
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                matKhau:
-                  type: string
-      responses:
-        '200':
-          description: Đăng nhập thành công
-        '401':
-          description: Sai thông tin đăng nhập
-  /danhsachsan:
-    get:
-      summary: Lấy danh sách sân bóng
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Danh sách sân bóng
-  /sanbong/{id}:
-    get:
-      summary: Lấy thông tin sân bóng theo id
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Thông tin sân bóng
-        '404':
-          description: Không tìm thấy sân bóng
-  /datsan:
-    post:
-      summary: Đặt sân
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                sanBong:
-                  type: string
-                khungGio:
-                  type: string
-                ghiChu:
-                  type: string
-      responses:
-        '201':
-          description: Đặt sân thành công
-        '400':
-          description: Lỗi đặt sân
-  /danhsachdadat:
-    get:
-      summary: Lấy danh sách đặt sân theo user
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Danh sách đặt sân
-  /addsan:
-    post:
-      summary: Thêm sân bóng (admin)
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tenSan:
-                  type: string
-                Danhmuc:
-                  type: string
-                loaiSan:
-                  type: string
-                  enum: ['2 người','5 người', '7 người', '11 người']
-                diaChi:
-                  type: string
-                hinhAnh:
-                  type: string
-                giaTheoKhungGio:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      khungGio:
-                        type: string
-                      gia:
-                        type: number
-                      Trangthai:
-                        type: string
-                        enum: ['Còn sân', 'Hết sân']
-                tinhTrang:
-                  type: string
-                  enum: ['Đang hoạt động', 'Bảo trì']
-      responses:
-        '201':
-          description: Thêm sân thành công
-        '403':
-          description: Không có quyền
-  /suasan/{id}:
-    put:
-      summary: Sửa sân bóng (admin)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tenSan:
-                  type: string
-                Danhmuc:
-                  type: string
-                loaiSan:
-                  type: string
-                  enum: ['2 người','5 người', '7 người', '11 người']
-                diaChi:
-                  type: string
-                hinhAnh:
-                  type: string
-                giaTheoKhungGio:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      khungGio:
-                        type: string
-                      gia:
-                        type: number
-                      Trangthai:
-                        type: string
-                        enum: ['Còn sân', 'Hết sân']
-                tinhTrang:
-                  type: string
-                  enum: ['Đang hoạt động', 'Bảo trì']
-      responses:
-        '200':
-          description: Cập nhật sân thành công
-        '403':
-          description: Không có quyền
-  /xoasan/{id}:
-    delete:
-      summary: Xóa sân bóng (admin)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Xóa sân thành công
-        '403':
-          description: Không có quyền
-  /{id}/xacnhandatsan:
-    put:
-      summary: Admin xác nhận đặt sân
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                daXacNhan:
-                  type: boolean
-                trangThaiThanhToan:
-                  type: string
-      responses:
-        '200':
-          description: Xác nhận thành công
-        '403':
-          description: Không có quyền
-  /xoauser/{id}:
-    delete:
-      summary: Xóa người dùng (admin)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Xóa người dùng thành công
-        '403':
-          description: Không có quyền
-  /updateuser/{id}:
-    put:
-      summary: Sửa thông tin người dùng (admin)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                hoTen:
-                  type: string
-                soDienThoai:
-                  type: string
-                trangThai:
-                  type: string
-                role:
-                  type: string
-      responses:
-        '200':
-          description: Cập nhật thành công
-        '403':
-          description: Không có quyền
-  /user:
-    get:
-      summary: Lấy danh sách người dùng (admin hoặc user)
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Lấy danh sách người dùng thành công
-  /cap-nhat-thong-tin:
-    put:
-      summary: Cập nhật thông tin cá nhân
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                hoTen:
-                  type: string
-                email:
-                  type: string
-                soDienThoai:
-                  type: string
-      responses:
-        '200':
-          description: Cập nhật thành công
-  /doi-mat-khau:
-    put:
-      summary: Đổi mật khẩu
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                matKhauCu:
-                  type: string
-                matKhauMoi:
-                  type: string
-      responses:
-        '200':
-          description: Đổi mật khẩu thành công
+    description: Development server
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          type: string
+          enum: [customer, admin]
+        address:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Field:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        fieldType:
+          type: string
+        location:
+          type: string
+        address:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        pricePerHour:
+          type: number
+        facilities:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, inactive, maintenance]
+        rating:
+          type: number
+        totalReviews:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+
+    TimeSlot:
+      type: object
+      properties:
+        _id:
+          type: string
+        field:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+        price:
+          type: number
+        isAvailable:
+          type: boolean
+        date:
+          type: string
+          format: date
+
+    Booking:
+      type: object
+      properties:
+        _id:
+          type: string
+        bookingCode:
+          type: string
+        user:
+          type: string
+        field:
+          type: string
+        timeSlot:
+          type: string
+        bookingDate:
+          type: string
+          format: date
+        startTime:
+          type: string
+        endTime:
+          type: string
+        totalPrice:
+          type: number
+        services:
+          type: array
+          items:
+            type: object
+        status:
+          type: string
+          enum: [pending, confirmed, completed, cancelled]
+        paymentStatus:
+          type: string
+          enum: [unpaid, paid, refunded]
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        notes:
+          type: string
+
+    Service:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        unit:
+          type: string
+        image:
+          type: string
+        isAvailable:
+          type: boolean
+
+    Review:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+        field:
+          type: string
+        booking:
+          type: string
+        rating:
+          type: number
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==================== AUTH ROUTES ====================
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng ký tài khoản mới
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - password
+                - phoneNumber
+              properties:
+                fullName:
+                  type: string
+                  example: Nguyễn Văn A
+                email:
+                  type: string
+                  example: nguyenvana@example.com
+                password:
+                  type: string
+                  example: password123
+                phoneNumber:
+                  type: string
+                  example: "0901234567"
+                address:
+                  type: string
+                  example: TP.HCM
+      responses:
+        '201':
+          description: Đăng ký thành công
+        '400':
+          description: Dữ liệu không hợp lệ
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng nhập
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: admin123
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          description: Thông tin đăng nhập không đúng
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Lấy thông tin user hiện tại
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/update-profile:
+    put:
+      tags:
+        - Authentication
+      summary: Cập nhật thông tin cá nhân
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                phoneNumber:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+  /auth/change-password:
+    put:
+      tags:
+        - Authentication
+      summary: Đổi mật khẩu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Đổi mật khẩu thành công
+
+  # ==================== FIELD ROUTES ====================
+  /fields:
+    get:
+      tags:
+        - Fields
+      summary: Lấy danh sách sân
+      security: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Tìm kiếm theo tên sân (hỗ trợ tiếng Việt không dấu)
+        - name: location
+          in: query
+          schema:
+            type: string
+          description: Lọc theo địa điểm (hỗ trợ tiếng Việt không dấu)
+        - name: fieldType
+          in: query
+          schema:
+            type: string
+          description: Lọc theo loại sân (5vs5, 7vs7, 11vs11)
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [name, priceAsc, priceDesc, rating]
+          description: Sắp xếp (name, priceAsc, priceDesc, rating)
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Field'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+                      totalPages:
+                        type: integer
+
+    post:
+      tags:
+        - Fields
+      summary: Tạo sân mới (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - fieldType
+                - location
+                - pricePerHour
+              properties:
+                name:
+                  type: string
+                fieldType:
+                  type: string
+                location:
+                  type: string
+                address:
+                  type: string
+                description:
+                  type: string
+                images:
+                  type: array
+                  items:
+                    type: string
+                pricePerHour:
+                  type: number
+                facilities:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Tạo sân thành công
+
+  /fields/{id}:
+    get:
+      tags:
+        - Fields
+      summary: Lấy chi tiết sân
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Field'
+
+    put:
+      tags:
+        - Fields
+      summary: Cập nhật thông tin sân (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                fieldType:
+                  type: string
+                location:
+                  type: string
+                address:
+                  type: string
+                description:
+                  type: string
+                pricePerHour:
+                  type: number
+                facilities:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+    delete:
+      tags:
+        - Fields
+      summary: Xóa sân (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa thành công
+
+  # ==================== TIMESLOT ROUTES ====================
+  /timeslots/{fieldId}:
+    get:
+      tags:
+        - TimeSlots
+      summary: Lấy danh sách khung giờ của sân
+      security: []
+      parameters:
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Ngày cần xem khung giờ (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimeSlot'
+
+    post:
+      tags:
+        - TimeSlots
+      summary: Tạo khung giờ mới (Admin)
+      parameters:
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - startTime
+                - endTime
+                - price
+              properties:
+                startTime:
+                  type: string
+                  example: "08:00"
+                endTime:
+                  type: string
+                  example: "09:00"
+                price:
+                  type: number
+                  example: 50000
+      responses:
+        '201':
+          description: Tạo khung giờ thành công
+
+  /timeslots/slot/{id}:
+    put:
+      tags:
+        - TimeSlots
+      summary: Cập nhật khung giờ (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+                price:
+                  type: number
+                isAvailable:
+                  type: boolean
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+    delete:
+      tags:
+        - TimeSlots
+      summary: Xóa khung giờ (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa thành công
+
+  # ==================== BOOKING ROUTES ====================
+  /bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Lấy danh sách đặt sân (Admin - tất cả, User - của mình)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, completed, cancelled]
+      responses:
+        '200':
+          description: Thành công
+
+    post:
+      tags:
+        - Bookings
+      summary: Tạo đặt sân mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - field
+                - bookingDate
+                - startTime
+                - endTime
+                - customerName
+                - customerPhone
+              properties:
+                field:
+                  type: string
+                  description: ID của sân
+                timeSlot:
+                  type: string
+                  description: ID của khung giờ (nếu có)
+                bookingDate:
+                  type: string
+                  format: date
+                  example: "2026-01-20"
+                startTime:
+                  type: string
+                  example: "08:00"
+                endTime:
+                  type: string
+                  example: "09:00"
+                customerName:
+                  type: string
+                  example: Nguyễn Văn A
+                customerPhone:
+                  type: string
+                  example: "0901234567"
+                services:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      service:
+                        type: string
+                      quantity:
+                        type: integer
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Đặt sân thành công
+
+  /bookings/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Lấy chi tiết đặt sân
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+
+    put:
+      tags:
+        - Bookings
+      summary: Cập nhật trạng thái đặt sân (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, confirmed, completed, cancelled]
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+  /bookings/{id}/cancel:
+    put:
+      tags:
+        - Bookings
+      summary: Hủy đặt sân
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cancelReason:
+                  type: string
+      responses:
+        '200':
+          description: Hủy đặt sân thành công
+
+  /bookings/user/my-bookings:
+    get:
+      tags:
+        - Bookings
+      summary: Lấy danh sách đặt sân của user hiện tại
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+
+  # ==================== SERVICE ROUTES ====================
+  /services:
+    get:
+      tags:
+        - Services
+      summary: Lấy danh sách dịch vụ
+      security: []
+      parameters:
+        - name: isAvailable
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+
+    post:
+      tags:
+        - Services
+      summary: Tạo dịch vụ mới (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - unit
+              properties:
+                name:
+                  type: string
+                  example: Thuê bóng
+                description:
+                  type: string
+                price:
+                  type: number
+                  example: 50000
+                unit:
+                  type: string
+                  example: quả
+                image:
+                  type: string
+      responses:
+        '201':
+          description: Tạo dịch vụ thành công
+
+  /services/{id}:
+    get:
+      tags:
+        - Services
+      summary: Lấy chi tiết dịch vụ
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+
+    put:
+      tags:
+        - Services
+      summary: Cập nhật dịch vụ (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                unit:
+                  type: string
+                isAvailable:
+                  type: boolean
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+    delete:
+      tags:
+        - Services
+      summary: Xóa dịch vụ (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa thành công
+
+  # ==================== REVIEW ROUTES ====================
+  /reviews/field/{fieldId}:
+    get:
+      tags:
+        - Reviews
+      summary: Lấy danh sách đánh giá của sân
+      security: []
+      parameters:
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+
+    post:
+      tags:
+        - Reviews
+      summary: Tạo đánh giá cho sân
+      parameters:
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - booking
+                - rating
+              properties:
+                booking:
+                  type: string
+                  description: ID của booking
+                rating:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                comment:
+                  type: string
+                  example: Sân đẹp, chất lượng tốt
+      responses:
+        '201':
+          description: Tạo đánh giá thành công
+
+  /reviews/{id}:
+    put:
+      tags:
+        - Reviews
+      summary: Cập nhật đánh giá
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+
+    delete:
+      tags:
+        - Reviews
+      summary: Xóa đánh giá
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa thành công
+
+  # ==================== PAYMENT ROUTES ====================
+  /payments:
+    get:
+      tags:
+        - Payments
+      summary: Lấy danh sách thanh toán (Admin)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed, refunded]
+      responses:
+        '200':
+          description: Thành công
+
+  /payments/booking/{bookingId}:
+    post:
+      tags:
+        - Payments
+      summary: Tạo thanh toán cho booking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - paymentMethod
+              properties:
+                amount:
+                  type: number
+                paymentMethod:
+                  type: string
+                  enum: [cash, bank_transfer, momo, vnpay]
+      responses:
+        '201':
+          description: Tạo thanh toán thành công
+
+  /payments/{id}:
+    get:
+      tags:
+        - Payments
+      summary: Lấy chi tiết thanh toán
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+
+  /payments/{id}/verify:
+    put:
+      tags:
+        - Payments
+      summary: Xác nhận thanh toán (Admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Xác nhận thành công
+
+  # ==================== NOTIFICATION ROUTES ====================
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Lấy danh sách thông báo của user
+      parameters:
+        - name: isRead
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Thành công
+
+  /notifications/{id}/read:
+    put:
+      tags:
+        - Notifications
+      summary: Đánh dấu thông báo đã đọc
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+
+  /notifications/mark-all-read:
+    put:
+      tags:
+        - Notifications
+      summary: Đánh dấu tất cả thông báo đã đọc
+      responses:
+        '200':
+          description: Thành công
+
+  # ==================== REVENUE ROUTES ====================
+  /revenue/stats:
+    get:
+      tags:
+        - Revenue
+      summary: Lấy thống kê doanh thu tổng quan (Admin)
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Ngày bắt đầu (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Ngày kết thúc (YYYY-MM-DD)
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [all, pending, confirmed, completed, cancelled]
+          description: Lọc theo trạng thái booking
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      summary:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                            description: Tổng doanh thu
+                          monthly:
+                            type: number
+                            description: Doanh thu tháng này
+                          daily:
+                            type: number
+                            description: Doanh thu hôm nay
+                          totalBookings:
+                            type: number
+                            description: Tổng số đơn
+                      statusStats:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              description: Trạng thái
+                            count:
+                              type: number
+                              description: Số lượng đơn
+                            total:
+                              type: number
+                              description: Tổng tiền
+                      monthlyStats:
+                        type: array
+                        description: Thống kê 6 tháng gần nhất
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: object
+                              properties:
+                                year:
+                                  type: number
+                                month:
+                                  type: number
+                            count:
+                              type: number
+                            revenue:
+                              type: number
+                      bookings:
+                        type: array
+                        description: Danh sách booking
+                        items:
+                          $ref: '#/components/schemas/Booking'
+
+  /revenue/daily:
+    get:
+      tags:
+        - Revenue
+      summary: Lấy thống kê doanh thu theo ngày (Admin)
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: object
+                          properties:
+                            year:
+                              type: number
+                            month:
+                              type: number
+                            day:
+                              type: number
+                        count:
+                          type: number
+                        revenue:
+                          type: number
+
+  /revenue/top-fields:
+    get:
+      tags:
+        - Revenue
+      summary: Lấy top sân có doanh thu cao nhất (Admin)
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+          description: Số lượng sân top
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: ID của sân
+                        count:
+                          type: number
+                          description: Số lượng đặt sân
+                        revenue:
+                          type: number
+                          description: Tổng doanh thu
+                        fieldInfo:
+                          $ref: '#/components/schemas/Field'
