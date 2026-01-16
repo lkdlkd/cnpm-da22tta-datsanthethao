@@ -1,6 +1,108 @@
+/* Liên hệ - Modern Design */
+.contact-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 40px 0;
+}
+
 .lien-he-page {
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* Page Header */
+.contact-header {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    padding: 80px 0;
+    margin-bottom: 50px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.contact-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+}
+
+.contact-header-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.contact-header h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+}
+
+.contact-header p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Contact Info Cards */
+.contact-info-section {
+    margin-bottom: 50px;
+}
+
+.contact-info-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(15, 46, 113, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.contact-info-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 30px rgba(15, 46, 113, 0.15);
+}
+
+.contact-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+}
+
+.contact-icon.phone {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.contact-icon.email {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    color: white;
+}
+
+.contact-icon.location {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.contact-info-card h5 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0f2e71;
+    margin-bottom: 12px;
 }
 
 .contact-item {
@@ -10,29 +112,219 @@
 .contact-item h6 {
     color: #495057;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
 }
 
-.social-links .btn {
-    transition: transform 0.2s ease;
+.contact-item p {
+    color: #6b7280;
+    margin-bottom: 0;
+    font-size: 1rem;
 }
 
-.social-links .btn:hover {
-    transform: scale(1.05);
+.contact-item a {
+    color: #10b981;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.map-container {
-    border-radius: 0.5rem;
-    overflow: hidden;
+.contact-item a:hover {
+    color: #059669;
+}
+
+/* Contact Form */
+.contact-form-section {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(15, 46, 113, 0.08);
+    margin-bottom: 50px;
+}
+
+.contact-form-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #0f2e71;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-title-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.contact-form-subtitle {
+    color: #6b7280;
+    font-size: 1.05rem;
+    margin-bottom: 32px;
+}
+
+.contact-form .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.contact-form .form-control,
+.contact-form .form-select {
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    transition: all 0.3s ease;
+    font-size: 1rem;
 }
 
 .contact-form .form-control:focus,
 .contact-form .form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #0f2e71;
+    box-shadow: 0 0 0 3px rgba(15, 46, 113, 0.1);
 }
 
+.contact-form textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    border: none;
+    padding: 14px 40px;
+    font-weight: 700;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 1.05rem;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 46, 113, 0.35);
+}
+
+/* Map Container */
+.map-section {
+    margin-bottom: 50px;
+}
+
+.map-container {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    height: 400px;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-placeholder {
+    text-align: center;
+    color: #6b7280;
+}
+
+.map-placeholder svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    color: #9ca3af;
+}
+
+/* Social Links */
+.social-section {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.social-title {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #0f2e71;
+    margin-bottom: 24px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.social-links .btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.social-links .btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.social-links .btn-primary {
+    background: linear-gradient(135deg, #1877f2 0%, #0e5fc2 100%);
+}
+
+.social-links .btn-info {
+    background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+}
+
+.social-links .btn-danger {
+    background: linear-gradient(135deg, #e4405f 0%, #c13584 100%);
+}
+
+.social-links .btn-success {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+    .contact-header h1 {
+        font-size: 2rem;
+    }
+
+    .contact-header p {
+        font-size: 1rem;
+    }
+    
+    .contact-info-card {
+        margin-bottom: 20px;
+    }
+
+    .contact-form-section {
+        padding: 24px;
+    }
+
+    .social-section {
+        padding: 24px;
+    }
+
+    .social-links .btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
     .lien-he-page h1 {
         font-size: 2rem;
     }

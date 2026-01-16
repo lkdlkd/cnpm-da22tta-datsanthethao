@@ -12,6 +12,7 @@ import Quanlykhungio from "./page/Admin/Quanlykhungio";
 import Quanlydatsan from "./page/Admin/Quanlydatsan";
 import Quanlydichvu from "./page/Admin/Quanlydichvu";
 import Quanlydanhgia from "./page/Admin/Quanlydanhgia";
+import Quanlydoanhthu from "./page/Admin/Quanlydoanhthu";
 import DatSan from "./page/User/DatSan";
 import Danhsachsan from "./page/User/Danhsachsan";
 import Danhsachsandadat from "./page/User/Danhsachsandadat";
@@ -74,7 +75,9 @@ function App() {
             }
           >
             <Route path="/admin/quan-ly-khach-hang" element={<Quanlykhachhang />} />
-            <Route index element={<Navigate to="/admin/quan-ly-khach-hang" replace />} />
+            <Route path="/admin/dashboard" element={<Quanlykhachhang />} />
+            <Route path="/admin/quan-ly-doanh-thu" element={<Quanlydoanhthu />} />
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin/quan-ly-khung-gio" element={<Quanlykhungio />} />
             <Route path="/admin/quan-ly-san" element={<Quanlysan />} />
             <Route path="/admin/quan-ly-dat-san" element={<Quanlydatsan />} />

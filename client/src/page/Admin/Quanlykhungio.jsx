@@ -13,6 +13,18 @@ import {
 } from 'react-bootstrap';
 import { timeSlotService, fieldService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
+import './Quanlykhungio.css';
+
+// Helper function để format loại sân
+const formatFieldType = (fieldType) => {
+    const typeMap = {
+        '5vs5': 'Sân 5',
+        '7vs7': 'Sân 7',
+        '11vs11': 'Sân 11'
+    };
+    return typeMap[fieldType] || fieldType;
+};
 
 const Quanlykhungio = () => {
     const [fields, setFields] = useState([]);
@@ -128,15 +140,21 @@ const Quanlykhungio = () => {
     };
 
     return (
-        <Container fluid className="admin-page">
-            <h2>⏰ Quản Lý Khung Giờ Sân</h2>
+        <Container fluid className="quanlykhungio-page">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                </svg>
+                Quản Lý Khung Giờ Sân
+            </h2>
 
             {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
             {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
 
             <Card className="mb-4">
-                <Card.Header>
-                    <h5>🎯 Tạo Khung Giờ Tự Động</h5>
+                <Card.Header style={{ background: '#f8f9fa', borderBottom: '2px solid #e9ecef' }}>
+                    <h5 style={{ margin: 0, color: '#0f2e71', fontWeight: '600' }}>Tạo Khung Giờ Tự Động</h5>
                 </Card.Header>
                 <Card.Body>
                     <Row>
@@ -150,7 +168,7 @@ const Quanlykhungio = () => {
                                     <option value="">-- Chọn sân --</option>
                                     {fields.map(field => (
                                         <option key={field._id} value={field._id}>
-                                            {field.name} ({field.fieldType})
+                                            {field.name} ({formatFieldType(field.fieldType)})
                                         </option>
                                     ))}
                                 </Form.Select>
@@ -174,7 +192,7 @@ const Quanlykhungio = () => {
                                 onClick={() => setShowModal(true)}
                                 disabled={!selectedField || !selectedDate}
                             >
-                                ⚙️ Cấu Hình & Tạo
+                                Cấu Hình & Tạo
                             </Button>
                         </Col>
                     </Row>
@@ -223,25 +241,21 @@ const Quanlykhungio = () => {
                                             <td>{slot.price?.toLocaleString()}</td>
                                             <td>{getStatusBadge(slot.status)}</td>
                                             <td>
-                                                <div className="d-flex gap-2">
-                                                    {slot.status !== 'available' && (
-                                                        <Button 
-                                                            variant="warning" 
-                                                            size="sm"
-                                                            onClick={() => handleResetSlot(slot._id)}
-                                                            title="Reset về trạng thái trống"
-                                                        >
-                                                            🔄 Reset
-                                                        </Button>
-                                                    )}
-                                                    <Button 
-                                                        variant="danger" 
-                                                        size="sm"
+                                                <div className="action-btn-group">
+                                                    <button 
+                                                        className="action-btn confirm"
+                                                        onClick={() => handleResetSlot(slot._id)}
+                                                        disabled={slot.status === 'available'}
+                                                        title={slot.status === 'available' ? 'Đã sẵn sàng' : 'Reset về trạng thái trống'}
+                                                        style={slot.status === 'available' ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
+                                                    >
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn delete"
                                                         onClick={() => handleDeleteSlot(slot._id, slot.status)}
                                                         title="Xóa khung giờ"
                                                     >
-                                                        🗑️ Xóa
-                                                    </Button>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -278,7 +292,7 @@ const Quanlykhungio = () => {
             {/* Modal Cấu Hình */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>⚙️ Cấu Hình Khung Giờ</Modal.Title>
+                    <Modal.Title>Cấu Hình Khung Giờ</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">

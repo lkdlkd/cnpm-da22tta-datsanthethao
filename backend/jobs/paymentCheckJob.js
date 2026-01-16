@@ -87,7 +87,7 @@ async function checkPendingPayments() {
                 // Cập nhật payment
                 payment.status = 'success';
                 payment.transactionId = matchedTransaction.transactionID;
-                payment.paymentDate = new Date(matchedTransaction.transactionDate);
+                payment.paymentDate = new Date();
                 await payment.save();
 
                 // Cập nhật booking

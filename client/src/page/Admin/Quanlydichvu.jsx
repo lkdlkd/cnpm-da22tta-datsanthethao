@@ -14,6 +14,7 @@ import {
 } from 'react-bootstrap';
 import { serviceService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
 import './Quanlydichvu.css';
 
 const Quanlydichvu = () => {
@@ -250,10 +251,15 @@ const Quanlydichvu = () => {
     };
 
     return (
-        <Container fluid className="admin-page">
+        <Container fluid className="quanlydichvu-page">
             <Row className="mb-4">
                 <Col>
-                    <h2>🛠️ Quản Lý Dịch Vụ</h2>
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                        </svg>
+                        Quản Lý Dịch Vụ
+                    </h2>
                     <p className="text-muted">Quản lý các dịch vụ bổ sung cho sân bóng</p>
                 </Col>
                 <Col xs="auto">
@@ -336,10 +342,17 @@ const Quanlydichvu = () => {
                         </Col>
                         <Col md={5} className="d-flex align-items-end">
                             <Button variant="primary" onClick={handleSearch} className="me-2">
-                                🔍 Tìm kiếm
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                </svg>
+                                Tìm kiếm
                             </Button>
                             <Button variant="outline-secondary" onClick={handleReset}>
-                                🔄 Đặt lại
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                </svg>
+                                Đặt lại
                             </Button>
                         </Col>
                     </Row>
@@ -368,7 +381,6 @@ const Quanlydichvu = () => {
                                         <th>Tên dịch vụ</th>
                                         <th>Danh mục</th>
                                         <th>Giá</th>
-                                        <th>Đơn vị</th>
                                         <th>Tồn kho</th>
                                         <th>Trạng thái</th>
                                         <th>Thao tác</th>
@@ -379,20 +391,14 @@ const Quanlydichvu = () => {
                                         <tr key={service._id}>
                                             <td>
                                                 <strong>{service.name}</strong>
-                                                {service.description && (
-                                                    <div className="text-muted small">
-                                                        {service.description}
-                                                    </div>
-                                                )}
                                             </td>
                                             <td>{getCategoryBadge(service.category)}</td>
                                             <td className="text-primary fw-bold">
                                                 {service.price.toLocaleString()}đ
                                             </td>
-                                            <td>{service.unit}</td>
                                             <td>
                                                 <Badge bg={service.stock > 0 ? 'success' : 'danger'}>
-                                                    {service.stock}
+                                                    {service.stock} {service.unit}
                                                 </Badge>
                                             </td>
                                             <td>
@@ -401,29 +407,26 @@ const Quanlydichvu = () => {
                                                 </Badge>
                                             </td>
                                             <td>
-                                                <Button
-                                                    variant="outline-primary"
-                                                    size="sm"
-                                                    className="me-1"
-                                                    onClick={() => openStockModal(service)}
-                                                >
-                                                    📦
-                                                </Button>
-                                                <Button
-                                                    variant="outline-success"
-                                                    size="sm"
-                                                    className="me-1"
-                                                    onClick={() => openEditModal(service)}
-                                                >
-                                                    ✏️
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(service._id)}
-                                                >
-                                                    🗑️
-                                                </Button>
+                                                <div className="action-btn-group">
+                                                    <button
+                                                        className="action-btn view"
+                                                        onClick={() => openEditModal(service)}
+                                                        title="Xem chi tiết"
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn edit"
+                                                        onClick={() => openEditModal(service)}
+                                                        title="Chỉnh sửa"
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn delete"
+                                                        onClick={() => handleDelete(service._id)}
+                                                        title="Xóa"
+                                                    >
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -439,7 +442,7 @@ const Quanlydichvu = () => {
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {modalMode === 'create' ? '➕ Thêm Dịch Vụ' : '✏️ Sửa Dịch Vụ'}
+                        {modalMode === 'create' ? 'Thêm Dịch Vụ' : 'Sửa Dịch Vụ'}
                     </Modal.Title>
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
@@ -566,7 +569,7 @@ const Quanlydichvu = () => {
             {/* Stock Update Modal */}
             <Modal show={showStockModal} onHide={() => setShowStockModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>📦 Cập Nhật Tồn Kho</Modal.Title>
+                    <Modal.Title>Cập Nhật Tồn Kho</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Alert variant="info">

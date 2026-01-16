@@ -13,6 +13,18 @@ import {
 } from 'react-bootstrap';
 import { bookingService, paymentService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
+import './Quanlydatsan.css';
+
+// Helper function để format loại sân
+const formatFieldType = (fieldType) => {
+    const typeMap = {
+        '5vs5': 'Sân 5',
+        '7vs7': 'Sân 7',
+        '11vs11': 'Sân 11'
+    };
+    return typeMap[fieldType] || fieldType;
+};
 
 const Quanlydatsan = () => {
     const [bookings, setBookings] = useState([]);
@@ -205,8 +217,14 @@ const Quanlydatsan = () => {
     };
 
     return (
-        <Container fluid className="admin-page">
-            <h2>📅 Quản Lý Đặt Sân</h2>
+        <Container fluid className="quanlydatsan-page">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                    <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                </svg>
+                Quản Lý Đặt Sân
+            </h2>
 
             {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
             {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
@@ -245,23 +263,20 @@ const Quanlydatsan = () => {
                         <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '50px' }}>#</th>
-                                    <th style={{ width: '110px' }}>Mã Đơn</th>
-                                    <th style={{ width: '150px' }}>Khách Hàng</th>
-                                    <th style={{ width: '140px' }}>Sân</th>
-                                    <th style={{ width: '100px' }}>Ngày Đặt</th>
-                                    <th style={{ width: '100px' }}>Giờ</th>
-                                    <th style={{ width: '160px' }}>Dịch Vụ</th>
-                                    <th style={{ width: '100px' }}>Tổng Tiền</th>
-                                    <th style={{ width: '130px' }}>Thanh Toán</th>
-                                    <th style={{ width: '110px' }}>Trạng Thái</th>
-                                    <th style={{ width: '200px' }}>Thao Tác</th>
+                                    <th>STT</th>
+                                    <th>Mã Đơn</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Sân</th>
+                                    <th>Ngày Đặt</th>
+                                    <th>Tổng Tiền</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
                                 </tr>
                             </thead>
                         <tbody>
                             {bookings.length === 0 ? (
                                 <tr>
-                                    <td colSpan="11" className="text-center py-4">
+                                    <td colSpan="8" className="text-center py-4">
                                         {loading ? (
                                             <div>
                                                 <div className="spinner-border spinner-border-sm text-primary" role="status">
@@ -286,69 +301,40 @@ const Quanlydatsan = () => {
                                         <td>
                                             <div style={{ fontSize: '0.85rem' }}>{booking.field?.name || 'N/A'}</div>
                                             <Badge bg="secondary" className="mt-1" style={{ fontSize: '0.75rem' }}>
-                                                {booking.field?.fieldType || 'N/A'}
+                                                {formatFieldType(booking.field?.fieldType) || 'N/A'}
                                             </Badge>
                                         </td>
                                         <td style={{ fontSize: '0.85rem' }}>
                                             {new Date(booking.bookingDate).toLocaleDateString('vi-VN')}
                                         </td>
-                                        <td style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-                                            {booking.startTime} - {booking.endTime}
-                                        </td>
-                                        <td>
-                                            {booking.services && booking.services.length > 0 ? (
-                                                <div style={{ maxHeight: '60px', overflowY: 'auto' }}>
-                                                    {booking.services.map((s, idx) => (
-                                                        <Badge 
-                                                            key={idx} 
-                                                            bg="info" 
-                                                            className="me-1 mb-1"
-                                                            style={{ fontSize: '0.7rem' }}
-                                                            title={`${s.service?.name}: ${s.quantity} x ${s.price?.toLocaleString()}đ`}
-                                                        >
-                                                            {s.service?.name || 'N/A'} (x{s.quantity})
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-muted" style={{ fontSize: '0.85rem' }}>Không có</span>
-                                            )}
-                                        </td>
                                         <td className="text-end" style={{ fontSize: '0.9rem' }}>
-                                            <strong>{booking.totalPrice?.toLocaleString() || 0}đ</strong>
+                                            <strong className="text-success">{booking.totalPrice?.toLocaleString() || 0}đ</strong>
                                         </td>
-                                        <td style={{ fontSize: '0.8rem' }}>{getPaymentBadge(booking.paymentStatus, booking.payment?.paymentMethod)}</td>
                                         <td>{getStatusBadge(booking.status)}</td>
                                         <td>
-                                            <div className="d-flex flex-wrap gap-1">
-                                                <Button 
-                                                    variant="info" 
-                                                    size="sm" 
-                                                    style={{ fontSize: '0.8rem', padding: '4px 8px' }}
+                                            <div className="action-btn-group">
+                                                <button 
+                                                    className="action-btn view" 
                                                     onClick={() => viewDetail(booking)}
+                                                    title="Xem chi tiết"
                                                 >
-                                                    👁️
-                                                </Button>
-                                                {booking.status === 'pending' && (
-                                                    <Button 
-                                                        variant="success" 
-                                                        size="sm"
-                                                        style={{ fontSize: '0.8rem', padding: '4px 8px' }}
-                                                        onClick={() => handleConfirm(booking._id)}
-                                                    >
-                                                        ✅
-                                                    </Button>
-                                                )}
-                                                {booking.paymentStatus === 'unpaid' && booking.payment && (
-                                                    <Button 
-                                                        variant="warning" 
-                                                        size="sm"
-                                                        style={{ fontSize: '0.8rem', padding: '4px 8px' }}
-                                                        onClick={() => handleConfirmPayment(booking)}
-                                                    >
-                                                        💵
-                                                    </Button>
-                                                )}
+                                                </button>
+                                                <button 
+                                                    className="action-btn confirm"
+                                                    onClick={() => handleConfirm(booking._id)}
+                                                    disabled={booking.status !== 'pending'}
+                                                    title={booking.status === 'pending' ? 'Xác nhận đơn' : 'Đã xác nhận'}
+                                                    style={booking.status !== 'pending' ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
+                                                >
+                                                </button>
+                                                <button 
+                                                    className="action-btn payment"
+                                                    onClick={() => handleConfirmPayment(booking)}
+                                                    disabled={booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash'}
+                                                    title={booking.paymentStatus === 'paid' ? 'Đã thanh toán' : (booking.payment?.paymentMethod === 'cash' ? 'Xác nhận thanh toán' : 'Không áp dụng')}
+                                                    style={(booking.paymentStatus === 'paid' || !booking.payment || booking.payment.paymentMethod !== 'cash') ? {opacity: 0.4, cursor: 'not-allowed'} : {}}
+                                                >
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -376,7 +362,7 @@ const Quanlydatsan = () => {
                 style={{ maxHeight: '90vh' }}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>📋 Chi Tiết Đơn Đặt</Modal.Title>
+                    <Modal.Title>Chi Tiết Đơn Đặt</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ maxHeight: 'calc(90vh - 120px)', overflowY: 'auto' }}>
                     {selectedBooking && (
@@ -395,9 +381,9 @@ const Quanlydatsan = () => {
                             <p><strong>Số điện thoại:</strong> {selectedBooking.customerPhone}</p>
                             <p><strong>Email:</strong> {selectedBooking.user?.email || 'N/A'}</p>
                             <hr />
-                            <h5>🏟️ Thông Tin Sân</h5>
+                            <h5>Thông Tin Sân</h5>
                             <p><strong>Tên sân:</strong> {selectedBooking.field?.name || 'N/A'}</p>
-                            <p><strong>Loại sân:</strong> <Badge bg="secondary">{selectedBooking.field?.fieldType || 'N/A'}</Badge></p>
+                            <p><strong>Loại sân:</strong> <Badge bg="secondary">{formatFieldType(selectedBooking.field?.fieldType) || 'N/A'}</Badge></p>
                             <p><strong>Địa chỉ:</strong> {selectedBooking.field?.address || 'N/A'}</p>
                             <hr />
                             <h5>📅 Thông Tin Đặt Sân</h5>
@@ -408,7 +394,7 @@ const Quanlydatsan = () => {
                             {selectedBooking.services && selectedBooking.services.length > 0 && (
                                 <>
                                     <hr />
-                                    <h5>🛠️ Dịch Vụ Đã Chọn</h5>
+                                    <h5>Dịch Vụ Đã Chọn</h5>
                                     <Table bordered size="sm">
                                         <thead>
                                             <tr>
@@ -449,7 +435,7 @@ const Quanlydatsan = () => {
                             )}
 
                             <hr />
-                            <h5>💰 Thông Tin Thanh Toán</h5>
+                            <h5>Thông Tin Thanh Toán</h5>
                             <p>
                                 <strong>Tổng tiền:</strong>{' '}
                                 <span className="text-danger fw-bold fs-5">{selectedBooking.totalPrice?.toLocaleString() || 0}đ</span>

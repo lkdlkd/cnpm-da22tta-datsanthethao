@@ -15,6 +15,8 @@ import {
 } from 'react-bootstrap';
 import { fieldService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
+import './Quanlysan.css';
 
 const Quanlysan = () => {
     const [fields, setFields] = useState([]);
@@ -64,7 +66,7 @@ const Quanlysan = () => {
         setError('');
         setSuccess('');
 
-        if (mode === 'edit' && field) {
+        if ((mode === 'edit' || mode === 'view') && field) {
             setCurrentField(field);
             setFormData({
                 name: field.name,
@@ -279,8 +281,13 @@ const Quanlysan = () => {
     });
 
     return (
-        <Container fluid className="admin-page">
-            <h2>🏟️ Quản Lý Sân Bóng</h2>
+        <Container fluid className="quanlysan-page">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                </svg>
+                Quản Lý Sân Bóng
+            </h2>
 
             {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
             {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
@@ -291,15 +298,36 @@ const Quanlysan = () => {
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>Tìm kiếm</Form.Label>
-                                <InputGroup>
-                                    <InputGroup.Text>🔍</InputGroup.Text>
+                                <div style={{ position: 'relative' }}>
                                     <Form.Control
                                         type="text"
                                         placeholder="Tìm theo tên hoặc khu vực..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
+                                        style={{ paddingRight: '45px' }}
                                     />
-                                </InputGroup>
+                                    <button 
+                                        style={{
+                                            position: 'absolute',
+                                            right: '8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: '8px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            color: '#6c757d'
+                                        }}
+                                        onClick={() => {}}
+                                        title="Tìm kiếm"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </Form.Group>
                         </Col>
                         <Col md={3}>
@@ -333,14 +361,11 @@ const Quanlysan = () => {
                         <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>STT</th>
                                     <th>Hình Ảnh</th>
                                     <th>Tên Sân</th>
                                     <th>Loại Sân</th>
-                                    <th>Khu Vực</th>
-                                    <th>Địa Chỉ</th>
                                     <th>Giá/Giờ</th>
-                                    <th>Đánh Giá</th>
                                     <th>Trạng Thái</th>
                                     <th>Thao Tác</th>
                                 </tr>
@@ -348,7 +373,7 @@ const Quanlysan = () => {
                             <tbody>
                                 {filteredFields.length === 0 ? (
                                     <tr>
-                                        <td colSpan="10" className="text-center">
+                                        <td colSpan="7" className="text-center">
                                             Không có dữ liệu
                                         </td>
                                     </tr>
@@ -361,11 +386,11 @@ const Quanlysan = () => {
                                                     <img
                                                         src={field.images[0]}
                                                         alt={field.name}
-                                                        style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
-                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/80x60?text=No+Image' }}
+                                                        style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '8px' }}
+                                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/60x45?text=No+Image' }}
                                                     />
                                                 ) : (
-                                                    <div style={{ width: '80px', height: '60px', background: '#e9ecef', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: '#6c757d' }}>
+                                                    <div style={{ width: '60px', height: '45px', background: '#e9ecef', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#6c757d' }}>
                                                         Chưa có ảnh
                                                     </div>
                                                 )}
@@ -374,31 +399,31 @@ const Quanlysan = () => {
                                             <td>
                                                 <Badge bg="info">{field.fieldType}</Badge>
                                             </td>
-                                            <td>{field.location}</td>
-                                            <td>{field.address}</td>
                                             <td className="text-end">
                                                 <strong>{(field.pricePerHour || 0).toLocaleString()}đ</strong>
                                             </td>
-                                            <td className="text-center">
-                                                ⭐ {(field.rating || 0).toFixed(1)} ({field.totalReviews || 0})
-                                            </td>
                                             <td>{getStatusBadge(field.status)}</td>
                                             <td>
-                                                <Button
-                                                    variant="warning"
-                                                    size="sm"
-                                                    className="me-2"
-                                                    onClick={() => handleShowModal('edit', field)}
-                                                >
-                                                    ✏️ Sửa
-                                                </Button>
-                                                <Button
-                                                    variant="danger"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(field._id)}
-                                                >
-                                                    🗑️ Xóa
-                                                </Button>
+                                                <div className="action-btn-group">
+                                                    <button
+                                                        className="action-btn view"
+                                                        onClick={() => handleShowModal('view', field)}
+                                                        title="Xem chi tiết"
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn edit"
+                                                        onClick={() => handleShowModal('edit', field)}
+                                                        title="Chỉnh sửa"
+                                                    >
+                                                    </button>
+                                                    <button
+                                                        className="action-btn delete"
+                                                        onClick={() => handleDelete(field._id)}
+                                                        title="Xóa"
+                                                    >
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
@@ -415,17 +440,84 @@ const Quanlysan = () => {
                 </Card.Body>
             </Card>
 
-            {/* Modal Thêm/Sửa Sân */}
+            {/* Modal Thêm/Sửa/Xem Sân */}
             <Modal show={showModal} onHide={handleCloseModal} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        {modalMode === 'add' ? '➕ Thêm Sân Mới' : '✏️ Chỉnh Sửa Sân'}
+                        {modalMode === 'add' ? 'Thêm Sân Mới' : modalMode === 'view' ? 'Chi Tiết Sân' : 'Chỉnh Sửa Sân'}
                     </Modal.Title>
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
                         {error && <Alert variant="danger">{error}</Alert>}
 
+                        {modalMode === 'view' ? (
+                            /* View Mode - Display Only */
+                            <div>
+                                <Row className="mb-3">
+                                    <Col md={8}>
+                                        <h5>{formData.name}</h5>
+                                        <Badge bg="info" className="me-2">{formData.fieldType}</Badge>
+                                        {getStatusBadge(formData.status)}
+                                    </Col>
+                                    <Col md={4} className="text-end">
+                                        <h4 className="text-success">{Number(formData.pricePerHour).toLocaleString()}đ/giờ</h4>
+                                    </Col>
+                                </Row>
+                                
+                                <Row className="mb-3">
+                                    <Col md={6}>
+                                        <p><strong>Khu vực:</strong> {formData.location}</p>
+                                    </Col>
+                                    <Col md={6}>
+                                        <p><strong>Đánh giá:</strong> ⭐ {(currentField?.rating || 0).toFixed(1)} ({currentField?.totalReviews || 0} đánh giá)</p>
+                                    </Col>
+                                </Row>
+                                
+                                <Row className="mb-3">
+                                    <Col md={12}>
+                                        <p><strong>Địa chỉ:</strong> {formData.address}</p>
+                                    </Col>
+                                </Row>
+
+                                <Row className="mb-3">
+                                    <Col md={12}>
+                                        <p><strong>Mô tả:</strong></p>
+                                        <p>{formData.description || 'Chưa có mô tả'}</p>
+                                    </Col>
+                                </Row>
+
+                                <Row className="mb-3">
+                                    <Col md={12}>
+                                        <p><strong>Tiện nghi:</strong></p>
+                                        <p>{formData.facilities || 'Chưa cập nhật'}</p>
+                                    </Col>
+                                </Row>
+
+                                {imageLinks.length > 0 && imageLinks[0] && (
+                                    <Row>
+                                        <Col md={12}>
+                                            <p><strong>Hình ảnh:</strong></p>
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {imageLinks.map((img, idx) => (
+                                                    img && (
+                                                        <img 
+                                                            key={idx} 
+                                                            src={img} 
+                                                            alt={`Field ${idx + 1}`}
+                                                            style={{ width: '150px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/150x100?text=Error' }}
+                                                        />
+                                                    )
+                                                ))}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                )}
+                            </div>
+                        ) : (
+                            /* Edit/Add Mode - Form Fields */
+                            <>
                         <Row>
                             <Col md={8}>
                                 <Form.Group className="mb-3">
@@ -554,7 +646,7 @@ const Quanlysan = () => {
                                     </Form.Text>
                                     {imageLinks.map((link, index) => (
                                 <InputGroup className="mb-2" key={index}>
-                                    <InputGroup.Text>🖼️ #{index + 1}</InputGroup.Text>
+                                    <InputGroup.Text>#{index + 1}</InputGroup.Text>
                                     <Form.Control
                                         type="url"
                                         value={link}
@@ -688,21 +780,38 @@ const Quanlysan = () => {
                                 <option value="inactive">Không hoạt động</option>
                             </Form.Select>
                         </Form.Group>
+                            </>
+                        )}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Hủy
-                        </Button>
-                        <Button variant="primary" type="submit" disabled={loading}>
-                            {loading ? (
-                                <>
-                                    <Spinner animation="border" size="sm" className="me-2" />
-                                    Đang xử lý...
-                                </>
-                            ) : (
-                                modalMode === 'add' ? '➕ Thêm Sân' : '💾 Cập Nhật'
-                            )}
-                        </Button>
+                        {modalMode === 'view' ? (
+                            <>
+                                <Button variant="secondary" onClick={handleCloseModal}>
+                                    Đóng
+                                </Button>
+                                <Button variant="primary" onClick={() => {
+                                    setModalMode('edit');
+                                }}>
+                                    Chỉnh sửa
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="secondary" onClick={handleCloseModal}>
+                                    Hủy
+                                </Button>
+                                <Button variant="primary" type="submit" disabled={loading}>
+                                    {loading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" className="me-2" />
+                                            Đang xử lý...
+                                        </>
+                                    ) : (
+                                        modalMode === 'add' ? 'Thêm Sân' : 'Cập Nhật'
+                                    )}
+                                </Button>
+                            </>
+                        )}
                     </Modal.Footer>
                 </Form>
             </Modal>

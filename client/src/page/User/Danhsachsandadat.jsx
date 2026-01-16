@@ -14,6 +14,17 @@ import {
 } from 'react-bootstrap';
 import { useAuth } from '../../components/AuthContext';
 import { bookingService, paymentService, reviewService } from '../../services/api';
+import './Danhsachsandadat.css';
+
+// Helper function để format loại sân
+const formatFieldType = (fieldType) => {
+    const typeMap = {
+        '5vs5': 'Sân 5',
+        '7vs7': 'Sân 7',
+        '11vs11': 'Sân 11'
+    };
+    return typeMap[fieldType] || fieldType;
+};
 
 const Danhsachsandadat = () => {
     const { user } = useAuth();
@@ -280,157 +291,216 @@ const Danhsachsandadat = () => {
     };
 
     return (
-        <Container fluid className="py-4" style={{maxWidth:1200}}>
-            <Row className="mb-4">
-                <Col>
-                    <h2>📋 Đơn Đặt Sân Của Tôi</h2>
-                    <p className="text-muted">
-                        Quản lý các đơn đặt sân của bạn
-                        {pagination.total > 0 && (
-                            <span> - Tìm thấy <strong>{pagination.total}</strong> đơn
-                                {pagination.totalPages > 1 && (
-                                    <span> (Trang <strong>{currentPage}</strong>/<strong>{pagination.totalPages}</strong>)</span>
-                                )}
-                            </span>
-                        )}
-                    </p>
-                </Col>
-            </Row>
+        <div className="booking-list-page">
+            {/* Page Header */}
+            <div className="page-header">
+                <Container>
+                    <div className="page-header-content text-center">
+                        <h1 className="page-title">📋 Đơn Đặt Sân Của Tôi</h1>
+                        <p className="page-subtitle">
+                            Quản lý và theo dõi tất cả các đơn đặt sân của bạn
+                        </p>
+                    </div>
+                </Container>
+            </div>
 
-            {/* Filter Tabs */}
-            <Nav variant="tabs" className="mb-4">
-                <Nav.Item>
-                    <Nav.Link 
-                        active={activeTab === 'all'} 
-                        onClick={() => setActiveTab('all')}
-                    >
-                        Tất cả
-                    </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link 
-                        active={activeTab === 'pending'} 
-                        onClick={() => setActiveTab('pending')}
-                    >
-                        Chờ xác nhận
-                    </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link 
-                        active={activeTab === 'confirmed'} 
-                        onClick={() => setActiveTab('confirmed')}
-                    >
-                        Đã xác nhận
-                    </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link 
-                        active={activeTab === 'completed'} 
-                        onClick={() => setActiveTab('completed')}
-                    >
-                        Hoàn thành
-                    </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link 
-                        active={activeTab === 'cancelled'} 
-                        onClick={() => setActiveTab('cancelled')}
-                    >
-                        Đã hủy
-                    </Nav.Link>
-                </Nav.Item>
-            </Nav>
+            <Container>
+                {/* Filter Tabs */}
+                <Nav className="booking-tabs">
+                    <Nav.Item>
+                        <Nav.Link 
+                            active={activeTab === 'all'} 
+                            onClick={() => setActiveTab('all')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                            </svg>
+                            Tất cả
+                            {pagination.total > 0 && <Badge bg="secondary" className="ms-2">{pagination.total}</Badge>}
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link 
+                            active={activeTab === 'pending'} 
+                            onClick={() => setActiveTab('pending')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                            </svg>
+                            Chờ xác nhận
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link 
+                            active={activeTab === 'confirmed'} 
+                            onClick={() => setActiveTab('confirmed')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                            </svg>
+                            Đã xác nhận
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link 
+                            active={activeTab === 'completed'} 
+                            onClick={() => setActiveTab('completed')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM5.5 7h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zM.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8H.8z"/>
+                            </svg>
+                            Hoàn thành
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link 
+                            active={activeTab === 'cancelled'} 
+                            onClick={() => setActiveTab('cancelled')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                            Đã hủy
+                        </Nav.Link>
+                    </Nav.Item>
+                </Nav>
 
-            {/* Bookings List */}
-            <Row>
+                {/* Bookings Grid */}
                 {loading ? (
-                    <Col className="text-center py-5">
+                    <div className="text-center py-5">
                         <div className="spinner-border text-primary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
-                    </Col>
+                        <p className="mt-3 text-muted">Đang tải dữ liệu...</p>
+                    </div>
                 ) : bookings.length === 0 ? (
-                    <Col>
-                        <Alert variant="info" className="text-center">
-                            <h5>Không có đơn đặt nào</h5>
-                            <p>Hãy đặt sân để bắt đầu!</p>
-                        </Alert>
-                    </Col>
+                    <div className="empty-state">
+                        <div className="empty-icon">📭</div>
+                        <h3 className="empty-title">Chưa có đơn đặt nào</h3>
+                        <p className="empty-description">
+                            {activeTab === 'all' 
+                                ? 'Bạn chưa đặt sân nào. Hãy tìm và đặt sân ngay!'
+                                : `Không có đơn đặt nào ở trạng thái này`}
+                        </p>
+                        {activeTab === 'all' && (
+                            <Button variant="primary" size="lg" href="/danh-sach-san">
+                                Tìm Sân Ngay
+                            </Button>
+                        )}
+                    </div>
                 ) : (
-                    bookings.map((booking) => (
-                        <Col md={6} lg={4} key={booking._id} className="mb-4">
-                            <Card className="h-100 shadow-sm booking-card">
-                                <Card.Header className="d-flex justify-content-between align-items-center">
-                                    <strong>#{booking.bookingCode}</strong>
-                                    {getStatusBadge(booking.status)}
-                                </Card.Header>
-                                <Card.Body>
-                                    <h5 className="card-title">{booking.field?.name}</h5>
-                                    <div className="booking-details">
-                                        <p className="mb-1">
-                                            <strong>📅 Ngày:</strong>{' '}
-                                            {new Date(booking.bookingDate).toLocaleDateString('vi-VN')}
-                                        </p>
-                                        <p className="mb-1">
-                                            <strong>🕐 Giờ:</strong> {booking.startTime} - {booking.endTime}
-                                        </p>
-                                        <p className="mb-1">
-                                            <strong>💰 Tổng tiền:</strong>{' '}
-                                            <span className="text-primary fw-bold">
-                                                {booking.totalPrice.toLocaleString()}đ
-                                            </span>
-                                        </p>
-                                        <p className="mb-1">
-                                            <strong>💳 Thanh toán:</strong>{' '}
-                                            {getPaymentBadge(booking.paymentStatus)}
-                                        </p>
-                                        {booking.services && booking.services.length > 0 && (
-                                            <p className="mb-0 text-muted small">
-                                                🛍️ {booking.services.length} dịch vụ bổ sung
-                                            </p>
-                                        )}
-                                    </div>
-                                </Card.Body>
-                                <Card.Footer className="bg-white">
-                                    <div className="d-grid gap-2">
-                                        <Button
-                                            variant="primary"
-                                            size="sm"
-                                            onClick={() => viewBookingDetail(booking)}
-                                        >
-                                            👁️ Xem Chi Tiết
-                                        </Button>
-                                        {booking.status === 'pending' && (
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => cancelBooking(booking._id)}
-                                            >
-                                                ❌ Hủy Đơn
-                                            </Button>
-                                        )}
-                                        {canReview(booking) && (
-                                            <Button
-                                                variant="warning"
-                                                size="sm"
-                                                onClick={() => openReviewModal(booking)}
-                                            >
-                                                ⭐ Đánh Giá
-                                            </Button>
-                                        )}
-                                    </div>
-                                </Card.Footer>
-                            </Card>
-                        </Col>
-                    ))
+                    <>
+                        <Row className="g-4">
+                            {bookings.map((booking) => (
+                                <Col md={6} lg={4} key={booking._id}>
+                                    <Card className="booking-card">
+                                        <div className="booking-card-header">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <span className="booking-id">#{booking.bookingCode}</span>
+                                                <Badge className="booking-status-badge" bg={
+                                                    booking.status === 'pending' ? 'warning' :
+                                                    booking.status === 'confirmed' ? 'success' :
+                                                    booking.status === 'completed' ? 'info' : 'danger'
+                                                }>
+                                                    {booking.status === 'pending' ? 'Chờ xác nhận' :
+                                                     booking.status === 'confirmed' ? 'Đã xác nhận' :
+                                                     booking.status === 'completed' ? 'Hoàn thành' : 'Đã hủy'}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                        <div className="booking-card-body">
+                                            <h5 className="field-name-title">{booking.field?.name}</h5>
+                                            
+                                            <div className="booking-info-row">
+                                                <svg className="info-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                                                </svg>
+                                                <div>
+                                                    <span className="info-label">Ngày đặt:</span>
+                                                    <span className="info-value ms-2">
+                                                        {new Date(booking.bookingDate).toLocaleDateString('vi-VN')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="booking-info-row">
+                                                <svg className="info-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                                </svg>
+                                                <div>
+                                                    <span className="info-label">Giờ chơi:</span>
+                                                    <span className="info-value ms-2">
+                                                        {booking.startTime} - {booking.endTime}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="booking-info-row">
+                                                <svg className="info-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-2zm0 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+                                                </svg>
+                                                <div>
+                                                    <span className="info-label">Thanh toán:</span>
+                                                    <Badge bg={booking.paymentStatus === 'paid' ? 'success' : 'warning'} className="ms-2">
+                                                        {booking.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Giá tiền */}
+                                            <div className="booking-total-price">
+                                                <div className="total-price-label">Tổng tiền</div>
+                                                <div className="total-price-value">{booking.totalPrice.toLocaleString()}đ</div>
+                                            </div>
+                                            
+                                            {booking.services && booking.services.length > 0 && (
+                                                <div className="booking-info-row">
+                                                    <svg className="info-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                                                    </svg>
+                                                    <div>
+                                                        <span className="info-value">{booking.services.length} dịch vụ bổ sung</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="booking-actions">
+                                                <Button 
+                                                    className="btn-detail"
+                                                    onClick={() => viewBookingDetail(booking)}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                                    </svg>
+                                                    Chi tiết
+                                                </Button>
+                                                {booking.status === 'completed' && !booking.hasReviewed && (
+                                                    <Button 
+                                                        className="btn-review"
+                                                        onClick={() => openReviewModal(booking)}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                                        </svg>
+                                                        Đánh giá
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                        {renderPagination()}
+                    </>
                 )}
-            </Row>
-
-            {/* Pagination */}
-            {!loading && bookings.length > 0 && renderPagination()}
 
             {/* Review Modal */}
-            <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered>
+            <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered className="review-modal">
                 <Modal.Header closeButton>
                     <Modal.Title>⭐ Đánh Giá Sân Bóng</Modal.Title>
                 </Modal.Header>
@@ -448,17 +518,14 @@ const Danhsachsandadat = () => {
                             <Form.Group className="mb-4">
                                 <Form.Label className="fw-bold">Đánh giá của bạn</Form.Label>
                                 <div className="text-center mb-3">
-                                    <div className="star-rating" style={{ fontSize: '2.5rem', cursor: 'pointer' }}>
+                                    <div className="star-rating">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <span
                                                 key={star}
+                                                className={`star ${star <= (hoverRating || rating) ? 'filled' : ''}`}
                                                 onClick={() => setRating(star)}
                                                 onMouseEnter={() => setHoverRating(star)}
                                                 onMouseLeave={() => setHoverRating(0)}
-                                                style={{
-                                                    color: star <= (hoverRating || rating) ? '#ffc107' : '#e4e5e9',
-                                                    transition: 'color 0.2s'
-                                                }}
                                             >
                                                 ★
                                             </span>
@@ -512,189 +579,282 @@ const Danhsachsandadat = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Detail Modal */}
-            <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Chi Tiết Đơn Đặt</Modal.Title>
+            {/* Detail Modal - Redesigned */}
+            <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} size="xl" className="booking-detail-modal">
+                <Modal.Header closeButton style={{ background: 'linear-gradient(135deg, #0f2e71 0%, #1e40af 100%)', color: 'white', borderRadius: '0' }}>
+                    <Modal.Title>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '10px' }}>
+                            <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85v5.65z"/>
+                        </svg>
+                        Chi Tiết Đơn Đặt Sân
+                    </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={{ padding: '0', background: '#f8fafc' }}>
                     {selectedBooking && (
-                        <>
-                            <Card className="mb-3">
-                                <Card.Body>
-                                    <Row className="mb-3">
-                                        <Col md={6}>
-                                            <strong>Mã đơn:</strong> {selectedBooking.bookingCode}
+                        <Row className="g-0">
+                            {/* Left Column - Main Info */}
+                            <Col md={7} style={{ padding: '2rem', borderRight: '2px solid #e2e8f0' }}>
+                                {/* Booking Code & Status */}
+                                <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <small style={{ color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mã đơn đặt</small>
+                                            <h4 style={{ color: '#0f2e71', fontWeight: '800', marginBottom: '0', marginTop: '4px' }}>{selectedBooking.bookingCode}</h4>
+                                        </div>
+                                        {getStatusBadge(selectedBooking.status)}
+                                    </div>
+                                    <hr style={{ margin: '1rem 0', borderColor: '#e2e8f0' }} />
+                                    <Row>
+                                        <Col xs={6}>
+                                            <div style={{ marginBottom: '0.75rem' }}>
+                                                <small style={{ color: '#64748b', fontSize: '0.85rem' }}>Khách hàng</small>
+                                                <div style={{ color: '#0f2e71', fontWeight: '600' }}>{selectedBooking.customerName}</div>
+                                            </div>
                                         </Col>
-                                        <Col md={6} className="text-end">
-                                            {getStatusBadge(selectedBooking.status)}
+                                        <Col xs={6}>
+                                            <div style={{ marginBottom: '0.75rem' }}>
+                                                <small style={{ color: '#64748b', fontSize: '0.85rem' }}>Số điện thoại</small>
+                                                <div style={{ color: '#0f2e71', fontWeight: '600' }}>{selectedBooking.customerPhone}</div>
+                                            </div>
                                         </Col>
                                     </Row>
-                                    <hr />
-                                    <h5>🏟️ Thông Tin Sân</h5>
-                                    <p><strong>Tên sân:</strong> {selectedBooking.field?.name}</p>
-                                    <p><strong>Loại sân:</strong> {selectedBooking.field?.fieldType}</p>
-                                    <p><strong>Địa chỉ:</strong> {selectedBooking.field?.address}</p>
-                                    <hr />
-                                    <h5>📅 Thông Tin Đặt</h5>
-                                    <p><strong>Ngày:</strong> {new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN')}</p>
-                                    <p><strong>Giờ:</strong> {selectedBooking.startTime} - {selectedBooking.endTime}</p>
-                                    <p><strong>Khách hàng:</strong> {selectedBooking.customerName}</p>
-                                    <p><strong>Số điện thoại:</strong> {selectedBooking.customerPhone}</p>
-                                    {selectedBooking.notes && (
-                                        <p><strong>Ghi chú:</strong> {selectedBooking.notes}</p>
-                                    )}
-                                    
-                                    {/* Hiển thị dịch vụ nếu có */}
-                                    {selectedBooking.services && selectedBooking.services.length > 0 && (
-                                        <>
-                                            <hr />
-                                            <h5>🛍️ Dịch Vụ Bổ Sung</h5>
-                                            <Table bordered hover size="sm">
-                                                <thead>
+                                </div>
+
+                                {/* Field Info Card */}
+                                <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                                    <h5 style={{ color: '#0f2e71', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '10px', color: '#10b981' }}>
+                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                        </svg>
+                                        Thông Tin Sân Bóng
+                                    </h5>
+                                    <div style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
+                                        <h6 style={{ color: '#0f2e71', fontWeight: '700', marginBottom: '4px' }}>{selectedBooking.field?.name}</h6>
+                                        <Badge bg="info" style={{ fontSize: '0.8rem' }}>{formatFieldType(selectedBooking.field?.fieldType)}</Badge>
+                                    </div>
+                                    <div style={{ marginBottom: '0.75rem' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#64748b" viewBox="0 0 16 16" style={{ marginRight: '8px' }}>
+                                            <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                                            <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                        </svg>
+                                        <small style={{ color: '#64748b' }}>{selectedBooking.field?.address}</small>
+                                    </div>
+                                    <Row className="g-2">
+                                        <Col xs={6}>
+                                            <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0f2e71" viewBox="0 0 16 16" style={{ marginBottom: '4px' }}>
+                                                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5z"/>
+                                                </svg>
+                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '2px' }}>Ngày đặt</div>
+                                                <div style={{ color: '#0f2e71', fontWeight: '700' }}>{new Date(selectedBooking.bookingDate).toLocaleDateString('vi-VN')}</div>
+                                            </div>
+                                        </Col>
+                                        <Col xs={6}>
+                                            <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0f2e71" viewBox="0 0 16 16" style={{ marginBottom: '4px' }}>
+                                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                                </svg>
+                                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '2px' }}>Giờ chơi</div>
+                                                <div style={{ color: '#0f2e71', fontWeight: '700' }}>{selectedBooking.startTime} - {selectedBooking.endTime}</div>
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </div>
+
+                                {/* Services - if any */}
+                                {selectedBooking.services && selectedBooking.services.length > 0 && (
+                                    <div style={{ background: 'white', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                                        <h5 style={{ color: '#0f2e71', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '10px', color: '#f59e0b' }}>
+                                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5z"/>
+                                            </svg>
+                                            Dịch Vụ Bổ Sung
+                                        </h5>
+                                        <div style={{ background: '#f8fafc', borderRadius: '12px', overflow: 'hidden' }}>
+                                            <Table hover className="mb-0" style={{ background: 'transparent' }}>
+                                                <thead style={{ background: '#e2e8f0' }}>
                                                     <tr>
-                                                        <th>Tên dịch vụ</th>
-                                                        <th className="text-center">SL</th>
-                                                        <th className="text-end">Đơn giá</th>
-                                                        <th className="text-end">Thành tiền</th>
+                                                        <th style={{ border: 'none', padding: '0.75rem', color: '#0f2e71', fontWeight: '600' }}>Dịch vụ</th>
+                                                        <th style={{ border: 'none', padding: '0.75rem', color: '#0f2e71', fontWeight: '600', textAlign: 'center' }}>SL</th>
+                                                        <th style={{ border: 'none', padding: '0.75rem', color: '#0f2e71', fontWeight: '600', textAlign: 'right' }}>Đơn giá</th>
+                                                        <th style={{ border: 'none', padding: '0.75rem', color: '#0f2e71', fontWeight: '600', textAlign: 'right' }}>Thành tiền</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {selectedBooking.services.map((item, idx) => (
                                                         <tr key={idx}>
-                                                            <td>
-                                                                {item.service?.name || 'N/A'}
+                                                            <td style={{ border: 'none', padding: '0.75rem' }}>
+                                                                <div style={{ fontWeight: '600', color: '#0f2e71' }}>{item.service?.name || 'N/A'}</div>
                                                                 {item.service?.category && (
-                                                                    <small className="text-muted d-block">
-                                                                        ({item.service.category})
-                                                                    </small>
+                                                                    <small style={{ color: '#64748b' }}>({item.service.category})</small>
                                                                 )}
                                                             </td>
-                                                            <td className="text-center">{item.quantity}</td>
-                                                            <td className="text-end">{item.price.toLocaleString()}đ</td>
-                                                            <td className="text-end fw-bold">
+                                                            <td style={{ border: 'none', padding: '0.75rem', textAlign: 'center' }}>{item.quantity}</td>
+                                                            <td style={{ border: 'none', padding: '0.75rem', textAlign: 'right', color: '#64748b' }}>{item.price.toLocaleString()}đ</td>
+                                                            <td style={{ border: 'none', padding: '0.75rem', textAlign: 'right', fontWeight: '700', color: '#0f2e71' }}>
                                                                 {(item.price * item.quantity).toLocaleString()}đ
                                                             </td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </Table>
-                                        </>
-                                    )}
-                                    
-                                    <hr />
-                                    <h5>💰 Thanh Toán</h5>
-                                    <Row>
-                                        <Col md={6}>
-                                            <p><strong>Phương thức:</strong></p>
-                                            {paymentInfo ? (
-                                                <div>{getPaymentMethodBadge(paymentInfo.paymentMethod)}</div>
-                                            ) : (
-                                                <Badge bg="secondary">Đang tải...</Badge>
-                                            )}
-                                        </Col>
-                                        <Col md={6}>
-                                            <p><strong>Trạng thái:</strong></p>
-                                            <div>{getPaymentBadge(selectedBooking.paymentStatus)}</div>
-                                        </Col>
-                                    </Row>
-                                    <hr className="my-2" />
-                                    <p className="mb-2">
-                                        <strong>Tổng tiền:</strong>{' '}
-                                        <span className="text-primary fs-5 fw-bold">
-                                            {selectedBooking.totalPrice.toLocaleString()}đ
-                                        </span>
-                                    </p>
-                                    {paymentInfo && paymentInfo.paidAt && (
-                                        <p className="mb-2">
-                                            <strong>Thời gian thanh toán:</strong>{' '}
-                                            <span className="text-success">
-                                                {new Date(paymentInfo.paidAt).toLocaleString('vi-VN')}
-                                            </span>
-                                        </p>
-                                    )}
-                                    {paymentInfo && paymentInfo.transactionId && (
-                                        <p className="mb-0">
-                                            <strong>Mã giao dịch:</strong>{' '}
-                                            <code className="bg-light p-1">{paymentInfo.transactionId}</code>
-                                        </p>
-                                    )}
-                                </Card.Body>
-                            </Card>
+                                        </div>
+                                    </div>
+                                )}
+                            </Col>
 
-                            {/* Hiển thị thông tin chuyển khoản nếu chưa thanh toán và là banking */}
-                            {selectedBooking.paymentStatus === 'unpaid' && 
-                             paymentInfo && 
-                             paymentInfo.paymentMethod === 'banking' && (
-                                <Card className="border-warning">
-                                    <Card.Header className="bg-warning text-dark">
-                                        <h5 className="mb-0">📱 Thông Tin Chuyển Khoản</h5>
-                                    </Card.Header>
-                                    <Card.Body className="text-center">
-                                        <Alert variant="info">
-                                            <strong>⚠️ Đơn hàng chưa thanh toán</strong>
-                                            <p className="mb-0">Vui lòng chuyển khoản để hoàn tất đặt sân</p>
-                                        </Alert>
+                            {/* Right Column - Payment Info */}
+                            <Col md={5} style={{ padding: '2rem', background: 'white' }}>
+                                <h5 style={{ color: '#0f2e71', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center' }}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '10px', color: '#10b981' }}>
+                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4z"/>
+                                    </svg>
+                                    Thanh Toán
+                                </h5>
 
-                                        <div className="qr-code-container mb-3">
+                                {/* Payment Method & Status */}
+                                <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <small style={{ color: '#64748b', fontSize: '0.85rem' }}>Phương thức thanh toán</small>
+                                        <div style={{ marginTop: '6px' }}>
+                                            {paymentInfo ? getPaymentMethodBadge(paymentInfo.paymentMethod) : <Badge bg="secondary">Đang tải...</Badge>}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <small style={{ color: '#64748b', fontSize: '0.85rem' }}>Trạng thái</small>
+                                        <div style={{ marginTop: '6px' }}>
+                                            {getPaymentBadge(selectedBooking.paymentStatus)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Total Amount */}
+                                <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', borderRadius: '16px', padding: '1.75rem', marginBottom: '1.5rem', textAlign: 'center', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)' }}>
+                                    <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>Tổng Thanh Toán</div>
+                                    <div style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', lineHeight: '1' }}>
+                                        {selectedBooking.totalPrice.toLocaleString()}<span style={{ fontSize: '1.5rem' }}>đ</span>
+                                    </div>
+                                </div>
+
+                                {paymentInfo && paymentInfo.paidAt && (
+                                    <Alert variant="success" style={{ borderRadius: '12px', border: 'none' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '10px' }}>
+                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                            </svg>
+                                            <div>
+                                                <strong>Đã thanh toán</strong>
+                                                <div style={{ fontSize: '0.85rem', marginTop: '4px' }}>
+                                                    {new Date(paymentInfo.paidAt).toLocaleString('vi-VN')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Alert>
+                                )}
+
+                                {/* QR Code for Unpaid Banking */}
+                                {selectedBooking.paymentStatus === 'unpaid' && 
+                                 paymentInfo && 
+                                 paymentInfo.paymentMethod === 'banking' && (
+                                    <div style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)', borderRadius: '16px', padding: '1.5rem', border: '2px solid #fb923c' }}>
+                                        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                                            <h6 style={{ color: '#ea580c', fontWeight: '700', marginBottom: '8px' }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                                                </svg>
+                                                Quét Mã Để Thanh Toán
+                                            </h6>
+                                            <small style={{ color: '#9a3412' }}>Vui lòng chuyển khoản để hoàn tất đơn đặt sân</small>
+                                        </div>
+
+                                        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                                             <img 
                                                 src={`https://img.vietqr.io/image/${bankInfo.bank_name}-${bankInfo.account_number}-qronly.jpg?accountName=${encodeURIComponent(bankInfo.account_name)}&amount=${selectedBooking.totalPrice}&addInfo=${encodeURIComponent(selectedBooking.bookingCode)}`}
-                                                alt="QR Code"
-                                                style={{ maxWidth: '250px', width: '100%' }}
+                                                alt="QR Code Thanh Toán"
+                                                style={{ maxWidth: '200px', width: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
                                             />
                                         </div>
 
-                                        <Card className="bg-light">
-                                            <Card.Body>
-                                                <p className="mb-1"><strong>Ngân hàng:</strong> MB Bank (Quân đội)</p>
-                                                <p className="mb-1"><strong>Số tài khoản:</strong> {bankInfo.account_number}</p>
-                                                <p className="mb-1"><strong>Chủ tài khoản:</strong> {bankInfo.account_name}</p>
-                                                <p className="mb-1">
-                                                    <strong>Số tiền:</strong>{' '}
-                                                    <span className="text-danger fw-bold">
-                                                        {selectedBooking.totalPrice.toLocaleString()}đ
-                                                    </span>
-                                                </p>
-                                                <p className="mb-0">
-                                                    <strong>Nội dung:</strong>{' '}
-                                                    <code className="bg-warning p-1">{selectedBooking.bookingCode}</code>
-                                                </p>
-                                            </Card.Body>
-                                        </Card>
+                                        <div style={{ background: 'white', borderRadius: '12px', padding: '1rem' }}>
+                                            <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                <strong style={{ color: '#0f2e71' }}>Ngân hàng:</strong>
+                                                <span style={{ marginLeft: '8px', color: '#64748b' }}>MB Bank (Quân đội)</span>
+                                            </div>
+                                            <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                <strong style={{ color: '#0f2e71' }}>STK:</strong>
+                                                <span style={{ marginLeft: '8px', color: '#64748b' }}>{bankInfo.account_number}</span>
+                                            </div>
+                                            <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                <strong style={{ color: '#0f2e71' }}>Chủ TK:</strong>
+                                                <span style={{ marginLeft: '8px', color: '#64748b' }}>{bankInfo.account_name}</span>
+                                            </div>
+                                            <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                <strong style={{ color: '#0f2e71' }}>Số tiền:</strong>
+                                                <span style={{ marginLeft: '8px', color: '#dc2626', fontWeight: '700' }}>
+                                                    {selectedBooking.totalPrice.toLocaleString()}đ
+                                                </span>
+                                            </div>
+                                            <div style={{ fontSize: '0.9rem' }}>
+                                                <strong style={{ color: '#0f2e71' }}>Nội dung:</strong>
+                                                <code style={{ marginLeft: '8px', background: '#fef3c7', padding: '4px 8px', borderRadius: '6px', color: '#92400e', fontWeight: '600' }}>
+                                                    {selectedBooking.bookingCode}
+                                                </code>
+                                            </div>
+                                        </div>
 
-                                        <Alert variant="success" className="mt-3">
-                                            <small>
-                                                ✅ Hệ thống tự động xác nhận thanh toán sau 5-10 phút
-                                            </small>
+                                        <Alert variant="success" style={{ marginTop: '1rem', marginBottom: '0', borderRadius: '12px', border: 'none', fontSize: '0.85rem' }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                            </svg>
+                                            Hệ thống tự động xác nhận sau 5-10 phút
                                         </Alert>
-                                    </Card.Body>
-                                </Card>
-                            )}
+                                    </div>
+                                )}
 
-                            {selectedBooking.status === 'cancelled' && selectedBooking.cancelReason && (
-                                <Alert variant="danger">
-                                    <strong>Lý do hủy:</strong> {selectedBooking.cancelReason}
-                                </Alert>
-                            )}
-                        </>
+                                {/* Cancel Reason */}
+                                {selectedBooking.status === 'cancelled' && selectedBooking.cancelReason && (
+                                    <Alert variant="danger" style={{ borderRadius: '12px', marginTop: '1rem' }}>
+                                        <strong>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                            Lý do hủy:
+                                        </strong> {selectedBooking.cancelReason}
+                                    </Alert>
+                                )}
+                            </Col>
+                        </Row>
                     )}
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={{ background: '#f8fafc', borderTop: '2px solid #e2e8f0' }}>
                     {selectedBooking && selectedBooking.status === 'pending' && (
                         <Button
                             variant="danger"
                             onClick={() => cancelBooking(selectedBooking._id)}
+                            style={{ borderRadius: '10px', fontWeight: '600', padding: '0.5rem 1.5rem' }}
                         >
-                            ❌ Hủy Đơn
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '6px' }}>
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                            Hủy Đơn
                         </Button>
                     )}
-                    <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
+                    <Button 
+                        variant="secondary" 
+                        onClick={() => setShowDetailModal(false)}
+                        style={{ borderRadius: '10px', fontWeight: '600', padding: '0.5rem 1.5rem' }}
+                    >
                         Đóng
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </Container>
+            </Container>
+        </div>
     );
 };
 
-export default Danhsachsandadat ;
+export default Danhsachsandadat;

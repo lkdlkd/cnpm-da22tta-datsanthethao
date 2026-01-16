@@ -33,7 +33,7 @@ const paymentSchema = new mongoose.Schema({
     paymentDate: {
         type: Date,
         default: null
-    },
+    }
     // refundAmount: {
     //     type: Number,
     //     default: 0

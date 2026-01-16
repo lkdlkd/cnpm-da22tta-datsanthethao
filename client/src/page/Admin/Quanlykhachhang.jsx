@@ -15,6 +15,8 @@ import {
 } from 'react-bootstrap';
 import { authService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
+import './Quanlykhachhang.css';
 
 const Quanlykhachhang = () => {
     const [users, setUsers] = useState([]);
@@ -136,8 +138,15 @@ const Quanlykhachhang = () => {
     };
 
     return (
-        <Container fluid className="admin-page">
-            <h2>👥 Quản Lý Khách Hàng</h2>
+        <Container fluid className="quanlykhachhang-page">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                    <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+                Quản Lý Khách Hàng
+            </h2>
 
             {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
             {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
@@ -148,19 +157,37 @@ const Quanlykhachhang = () => {
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>Tìm kiếm</Form.Label>
-                                <InputGroup>
-                                    <InputGroup.Text>🔍</InputGroup.Text>
+                                <div style={{ position: 'relative' }}>
                                     <Form.Control
                                         type="text"
                                         placeholder="Tên, email, số điện thoại..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                                        style={{ paddingRight: '45px' }}
                                     />
-                                    <Button variant="primary" onClick={handleSearch}>
-                                        Tìm
-                                    </Button>
-                                </InputGroup>
+                                    <button 
+                                        style={{
+                                            position: 'absolute',
+                                            right: '8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: '8px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            color: '#6c757d'
+                                        }}
+                                        onClick={handleSearch}
+                                        title="Tìm kiếm"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </Form.Group>
                         </Col>
                         <Col md={3}>
@@ -198,20 +225,19 @@ const Quanlykhachhang = () => {
                         <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>STT</th>
                                     <th>Họ Tên</th>
                                     <th>Email</th>
                                     <th>Số Điện Thoại</th>
                                     <th>Vai Trò</th>
                                     <th>Trạng Thái</th>
-                                    <th>Ngày Đăng Ký</th>
                                     <th>Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {users.length === 0 ? (
                                     <tr>
-                                        <td colSpan="8" className="text-center">
+                                        <td colSpan="7" className="text-center">
                                             Không có dữ liệu
                                         </td>
                                     </tr>
@@ -224,24 +250,29 @@ const Quanlykhachhang = () => {
                                             <td>{user.phone || 'Chưa cập nhật'}</td>
                                             <td>{getRoleBadge(user.role)}</td>
                                             <td>{getStatusBadge(user.isActive)}</td>
-                                            <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
                                             <td>
-                                                <Button 
-                                                    variant="warning" 
-                                                    size="sm" 
-                                                    className="me-2"
-                                                    onClick={() => handleShowModal(user)}
-                                                >
-                                                    ✏️ Sửa
-                                                </Button>
-                                                <Button 
-                                                    variant="danger" 
-                                                    size="sm"
-                                                    onClick={() => handleDelete(user._id)}
-                                                    disabled={user.role === 'admin'}
-                                                >
-                                                    🗑️ Xóa
-                                                </Button>
+                                                <div className="action-btn-group">
+                                                    <button 
+                                                        className="action-btn view"
+                                                        onClick={() => handleShowModal(user)}
+                                                        title="Xem chi tiết"
+                                                    >
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn edit"
+                                                        onClick={() => handleShowModal(user)}
+                                                        title="Chỉnh sửa"
+                                                    >
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn delete"
+                                                        onClick={() => handleDelete(user._id)}
+                                                        disabled={user.role === 'admin'}
+                                                        title="Xóa"
+                                                        style={user.role === 'admin' ? {opacity: 0.5, cursor: 'not-allowed'} : {}}
+                                                    >
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
@@ -261,7 +292,7 @@ const Quanlykhachhang = () => {
             {/* Modal Chỉnh Sửa */}
             <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>✏️ Chỉnh Sửa Thông Tin</Modal.Title>
+                    <Modal.Title>Chỉnh Sửa Thông Tin</Modal.Title>
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>

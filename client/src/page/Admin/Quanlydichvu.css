@@ -1,59 +1,252 @@
-.service-stats {
-    margin-bottom: 2rem;
+/* ✨ PROFESSIONAL LIGHT THEME - Quản lý Dịch Vụ */
+
+.quanlydichvu-page {
+    background: #ffffff !important;
+    min-height: 100vh !important;
+    padding: 30px !important;
 }
 
-.service-stats .card {
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+.quanlydichvu-page h2 {
+    color: #0f2e71 !important;
+    font-weight: 700 !important;
+    font-size: 1.8rem !important;
+    margin-bottom: 25px !important;
 }
 
-.service-stats .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.quanlydichvu-page .text-muted {
+    color: #718096 !important;
 }
 
-.service-table .table {
-    margin-bottom: 0;
+/* Cards */
+.quanlydichvu-page .card {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+    margin-bottom: 24px !important;
+    transition: all 0.3s ease !important;
 }
 
-.service-table .badge {
-    font-size: 0.85rem;
-    padding: 0.4em 0.7em;
+.quanlydichvu-page .card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
 }
 
-.service-table td {
-    vertical-align: middle;
+.quanlydichvu-page .card-body {
+    padding: 24px !important;
 }
 
-.service-table .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
+/* Stats Cards */
+.quanlydichvu-page .stats-card {
+    text-align: center !important;
+    padding: 20px !important;
 }
 
-.filter-section {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 1rem;
+.quanlydichvu-page .stats-card h3 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 5px !important;
 }
 
-.stock-badge-success {
-    background-color: #28a745;
+.quanlydichvu-page .stats-card.primary h3 { color: #667eea !important; }
+.quanlydichvu-page .stats-card.success h3 { color: #48bb78 !important; }
+.quanlydichvu-page .stats-card.warning h3 { color: #d69e2e !important; }
+.quanlydichvu-page .stats-card.danger h3 { color: #f56565 !important; }
+
+/* Form Elements */
+.quanlydichvu-page .form-label {
+    color: #4a5568 !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
 }
 
-.stock-badge-warning {
-    background-color: #ffc107;
-    color: #000;
+.quanlydichvu-page .form-control,
+.quanlydichvu-page .form-select {
+    background: #f7fafc !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    color: #2d3748 !important;
+    transition: all 0.2s ease !important;
 }
 
-.stock-badge-danger {
-    background-color: #dc3545;
+.quanlydichvu-page .form-control:focus,
+.quanlydichvu-page .form-select:focus {
+    border-color: #0f2e71 !important;
+    box-shadow: 0 0 0 3px rgba(15, 46, 113, 0.15) !important;
+    background: #ffffff !important;
+    outline: none !important;
 }
 
-.pagination-wrapper {
-    margin-top: 1.5rem;
+/* Table */
+.quanlydichvu-page .table thead th {
+    background: #0f2e71 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+    padding: 16px !important;
+    border: none !important;
 }
 
-.pagination-wrapper .btn {
-    min-width: 40px;
+.quanlydichvu-page .table thead th:first-child {
+    border-radius: 12px 0 0 0 !important;
+}
+
+.quanlydichvu-page .table thead th:last-child {
+    border-radius: 0 12px 0 0 !important;
+}
+
+.quanlydichvu-page .table tbody tr {
+    background: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+.quanlydichvu-page .table tbody tr:hover {
+    background: #f3f4f6 !important;
+}
+
+.quanlydichvu-page .table tbody td {
+    padding: 16px !important;
+    color: #4a5568 !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #edf2f7 !important;
+}
+
+/* Buttons */
+.quanlydichvu-page .btn-primary {
+    background: #0f2e71 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 14px rgba(15, 46, 113, 0.3) !important;
+}
+
+.quanlydichvu-page .btn-primary:hover {
+    background: #0a1f4d !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(15, 46, 113, 0.4) !important;
+}
+
+.quanlydichvu-page .btn-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+
+.quanlydichvu-page .btn-danger {
+    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+
+/* Action Buttons */
+.quanlydichvu-page .btn-sm {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    margin: 0 4px !important;
+}
+
+.quanlydichvu-page .btn-info {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
+    color: white !important;
+}
+
+.quanlydichvu-page .btn-warning {
+    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%) !important;
+    color: white !important;
+}
+
+.quanlydichvu-page .btn-sm:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Badges */
+.quanlydichvu-page .badge {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+}
+
+.quanlydichvu-page .badge.bg-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+}
+
+.quanlydichvu-page .badge.bg-primary {
+    background: #0f2e71 !important;
+}
+
+.quanlydichvu-page .badge.bg-warning {
+    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%) !important;
+    color: #744210 !important;
+}
+
+.quanlydichvu-page .badge.bg-secondary {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%) !important;
+}
+
+/* Modal */
+.quanlydichvu-page .modal-content {
+    border: none !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+}
+
+.quanlydichvu-page .modal-header {
+    background: #0f2e71 !important;
+    color: white !important;
+    border: none !important;
+    padding: 20px 24px !important;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+.quanlydichvu-page .modal-title {
+    font-weight: 700 !important;
+}
+
+.quanlydichvu-page .modal-body {
+    padding: 24px !important;
+}
+
+.quanlydichvu-page .modal-header .btn-close {
+    filter: brightness(0) invert(1) !important;
+}
+
+/* Images */
+.quanlydichvu-page .img-thumbnail {
+    border-radius: 12px !important;
+    border: 2px solid #e2e8f0 !important;
+}
+
+.quanlydichvu-page .img-thumbnail:hover {
+    border-color: #d69e2e !important;
+    transform: scale(1.05) !important;
+}
+
+/* Alert */
+.quanlydichvu-page .alert-success {
+    background: rgba(72, 187, 120, 0.15) !important;
+    color: #276749 !important;
+    border: none !important;
+    border-left: 4px solid #48bb78 !important;
+    border-radius: 12px !important;
+}
+
+.quanlydichvu-page .alert-danger {
+    background: rgba(245, 101, 101, 0.15) !important;
+    color: #c53030 !important;
+    border: none !important;
+    border-left: 4px solid #f56565 !important;
+    border-radius: 12px !important;
 }

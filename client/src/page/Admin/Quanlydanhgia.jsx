@@ -13,6 +13,18 @@ import {
 } from 'react-bootstrap';
 import { reviewService } from '../../services/api';
 import './AdminCommon.css';
+import './SelectArrow.css';
+import './Quanlydanhgia.css';
+
+// Helper function để format loại sân
+const formatFieldType = (fieldType) => {
+    const typeMap = {
+        '5vs5': 'Sân 5',
+        '7vs7': 'Sân 7',
+        '11vs11': 'Sân 11'
+    };
+    return typeMap[fieldType] || fieldType;
+};
 
 const Quanlydanhgia = () => {
     const [reviews, setReviews] = useState([]);
@@ -191,8 +203,13 @@ const Quanlydanhgia = () => {
     };
 
     return (
-        <Container fluid className="admin-page">
-            <h2>⭐ Quản Lý Đánh Giá</h2>
+        <Container fluid className="quanlydanhgia-page">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" style={{ marginRight: '12px', verticalAlign: 'middle' }}>
+                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                </svg>
+                Quản Lý Đánh Giá
+            </h2>
 
             {success && <Alert variant="success" dismissible onClose={() => setSuccess('')}>{success}</Alert>}
             {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
@@ -232,21 +249,19 @@ const Quanlydanhgia = () => {
                         <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '50px' }}>#</th>
-                                    <th style={{ width: '150px' }}>Khách Hàng</th>
-                                    <th style={{ width: '140px' }}>Sân</th>
-                                    <th style={{ width: '100px' }}>Mã Đơn</th>
-                                    <th style={{ width: '100px' }}>Đánh Giá</th>
-                                    <th style={{ width: '250px' }}>Nội Dung</th>
-                                    <th style={{ width: '200px' }}>Phản Hồi</th>
-                                    <th style={{ width: '120px' }}>Ngày Tạo</th>
-                                    <th style={{ width: '150px' }}>Thao Tác</th>
+                                    <th>STT</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Sân</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Ngày Tạo</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {reviews.length === 0 ? (
                                     <tr>
-                                        <td colSpan="9" className="text-center py-4">
+                                        <td colSpan="7" className="text-center py-4">
                                             {loading ? (
                                                 <div>
                                                     <div className="spinner-border spinner-border-sm text-primary" role="status">
@@ -274,59 +289,39 @@ const Quanlydanhgia = () => {
                                                 </Badge>
                                             </td>
                                             <td>
-                                                <small className="text-muted">{review.booking?.bookingCode || 'N/A'}</small>
-                                            </td>
-                                            <td>
                                                 <div style={{ fontSize: '1.1rem' }}>{getRatingStars(review.rating)}</div>
                                                 <small className="text-muted">({review.rating}/5)</small>
-                                            </td>
-                                            <td>
-                                                <div style={{ 
-                                                    maxHeight: '60px', 
-                                                    overflowY: 'auto',
-                                                    fontSize: '0.85rem',
-                                                    whiteSpace: 'pre-wrap'
-                                                }}>
-                                                    {review.comment || 'Không có nội dung'}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {review.reply ? (
-                                                    <div style={{ 
-                                                        maxHeight: '60px', 
-                                                        overflowY: 'auto',
-                                                        fontSize: '0.8rem'
-                                                    }}>
-                                                        <Badge bg="success" className="mb-1">Đã phản hồi</Badge>
-                                                        <div className="text-muted">{review.reply.content}</div>
-                                                    </div>
-                                                ) : (
-                                                    <Badge bg="warning">Chưa phản hồi</Badge>
-                                                )}
                                             </td>
                                             <td style={{ fontSize: '0.8rem' }}>
                                                 {new Date(review.createdAt).toLocaleDateString('vi-VN')}
                                             </td>
                                             <td>
-                                                <div className="d-flex flex-wrap gap-1">
-                                                    <Button 
-                                                        variant={review.reply ? "secondary" : "primary"}
-                                                        size="sm" 
-                                                        style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                                                {review.reply ? (
+                                                    <Badge bg="success">Đã phản hồi</Badge>
+                                                ) : (
+                                                    <Badge bg="warning">Chưa phản hồi</Badge>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <div className="action-btn-group">
+                                                    <button 
+                                                        className="action-btn view"
                                                         onClick={() => openReplyModal(review)}
-                                                        title={review.reply ? "Sửa phản hồi" : "Phản hồi"}
+                                                        title="Xem chi tiết"
                                                     >
-                                                        💬
-                                                    </Button>
-                                                    <Button 
-                                                        variant="danger" 
-                                                        size="sm"
-                                                        style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn edit"
+                                                        onClick={() => openReplyModal(review)}
+                                                        title={review.reply ? "Sửa phản hồi" : "Thêm phản hồi"}
+                                                    >
+                                                    </button>
+                                                    <button 
+                                                        className="action-btn delete"
                                                         onClick={() => handleDelete(review._id)}
                                                         title="Xóa đánh giá"
                                                     >
-                                                        🗑️
-                                                    </Button>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -352,7 +347,7 @@ const Quanlydanhgia = () => {
                 onHide={() => setShowReplyModal(false)}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>💬 {selectedReview?.reply ? 'Sửa Phản Hồi' : 'Phản Hồi Đánh Giá'}</Modal.Title>
+                    <Modal.Title>{selectedReview?.reply ? 'Sửa Phản Hồi' : 'Phản Hồi Đánh Giá'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {selectedReview && (

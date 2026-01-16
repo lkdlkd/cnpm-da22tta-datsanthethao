@@ -1,12 +1,12 @@
-/* ✨ PROFESSIONAL LIGHT THEME - Quản lý Khách Hàng */
+/* ✨ PROFESSIONAL LIGHT THEME - Quản lý Đánh Giá */
 
-.quanlykhachhang-page {
+.quanlydanhgia-page {
     background: #ffffff !important;
     min-height: 100vh !important;
     padding: 30px !important;
 }
 
-.quanlykhachhang-page h2 {
+.quanlydanhgia-page h2 {
     color: #0f2e71 !important;
     font-weight: 700 !important;
     font-size: 1.8rem !important;
@@ -14,8 +14,8 @@
 }
 
 /* Cards */
-.quanlykhachhang-page .filter-section,
-.quanlykhachhang-page .card {
+.quanlydanhgia-page .filter-section,
+.quanlydanhgia-page .card {
     background: #ffffff !important;
     border: none !important;
     border-radius: 16px !important;
@@ -23,23 +23,23 @@
     margin-bottom: 24px !important;
 }
 
-.quanlykhachhang-page .card:hover {
+.quanlydanhgia-page .card:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
 }
 
-.quanlykhachhang-page .card-body {
+.quanlydanhgia-page .card-body {
     padding: 24px !important;
 }
 
 /* Form Elements */
-.quanlykhachhang-page .form-label {
+.quanlydanhgia-page .form-label {
     color: #4a5568 !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
 }
 
-.quanlykhachhang-page .form-control,
-.quanlykhachhang-page .form-select {
+.quanlydanhgia-page .form-control,
+.quanlydanhgia-page .form-select {
     background: #f7fafc !important;
     border: 2px solid #e2e8f0 !important;
     border-radius: 10px !important;
@@ -48,8 +48,8 @@
     transition: all 0.2s ease !important;
 }
 
-.quanlykhachhang-page .form-control:focus,
-.quanlykhachhang-page .form-select:focus {
+.quanlydanhgia-page .form-control:focus,
+.quanlydanhgia-page .form-select:focus {
     border-color: #0f2e71 !important;
     box-shadow: 0 0 0 3px rgba(15, 46, 113, 0.15) !important;
     background: #ffffff !important;
@@ -57,7 +57,7 @@
 }
 
 /* Table */
-.quanlykhachhang-page .table thead th {
+.quanlydanhgia-page .table thead th {
     background: #0f2e71 !important;
     color: #ffffff !important;
     font-weight: 600 !important;
@@ -68,32 +68,38 @@
     border: none !important;
 }
 
-.quanlykhachhang-page .table thead th:first-child {
+.quanlydanhgia-page .table thead th:first-child {
     border-radius: 12px 0 0 0 !important;
 }
 
-.quanlykhachhang-page .table thead th:last-child {
+.quanlydanhgia-page .table thead th:last-child {
     border-radius: 0 12px 0 0 !important;
 }
 
-.quanlykhachhang-page .table tbody tr {
+.quanlydanhgia-page .table tbody tr {
     background: #ffffff !important;
     transition: all 0.2s ease !important;
 }
 
-.quanlykhachhang-page .table tbody tr:hover {
+.quanlydanhgia-page .table tbody tr:hover {
     background: #f3f4f6 !important;
 }
 
-.quanlykhachhang-page .table tbody td {
+.quanlydanhgia-page .table tbody td {
     padding: 16px !important;
     color: #4a5568 !important;
     vertical-align: middle !important;
     border-bottom: 1px solid #edf2f7 !important;
 }
 
+/* Star Rating */
+.quanlydanhgia-page .text-warning {
+    color: #ecc94b !important;
+    text-shadow: 0 0 2px rgba(236, 201, 75, 0.3) !important;
+}
+
 /* Buttons */
-.quanlykhachhang-page .btn-primary {
+.quanlydanhgia-page .btn-primary {
     background: #0f2e71 !important;
     border: none !important;
     border-radius: 10px !important;
@@ -102,20 +108,20 @@
     box-shadow: 0 4px 14px rgba(15, 46, 113, 0.3) !important;
 }
 
-.quanlykhachhang-page .btn-primary:hover {
+.quanlydanhgia-page .btn-primary:hover {
     background: #0a1f4d !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 20px rgba(15, 46, 113, 0.4) !important;
 }
 
-.quanlykhachhang-page .btn-success {
+.quanlydanhgia-page .btn-success {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
     border: none !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
 }
 
-.quanlykhachhang-page .btn-danger {
+.quanlydanhgia-page .btn-danger {
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
     border: none !important;
     border-radius: 10px !important;
@@ -123,7 +129,7 @@
 }
 
 /* Action Buttons */
-.quanlykhachhang-page .btn-sm {
+.quanlydanhgia-page .btn-sm {
     width: 38px !important;
     height: 38px !important;
     border-radius: 10px !important;
@@ -135,53 +141,49 @@
     margin: 0 4px !important;
 }
 
-.quanlykhachhang-page .btn-info {
+.quanlydanhgia-page .btn-info {
     background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
     color: white !important;
 }
 
-.quanlykhachhang-page .btn-warning {
-    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%) !important;
-    color: white !important;
-}
-
-.quanlykhachhang-page .btn-sm:hover {
+.quanlydanhgia-page .btn-sm:hover {
     transform: translateY(-2px) scale(1.05) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Badges */
-.quanlykhachhang-page .badge {
+.quanlydanhgia-page .badge {
     font-size: 0.75rem !important;
     padding: 6px 12px !important;
     border-radius: 20px !important;
     font-weight: 600 !important;
 }
 
-.quanlykhachhang-page .badge.bg-success {
+.quanlydanhgia-page .badge.bg-success {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
 }
 
-.quanlykhachhang-page .badge.bg-primary {
-    background: #0f2e71 !important;
+.quanlydanhgia-page .badge.bg-warning {
+    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%) !important;
+    color: #744210 !important;
 }
 
-.quanlykhachhang-page .badge.bg-danger {
+.quanlydanhgia-page .badge.bg-danger {
     background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
 }
 
-.quanlykhachhang-page .badge.bg-secondary {
-    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%) !important;
+.quanlydanhgia-page .badge.bg-info {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
 }
 
 /* Modal */
-.quanlykhachhang-page .modal-content {
+.quanlydanhgia-page .modal-content {
     border: none !important;
     border-radius: 20px !important;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
 }
 
-.quanlykhachhang-page .modal-header {
+.quanlydanhgia-page .modal-header {
     background: #0f2e71 !important;
     color: white !important;
     border: none !important;
@@ -189,32 +191,34 @@
     border-radius: 20px 20px 0 0 !important;
 }
 
-.quanlykhachhang-page .modal-title {
+.quanlydanhgia-page .modal-title {
     font-weight: 700 !important;
 }
 
-.quanlykhachhang-page .modal-body {
+.quanlydanhgia-page .modal-body {
     padding: 24px !important;
 }
 
-.quanlykhachhang-page .modal-header .btn-close {
+.quanlydanhgia-page .modal-header .btn-close {
     filter: brightness(0) invert(1) !important;
 }
 
-/* Avatar */
-.quanlykhachhang-page .img-thumbnail {
-    border-radius: 50% !important;
-    border: 3px solid #e2e8f0 !important;
-    transition: all 0.3s ease !important;
+/* Review Card */
+.quanlydanhgia-page .review-card {
+    background: #f7fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
 }
 
-.quanlykhachhang-page .img-thumbnail:hover {
-    border-color: #319795 !important;
-    transform: scale(1.1) !important;
+.quanlydanhgia-page .review-card:hover {
+    border-color: #9f7aea !important;
+    box-shadow: 0 2px 8px rgba(159, 122, 234, 0.15) !important;
 }
 
 /* Alert */
-.quanlykhachhang-page .alert-success {
+.quanlydanhgia-page .alert-success {
     background: rgba(72, 187, 120, 0.15) !important;
     color: #276749 !important;
     border: none !important;
@@ -222,7 +226,7 @@
     border-radius: 12px !important;
 }
 
-.quanlykhachhang-page .alert-danger {
+.quanlydanhgia-page .alert-danger {
     background: rgba(245, 101, 101, 0.15) !important;
     color: #c53030 !important;
     border: none !important;

@@ -1,0 +1,372 @@
+/* Danh sách sân đã đặt - Modern Design */
+.booking-list-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 40px 0;
+}
+
+/* Header */
+.page-header {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    padding: 60px 0;
+    margin-bottom: 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+}
+
+.page-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+}
+
+/* Tabs Navigation */
+.booking-tabs {
+    background: white;
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.booking-tabs .nav-link {
+    color: #6b7280;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.booking-tabs .nav-link:hover {
+    background: #f3f4f6;
+    color: #0f2e71;
+}
+
+.booking-tabs .nav-link.active {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(15, 46, 113, 0.3);
+}
+
+.booking-tabs .nav-link .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+/* Booking Cards */
+.booking-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid rgba(15, 46, 113, 0.08);
+}
+
+.booking-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(15, 46, 113, 0.15);
+}
+
+.booking-card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 16px 20px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.booking-id {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f2e71;
+}
+
+.booking-status-badge {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.booking-card-body {
+    padding: 20px;
+}
+
+.field-name-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f2e71;
+    margin-bottom: 16px;
+}
+
+.booking-info-row {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.info-icon {
+    width: 20px;
+    height: 20px;
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #374151;
+    min-width: 90px;
+}
+
+.info-value {
+    color: #6b7280;
+}
+
+.booking-total-price {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 16px;
+}
+
+.total-price-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.total-price-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.booking-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.booking-actions .btn {
+    flex: 1;
+    padding: 10px 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-detail {
+    background: #0f2e71;
+    border: none;
+    color: white;
+}
+
+.btn-detail:hover {
+    background: #1a4596;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 46, 113, 0.3);
+}
+
+.btn-review {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    color: white;
+}
+
+.btn-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.empty-description {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+/* Modal */
+.booking-detail-modal .modal-content {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.booking-detail-modal .modal-header {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    color: white;
+    padding: 24px;
+    border: none;
+}
+
+.booking-detail-modal .modal-title {
+    font-weight: 700;
+}
+
+.booking-detail-modal .modal-body {
+    padding: 30px;
+}
+
+.detail-section {
+    margin-bottom: 30px;
+}
+
+.detail-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f2e71;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-table {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.detail-value {
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Review Modal */
+.review-modal .modal-content {
+    border-radius: 20px;
+    border: none;
+}
+
+.review-modal .modal-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+    padding: 24px;
+}
+
+.star-rating {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.star {
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #d1d5db;
+}
+
+.star.filled {
+    color: #fbbf24;
+}
+
+.star:hover {
+    transform: scale(1.2);
+}
+
+/* Pagination */
+.pagination-container {
+    margin-top: 40px;
+}
+
+.pagination .page-link {
+    border: 1px solid #e5e7eb;
+    color: #0f2e71;
+    font-weight: 600;
+    border-radius: 8px;
+    margin: 0 4px;
+    padding: 8px 16px;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #0f2e71 0%, #1a4596 100%);
+    border-color: #0f2e71;
+}
+
+.pagination .page-link:hover {
+    background: #f3f4f6;
+    border-color: #0f2e71;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .booking-tabs .nav-link {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+    }
+    
+    .booking-actions {
+        flex-direction: column;
+    }
+    
+    .price-amount {
+        font-size: 1.5rem;
+    }
+}

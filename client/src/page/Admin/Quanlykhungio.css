@@ -1,12 +1,12 @@
-/* ✨ PROFESSIONAL LIGHT THEME - Quản lý Khách Hàng */
+/* ✨ PROFESSIONAL LIGHT THEME - Quản lý Khung Giờ */
 
-.quanlykhachhang-page {
+.quanlykhungio-page {
     background: #ffffff !important;
     min-height: 100vh !important;
     padding: 30px !important;
 }
 
-.quanlykhachhang-page h2 {
+.quanlykhungio-page h2 {
     color: #0f2e71 !important;
     font-weight: 700 !important;
     font-size: 1.8rem !important;
@@ -14,32 +14,46 @@
 }
 
 /* Cards */
-.quanlykhachhang-page .filter-section,
-.quanlykhachhang-page .card {
+.quanlykhungio-page .card {
     background: #ffffff !important;
     border: none !important;
     border-radius: 16px !important;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
     margin-bottom: 24px !important;
+    transition: all 0.3s ease !important;
 }
 
-.quanlykhachhang-page .card:hover {
+.quanlykhungio-page .card:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
 }
 
-.quanlykhachhang-page .card-body {
+.quanlykhungio-page .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 16px 24px !important;
+    font-weight: 600 !important;
+    color: #2d3748 !important;
+}
+
+.quanlykhungio-page .card-header h5 {
+    color: #0f2e71 !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+.quanlykhungio-page .card-body {
     padding: 24px !important;
 }
 
 /* Form Elements */
-.quanlykhachhang-page .form-label {
+.quanlykhungio-page .form-label {
     color: #4a5568 !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
 }
 
-.quanlykhachhang-page .form-control,
-.quanlykhachhang-page .form-select {
+.quanlykhungio-page .form-control,
+.quanlykhungio-page .form-select {
     background: #f7fafc !important;
     border: 2px solid #e2e8f0 !important;
     border-radius: 10px !important;
@@ -48,8 +62,8 @@
     transition: all 0.2s ease !important;
 }
 
-.quanlykhachhang-page .form-control:focus,
-.quanlykhachhang-page .form-select:focus {
+.quanlykhungio-page .form-control:focus,
+.quanlykhungio-page .form-select:focus {
     border-color: #0f2e71 !important;
     box-shadow: 0 0 0 3px rgba(15, 46, 113, 0.15) !important;
     background: #ffffff !important;
@@ -57,7 +71,7 @@
 }
 
 /* Table */
-.quanlykhachhang-page .table thead th {
+.quanlykhungio-page .table thead th {
     background: #0f2e71 !important;
     color: #ffffff !important;
     font-weight: 600 !important;
@@ -68,32 +82,43 @@
     border: none !important;
 }
 
-.quanlykhachhang-page .table thead th:first-child {
+.quanlykhungio-page .table thead th:first-child {
     border-radius: 12px 0 0 0 !important;
 }
 
-.quanlykhachhang-page .table thead th:last-child {
+.quanlykhungio-page .table thead th:last-child {
     border-radius: 0 12px 0 0 !important;
 }
 
-.quanlykhachhang-page .table tbody tr {
+.quanlykhungio-page .table tbody tr {
     background: #ffffff !important;
     transition: all 0.2s ease !important;
 }
 
-.quanlykhachhang-page .table tbody tr:hover {
+.quanlykhungio-page .table tbody tr:hover {
     background: #f3f4f6 !important;
 }
 
-.quanlykhachhang-page .table tbody td {
+.quanlykhungio-page .table tbody td {
     padding: 16px !important;
     color: #4a5568 !important;
     vertical-align: middle !important;
     border-bottom: 1px solid #edf2f7 !important;
 }
 
+/* Time Slot Display */
+.quanlykhungio-page .time-slot {
+    background: #dbeafe !important;
+    border: 2px solid #0f2e71 !important;
+    border-radius: 10px !important;
+    padding: 8px 16px !important;
+    color: #0f2e71 !important;
+    font-weight: 700 !important;
+    display: inline-block !important;
+}
+
 /* Buttons */
-.quanlykhachhang-page .btn-primary {
+.quanlykhungio-page .btn-primary {
     background: #0f2e71 !important;
     border: none !important;
     border-radius: 10px !important;
@@ -102,86 +127,100 @@
     box-shadow: 0 4px 14px rgba(15, 46, 113, 0.3) !important;
 }
 
-.quanlykhachhang-page .btn-primary:hover {
+.quanlykhungio-page .btn-primary:hover {
     background: #0a1f4d !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 20px rgba(15, 46, 113, 0.4) !important;
 }
 
-.quanlykhachhang-page .btn-success {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+.quanlykhungio-page .btn-success {
+    background: #10b981 !important;
     border: none !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
 }
 
-.quanlykhachhang-page .btn-danger {
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
+.quanlykhungio-page .btn-success:hover {
+    background: #059669 !important;
+}
+
+.quanlykhungio-page .btn-danger {
+    background: #ef4444 !important;
     border: none !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
 }
 
 /* Action Buttons */
-.quanlykhachhang-page .btn-sm {
-    width: 38px !important;
-    height: 38px !important;
-    border-radius: 10px !important;
+.quanlykhungio-page .btn-sm {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
     border: none !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     transition: all 0.2s ease !important;
     margin: 0 4px !important;
+    background: #e5e7eb !important;
+    position: relative !important;
 }
 
-.quanlykhachhang-page .btn-info {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
-    color: white !important;
+.quanlykhungio-page .btn-sm::before {
+    content: '' !important;
+    width: 20px !important;
+    height: 20px !important;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
 }
 
-.quanlykhachhang-page .btn-warning {
-    background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%) !important;
-    color: white !important;
+.quanlykhungio-page .btn-info::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%232563eb' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E") !important;
 }
 
-.quanlykhachhang-page .btn-sm:hover {
+.quanlykhungio-page .btn-warning::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ef4444' viewBox='0 0 24 24'%3E%3Cpath d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/%3E%3C/svg%3E") !important;
+}
+
+.quanlykhungio-page .btn-sm:hover {
+    background: #d1d5db !important;
     transform: translateY(-2px) scale(1.05) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Badges */
-.quanlykhachhang-page .badge {
+.quanlykhungio-page .badge {
     font-size: 0.75rem !important;
     padding: 6px 12px !important;
     border-radius: 20px !important;
     font-weight: 600 !important;
 }
 
-.quanlykhachhang-page .badge.bg-success {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+.quanlykhungio-page .badge.bg-success {
+    background: #10b981 !important;
 }
 
-.quanlykhachhang-page .badge.bg-primary {
+.quanlykhungio-page .badge.bg-warning {
+    background: #f59e0b !important;
+    color: #ffffff !important;
+}
+
+.quanlykhungio-page .badge.bg-danger {
+    background: #ef4444 !important;
+}
+
+.quanlykhungio-page .badge.bg-info {
     background: #0f2e71 !important;
 }
 
-.quanlykhachhang-page .badge.bg-danger {
-    background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
-}
-
-.quanlykhachhang-page .badge.bg-secondary {
-    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%) !important;
-}
-
 /* Modal */
-.quanlykhachhang-page .modal-content {
+.quanlykhungio-page .modal-content {
     border: none !important;
     border-radius: 20px !important;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
 }
 
-.quanlykhachhang-page .modal-header {
+.quanlykhungio-page .modal-header {
     background: #0f2e71 !important;
     color: white !important;
     border: none !important;
@@ -189,32 +228,20 @@
     border-radius: 20px 20px 0 0 !important;
 }
 
-.quanlykhachhang-page .modal-title {
+.quanlykhungio-page .modal-title {
     font-weight: 700 !important;
 }
 
-.quanlykhachhang-page .modal-body {
+.quanlykhungio-page .modal-body {
     padding: 24px !important;
 }
 
-.quanlykhachhang-page .modal-header .btn-close {
+.quanlykhungio-page .modal-header .btn-close {
     filter: brightness(0) invert(1) !important;
 }
 
-/* Avatar */
-.quanlykhachhang-page .img-thumbnail {
-    border-radius: 50% !important;
-    border: 3px solid #e2e8f0 !important;
-    transition: all 0.3s ease !important;
-}
-
-.quanlykhachhang-page .img-thumbnail:hover {
-    border-color: #319795 !important;
-    transform: scale(1.1) !important;
-}
-
 /* Alert */
-.quanlykhachhang-page .alert-success {
+.quanlykhungio-page .alert-success {
     background: rgba(72, 187, 120, 0.15) !important;
     color: #276749 !important;
     border: none !important;
@@ -222,7 +249,7 @@
     border-radius: 12px !important;
 }
 
-.quanlykhachhang-page .alert-danger {
+.quanlykhungio-page .alert-danger {
     background: rgba(245, 101, 101, 0.15) !important;
     color: #c53030 !important;
     border: none !important;
