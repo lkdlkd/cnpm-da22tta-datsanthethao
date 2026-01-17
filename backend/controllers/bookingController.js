@@ -284,7 +284,7 @@ exports.getAllBookings = async (req, res) => {
 
         const bookings = await Booking.find(query)
             .populate('user', 'fullName email phone')
-            .populate('field', 'name fieldType')
+            .populate('field', 'name fieldType address location images')
             .populate({
                 path: 'timeSlot',
                 select: 'startTime endTime price'
