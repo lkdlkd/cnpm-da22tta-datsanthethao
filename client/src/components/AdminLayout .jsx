@@ -26,24 +26,18 @@ const AdminLayout = () => {
         <div className="admin-layout">
             <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 <div className="sidebar-header">
-                    <div className="logo-container" style={{ alignItems: 'center' }}>
-                        <div className="logo-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', borderRadius: '12px', padding: '8px', width: '42px', height: '42px' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="white">
-                                <path d="M177.1 228.6L207.9 320h96.5l29.62-91.38L256 172.1L177.1 228.6zM255.1 0C114.6 0 .0001 114.6 .0001 256S114.6 512 256 512s255.1-114.6 255.1-255.1S397.4 0 255.1 0zM435.2 361.1l-103.9-1.578l-30.67 99.52C286.2 462.2 271.3 464 256 464s-30.19-1.773-44.56-4.93L180.8 359.5L76.83 361.1C57.1 341.6 42.67 318.1 33.27 291.9l81.43-67.49L93.5 135.1l-91.31-23.58C10.48 83.72 24.83 54.96 45.49 29.96L139.6 63.57l76.12-57.59C232.7 2.363 244.1 0 256 0s23.27 2.363 40.28 5.984l76.13 57.59l94.14-33.61c20.66 25 35.01 53.76 43.3 85.45l-91.31 23.58l-21.18 89.37l81.43 67.49C469.3 318.1 454.1 341.6 435.2 361.1z"/>
-                            </svg>
-                        </div>
-                        {!sidebarCollapsed && (
-                            <h2 style={{ 
-                                fontSize: '1.75rem', 
-                                fontWeight: '800', 
-                                letterSpacing: '0.5px',
-                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                margin: 0,
-                                lineHeight: '1'
-                            }}>DatSan24H</h2>
-                        )}
+                    <div className="logo-container" style={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                        <h2 style={{ 
+                            fontSize: sidebarCollapsed ? '1rem' : '1.75rem', 
+                            fontWeight: '800', 
+                            letterSpacing: '0.5px',
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            margin: 0,
+                            lineHeight: '1',
+                            textAlign: 'center'
+                        }}>{sidebarCollapsed ? 'DS' : 'DatSan24H'}</h2>
                     </div>
                 </div>
 

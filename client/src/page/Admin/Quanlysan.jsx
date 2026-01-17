@@ -415,60 +415,57 @@ const Quanlysan = () => {
 
         return (
             <div className="quanlysan-pagination">
-                <Button
-                    variant="outline-primary"
-                    size="sm"
+                <button
+                    className="pagination-btn"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
-                    ‹ Trước
-                </Button>
+                    <span>‹</span>
+                    <span>Trước</span>
+                </button>
 
                 {startPage > 1 && (
                     <>
-                        <Button
-                            variant="outline-primary"
-                            size="sm"
+                        <button
+                            className="pagination-btn"
                             onClick={() => handlePageChange(1)}
                         >
                             1
-                        </Button>
-                        {startPage > 2 && <span>...</span>}
+                        </button>
+                        {startPage > 2 && <span className="pagination-dots">...</span>}
                     </>
                 )}
 
                 {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
-                    <Button
+                    <button
                         key={page}
-                        variant={currentPage === page ? "primary" : "outline-primary"}
-                        size="sm"
+                        className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
                         onClick={() => handlePageChange(page)}
                     >
                         {page}
-                    </Button>
+                    </button>
                 ))}
 
                 {endPage < totalPages && (
                     <>
-                        {endPage < totalPages - 1 && <span>...</span>}
-                        <Button
-                            variant="outline-primary"
-                            size="sm"
+                        {endPage < totalPages - 1 && <span className="pagination-dots">...</span>}
+                        <button
+                            className="pagination-btn"
                             onClick={() => handlePageChange(totalPages)}
                         >
                             {totalPages}
-                        </Button>
+                        </button>
                     </>
                 )}
 
-                <Button
-                    variant="outline-primary"
-                    size="sm"
+                <button
+                    className="pagination-btn"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                 >
-                    Sau ›
-                </Button>
+                    <span>Sau</span>
+                    <span>›</span>
+                </button>
             </div>
         );
     };

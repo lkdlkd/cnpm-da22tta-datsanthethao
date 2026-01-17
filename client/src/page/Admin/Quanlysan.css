@@ -352,24 +352,30 @@
     gap: 8px !important;
     margin-top: 24px !important;
     padding: 16px 0 !important;
+    flex-wrap: wrap !important;
 }
 
-.quanlysan-pagination .btn {
-    min-width: 40px !important;
-    height: 40px !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    font-size: 0.9rem !important;
+.quanlysan-pagination .pagination-btn {
+    min-width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
     transition: all 0.2s ease !important;
     border: 2px solid #e2e8f0 !important;
-}
-
-.quanlysan-pagination .btn-outline-primary {
-    color: #0f2e71 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 0 14px !important;
+    text-align: center !important;
+    line-height: 1 !important;
     background: #ffffff !important;
+    color: #0f2e71 !important;
+    cursor: pointer !important;
 }
 
-.quanlysan-pagination .btn-outline-primary:hover:not(:disabled) {
+.quanlysan-pagination .pagination-btn:hover:not(:disabled) {
     background: #0f2e71 !important;
     color: #ffffff !important;
     border-color: #0f2e71 !important;
@@ -377,20 +383,25 @@
     box-shadow: 0 4px 8px rgba(15, 46, 113, 0.2) !important;
 }
 
-.quanlysan-pagination .btn-primary {
+.quanlysan-pagination .pagination-btn.active {
     background: #0f2e71 !important;
     color: #ffffff !important;
     border-color: #0f2e71 !important;
     box-shadow: 0 2px 6px rgba(15, 46, 113, 0.3) !important;
 }
 
-.quanlysan-pagination .btn:disabled {
+.quanlysan-pagination .pagination-btn:disabled {
     opacity: 0.4 !important;
     cursor: not-allowed !important;
+    background: #f8f9fa !important;
 }
 
-.quanlysan-pagination span {
+.quanlysan-pagination .pagination-dots {
     color: #718096 !important;
     font-size: 0.9rem !important;
     padding: 0 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+    height: 44px !important;
 }
